@@ -7,26 +7,21 @@ from datetime import datetime
 # CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
 
-# LISTA MAESTRA DE REGIONES (+90)
+# LISTA MAESTRA DE REGIONES (Idiomas corregidos)
 REGIONS = [
-    # --- AMÉRICA DEL NORTE ---
-    {"c":"US", "l":"en-US"}, # Estados Unidos
-    {"c":"CA", "l":"en-CA"}, # Canadá
-    {"c":"PR", "l":"es-419"}, # Puerto Rico
-    {"c":"PM", "l":"fr-FR"}, # San Pedro y Miquelón
+    # --- ESPECIALES (Solicitud de Usuario) ---
+    {"c":"FK", "l":"es-419"}, # Malvinas -> Español Latino
+    {"c":"GI", "l":"es-ES"},  # Gibraltar -> Español España
 
-    # --- LATINOAMÉRICA ---
+    # --- AMÉRICA ---
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
     {"c":"CL", "l":"es-419"}, {"c":"CO", "l":"es-419"}, {"c":"PE", "l":"es-419"},
-    {"c":"UY", "l":"es-419"}, {"c":"VE", "l":"es-419"}, {"c":"EC", "l":"es-419"},
-    {"c":"GT", "l":"es-419"}, {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"},
-    {"c":"DO", "l":"es-419"}, {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"},
-    {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
-    {"c":"GY", "l":"en-US"},  {"c":"SR", "l":"en-US"},  {"c":"GF", "l":"fr-FR"},
-    {"c":"FK", "l":"es-419"}, # Islas Malvinas
-
-    # --- CARIBE ---
-    {"c":"BS", "l":"en-US"}, {"c":"JM", "l":"en-US"}, {"c":"BB", "l":"en-US"},
+    {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"UY", "l":"es-419"},
+    {"c":"VE", "l":"es-419"}, {"c":"EC", "l":"es-419"}, {"c":"GT", "l":"es-419"},
+    {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"}, {"c":"DO", "l":"es-419"},
+    {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"}, {"c":"NI", "l":"es-419"},
+    {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"}, {"c":"PR", "l":"es-419"},
+    {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"},
     {"c":"TT", "l":"en-US"}, {"c":"AG", "l":"en-US"}, {"c":"DM", "l":"en-US"},
     {"c":"GD", "l":"en-US"}, {"c":"KN", "l":"en-US"}, {"c":"LC", "l":"en-US"},
     {"c":"VC", "l":"en-US"}, {"c":"BZ", "l":"en-US"}, {"c":"HT", "l":"fr-FR"},
@@ -34,9 +29,10 @@ REGIONS = [
     {"c":"GP", "l":"fr-FR"}, {"c":"MQ", "l":"fr-FR"}, {"c":"BL", "l":"fr-FR"},
     {"c":"MF", "l":"fr-FR"}, {"c":"KY", "l":"en-US"}, {"c":"BM", "l":"en-US"},
     {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
-    {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"},
+    {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
+    {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"}, {"c":"PM", "l":"fr-FR"},
 
-    # --- EUROPA (Oeste, Norte, Sur, Este) ---
+    # --- EUROPA ---
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
     {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
     {"c":"NL", "l":"nl-NL"}, {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"},
@@ -44,7 +40,7 @@ REGIONS = [
     {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FL"},
     {"c":"IS", "l":"en-GB"}, {"c":"LU", "l":"fr-FR"}, {"c":"MC", "l":"fr-FR"},
     {"c":"LI", "l":"de-DE"}, {"c":"MT", "l":"en-GB"}, {"c":"AD", "l":"es-ES"},
-    {"c":"SM", "l":"it-IT"}, {"c":"VA", "l":"it-IT"}, {"c":"GI", "l":"en-GB"},
+    {"c":"SM", "l":"it-IT"}, {"c":"VA", "l":"it-IT"}, 
     {"c":"IM", "l":"en-GB"}, {"c":"GG", "l":"en-GB"}, {"c":"JE", "l":"en-GB"},
     {"c":"FO", "l":"da-DK"}, {"c":"GL", "l":"da-DK"}, {"c":"AX", "l":"sv-SE"},
     {"c":"SJ", "l":"no-NO"}, {"c":"PL", "l":"pl-PL"}, {"c":"CZ", "l":"cs-CZ"},
@@ -55,25 +51,23 @@ REGIONS = [
     {"c":"MK", "l":"mk-MK"}, {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"},
     {"c":"ME", "l":"sr-ME"}, {"c":"TR", "l":"tr-TR"},
 
-    # --- ASIA / PACÍFICO (Seleccionados) ---
-    {"c":"JP", "l":"ja-JP"}, # Japón
-    {"c":"KR", "l":"ko-KR"}, # Corea
-    {"c":"TW", "l":"zh-Hant-TW"}, # Taiwán
-    {"c":"HK", "l":"zh-Hant-HK"}, # Hong Kong
-    {"c":"SG", "l":"en-SG"}, # Singapur
-    {"c":"AU", "l":"en-AU"}, # Australia
-    {"c":"NZ", "l":"en-NZ"}, # Nueva Zelanda
-    {"c":"NC", "l":"fr-FR"}, # Nueva Caledonia
-    {"c":"PF", "l":"fr-FR"}, # Polinesia Fr
-    {"c":"WF", "l":"fr-FR"}, # Wallis y Futuna
-    {"c":"GU", "l":"en-US"}, # Guam
-    {"c":"MP", "l":"en-US"}, # Marianas Norte
-    {"c":"AS", "l":"en-US"}, # Samoa Americana
+    # --- ASIA / PACÍFICO ---
+    {"c":"JP", "l":"ja-JP"}, 
+    {"c":"KR", "l":"ko-KR"}, 
+    {"c":"TW", "l":"zh-Hant-TW"}, # Intentar forzar Chino Tradicional
+    {"c":"HK", "l":"zh-Hant-HK"}, # Intentar forzar Chino Tradicional
+    {"c":"SG", "l":"en-SG"}, 
+    {"c":"AU", "l":"en-AU"},
+    {"c":"NZ", "l":"en-NZ"}, 
+    {"c":"NC", "l":"fr-FR"}, 
+    {"c":"PF", "l":"fr-FR"}, 
+    {"c":"WF", "l":"fr-FR"}, 
+    {"c":"GU", "l":"en-US"}, 
+    {"c":"MP", "l":"en-US"}, 
+    {"c":"AS", "l":"en-US"},
 
-    # --- ISLAS INDICO / AFRICA (Excepciones solicitadas) ---
-    {"c":"RE", "l":"fr-FR"}, # Reunión (Depto FR)
-    {"c":"YT", "l":"fr-FR"}, # Mayotte (Depto FR)
-    {"c":"MU", "l":"en-GB"}  # Mauricio (Disponible standard)
+    # --- OTROS ---
+    {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"}, {"c":"MU", "l":"en-GB"}
 ]
 
 HEADERS = {
