@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Miraculous Global Tracker V21</title>
+    <title>Miraculous Global Tracker V22</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -23,11 +23,11 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
 
-        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 12px 0; }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         
         .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .brand { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
+        .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
         .brand span { color: var(--primary); }
         .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
 
@@ -44,37 +44,44 @@
         .panel.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
-        .flag-img { width: 42px; height: auto; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; }
+        /* PAIS HERO MEJORADO */
+        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding: 15px 20px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+        .flag-img { width: 48px; height: 36px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 1px solid #333; }
+        .country-name { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
 
+        /* TEMPORADAS */
         .season-block { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-card); overflow: hidden; }
-        .season-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; }
+        .season-header { padding: 12px 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; position: relative; }
         .season-header:hover { background: var(--surface-hover); }
-        .season-title { font-weight: 700; font-size: 1rem; color: #fff; }
-        .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; }
+        .season-title { font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+        .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; position: absolute; right: 20px; }
         .season-block.open .toggle-icon { transform: rotate(180deg); }
         .season-body { display: none; border-top: 1px solid var(--border); }
         .season-block.open .season-body { display: block; }
 
-        /* DISEÑO DE EPISODIO MODIFICADO (Centrado) */
-        .ep-card { padding: 25px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
+        /* EPISODIO */
+        .ep-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
         .ep-card:last-child { border-bottom: none; }
         
-        .ep-title { font-size: 1.1rem; font-weight: 700; color: #fff; line-height: 1.4; width: 100%; }
-        .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; display: inline-block; }
+        .ep-header-line { display: flex; gap: 15px; align-items: flex-start; }
+        .ep-num-pill { font-size: 0.8rem; font-weight: 800; color: #333; background: #555; color: #fff; padding: 2px 8px; border-radius: 6px; min-width: 30px; text-align: center; margin-top: 2px; }
         
-        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; width: 100%; text-align: left; } /* Texto desc a la izquierda para leer mejor */
-        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; margin-left: auto; margin-right: auto; }
+        .ep-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; flex: 1; }
+        .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; margin-left: auto; }
         
-        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); width: 100%; }
-        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; text-align: left; }
+        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; margin-top: 5px; }
+        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; }
+        
+        /* IDIOMAS */
+        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); }
+        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; }
         .lang-label { color: var(--text-dim); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; margin-top: 5px; min-width: 40px; }
         
         .badges-wrapper { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: 1; }
         .pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; }
         .pill.primary { background: var(--primary-soft); border-color: var(--primary); color: #fda4af; }
         .pill.secondary { background: var(--surface); border-color: var(--border); color: var(--text-dim); }
+        .type-tag { font-size: 0.6rem; margin-left: 4px; opacity: 0.7; border: 1px solid; padding: 0 2px; border-radius: 3px; }
         
         .expand-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; }
         .hidden-tracks { display: none; gap: 5px; flex-wrap: wrap; margin-top: 5px; width: 100%; }
@@ -89,8 +96,6 @@
             .ep-desc.show { display: block; animation: fadeIn 0.3s; }
             .desc-toggle-btn { display: inline-block; }
             .country-name { font-size: 1.1rem; }
-            .flag-img { width: 32px; }
-            .season-title { font-size: 0.95rem; }
         }
         @media (min-width: 641px) {
             .ep-desc { display: block !important; }
@@ -104,18 +109,18 @@
         <div class="container">
             <div class="nav-wrapper">
                 <div class="brand"><span>🐞</span> Miraculous Tracker</div>
-                <div class="last-update" id="lastUpdate">Sincronizando...</div>
+                <div class="last-update" id="lastUpdate">...</div>
             </div>
             
             <div class="controls">
                 <select id="countrySelect" onchange="updateState(this.value, getCurrentTab())">
-                    <option value="">Cargando regiones...</option>
+                    <option value="" id="optLoading">Loading...</option>
                 </select>
             </div>
 
             <div class="tabs">
-                <button id="btn-cat" class="tab-btn active" onclick="updateState(null, 'cat')">Catálogo</button>
-                <button id="btn-news" class="tab-btn" onclick="updateState(null, 'news')">Novedades <span id="newsBadge" class="badge">0</span></button>
+                <button id="btn-cat" class="tab-btn active" onclick="updateState(null, 'cat')">Catalog</button>
+                <button id="btn-news" class="tab-btn" onclick="updateState(null, 'news')">New Releases <span id="newsBadge" class="badge">0</span></button>
             </div>
         </div>
     </header>
@@ -129,39 +134,60 @@
         <div id="view-cat" class="panel active">
             <div id="catContent" class="msg-box">
                 <div class="loading-spinner"></div>
-                <div>Cargando base de datos...</div>
+                <div>Connecting to database...</div>
             </div>
         </div>
 
         <div id="view-news" class="panel">
-            <div id="newsContent" class="msg-box">Selecciona una región.</div>
+            <div id="newsContent" class="msg-box">Select a region.</div>
         </div>
     </main>
 
     <script>
         let GLOBAL_DB = null;
         let CURRENT_TAB = 'cat';
+        
+        // --- DETECCIÓN DE IDIOMA DEL NAVEGADOR ---
+        const USER_LANG = navigator.language.startsWith('es') ? 'es' : 'en';
 
-        // CONFIGURACIÓN DE PAÍSES Y BANDERAS (URLs Estables de Imgur)
+        // TEXTOS UI (Traducción)
+        const UI_TEXTS = {
+            es: { 
+                cat: "Catálogo", news: "Novedades", load: "Cargando...", sel: "-- Selecciona Región --",
+                audio: "AUDIO", subs: "SUBS", added: "Agregado", sync: "Sincronizando...", view_desc: "Ver sinopsis ▾", hide_desc: "Ocultar ▴", season: "TEMPORADA"
+            },
+            en: { 
+                cat: "Catalog", news: "New Releases", load: "Loading...", sel: "-- Select Region --",
+                audio: "AUDIO", subs: "SUBS", added: "Added", sync: "Syncing...", view_desc: "View synopsis ▾", hide_desc: "Hide ▴", season: "SEASON"
+            }
+        };
+        const T = UI_TEXTS[USER_LANG];
+
+        // Aplicar textos iniciales
+        document.getElementById('btn-cat').childNodes[0].textContent = T.cat;
+        document.getElementById('btn-news').childNodes[0].textContent = T.news;
+        document.getElementById('optLoading').textContent = T.load;
+        document.getElementById('lastUpdate').textContent = T.sync;
+
+        // MAPA MAESTRO DE PAÍSES, BANDERAS E IDIOMAS TARGET
         const COUNTRY_MAP = {
-            // Personalizados
-            "FK": {n:"Islas Malvinas (AR)", l:"Spanish", flag:"https://i.imgur.com/Q9Z7J7z.png"}, // Bandera Tierra del Fuego
-            "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://i.imgur.com/8QZ7J7z.png"}, // Cruz de Borgoña (Placeholder, usar URL real si imgur falla)
+            // Especiales (Banderas arregladas Wikimedia)
+            "FK": {n:"Islas Malvinas (ARG)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
+            "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
             
-            // Si Imgur falla, usar Wikimedia direct links:
-            // FK: https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png
-            // GI: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png
-
             // Nombres corregidos
             "US": {n:"Estados Unidos", l:"English"},
-            "GB": {n:"Reino Unido", l:"English"},
+            "GB": {n:"Reino Unido (R. U.)", l:"English"},
             "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"},
             "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
-            
-            // Idiomas Específicos para sorting
-            "TW": {n:"Taiwán", l:["Mandarin", "Chinese", "Putonghua"]},
+            "LI": {n:"Liechtenstein", l:"German"}, // Idioma corregido
+            "BO": {n:"Bolivia", l:"Spanish"}, // Nombre corregido
+
+            // Idiomas Específicos Prioritarios
+            "TW": {n:"Taiwán", l:["Mandarin", "Chinese"]},
             "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
             "TR": {n:"Turquía", l:"Turkish"},
+            "GR": {n:"Grecia", l:"Greek"},
             "BR": {n:"Brasil", l:"Portuguese"},
             "FR": {n:"Francia", l:"French"},
             "DE": {n:"Alemania", l:"German"},
@@ -175,7 +201,7 @@
             "VN": {n:"Vietnam", l:"Vietnamese"},
             "ID": {n:"Indonesia", l:"Indonesian"},
 
-            // Resto
+            // Resto (Defaults)
             "AR":{n:"Argentina",l:"Spanish"},"MX":{n:"México",l:"Spanish"},"CL":{n:"Chile",l:"Spanish"},
             "CO":{n:"Colombia",l:"Spanish"},"PE":{n:"Perú",l:"Spanish"},"CA":{n:"Canadá",l:"English"},
             "ES":{n:"España",l:"Spanish"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
@@ -188,13 +214,13 @@
             "SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},"BE":{n:"Bélgica",l:"French"},
             "CH":{n:"Suiza",l:"German"},"AT":{n:"Austria",l:"German"},"IE":{n:"Irlanda",l:"English"},
             "FI":{n:"Finlandia",l:"Finnish"},"IS":{n:"Islandia",l:"English"},"LU":{n:"Luxemburgo",l:"French"},
-            "MC":{n:"Mónaco",l:"French"},"LI":{n:"Liechtenstein",l:"German"},"MT":{n:"Malta",l:"English"},
+            "MC":{n:"Mónaco",l:"French"},"MT":{n:"Malta",l:"English"},
             "AD":{n:"Andorra",l:"Spanish"},"SM":{n:"San Marino",l:"Italian"},"VA":{n:"Vaticano",l:"Italian"},
             "IM":{n:"Isla de Man",l:"English"},"GG":{n:"Guernsey",l:"English"},"JE":{n:"Jersey",l:"English"},
             "FO":{n:"Islas Feroe",l:"Danish"},"GL":{n:"Groenlandia",l:"Danish"},"AX":{n:"Islas Åland",l:"Swedish"},
             "SJ":{n:"Svalbard",l:"Norwegian"},"CZ":{n:"Rep. Checa",l:"Czech"},"SK":{n:"Eslovaquia",l:"Slovak"},
             "HU":{n:"Hungría",l:"Hungarian"},"BG":{n:"Bulgaria",l:"Bulgarian"},"HR":{n:"Croacia",l:"Croatian"},
-            "GR":{n:"Grecia",l:"Greek"},"SI":{n:"Eslovenia",l:"Slovenian"},"EE":{n:"Estonia",l:"Estonian"},
+            "SI":{n:"Eslovenia",l:"Slovenian"},"EE":{n:"Estonia",l:"Estonian"},
             "LV":{n:"Letonia",l:"Latvian"},"LT":{n:"Lituania",l:"Lithuanian"},"CY":{n:"Chipre",l:"Greek"},
             "AL":{n:"Albania",l:"Albanian"},"MK":{n:"Macedonia del Norte",l:"Macedonian"},
             "BA":{n:"Bosnia",l:"Croatian"},"RS":{n:"Serbia",l:"Serbian"},"ME":{n:"Montenegro",l:"Serbian"},
@@ -212,17 +238,13 @@
             "MS":{n:"Montserrat",l:"English"},"PM":{n:"San Pedro",l:"French"}
         };
 
-        // Fallback flags si las cortas fallan
-        if(COUNTRY_MAP["FK"]) COUNTRY_MAP["FK"].flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png";
-        if(COUNTRY_MAP["GI"]) COUNTRY_MAP["GI"].flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png";
-
         async function init() {
             try {
                 const r = await fetch('database.json?t=' + Date.now());
                 if(!r.ok) throw new Error("DB Missing");
                 GLOBAL_DB = await r.json();
                 
-                document.getElementById('lastUpdate').innerText = `Update: ${GLOBAL_DB.meta.updated}`;
+                document.getElementById('lastUpdate').innerText = GLOBAL_DB.meta.updated;
                 populateMenu();
                 
                 const params = new URLSearchParams(window.location.search);
@@ -240,13 +262,13 @@
                 updateState(targetCountry, CURRENT_TAB, false);
 
             } catch(e) {
-                document.getElementById('catContent').innerHTML = `<div class="msg-box" style="color:var(--primary)">⚠️ Sincronizando... Espera unos minutos.</div>`;
+                document.getElementById('catContent').innerHTML = `<div class="msg-box" style="color:var(--primary)">⚠️ ${T.sync}</div>`;
             }
         }
 
         function populateMenu() {
             const sel = document.getElementById('countrySelect');
-            sel.innerHTML = '<option value="">-- Selecciona Región --</option>';
+            sel.innerHTML = `<option value="">${T.sel}</option>`;
             const codes = Object.keys(GLOBAL_DB.regions).sort((a,b) => {
                 const nA = COUNTRY_MAP[a]?.n || a;
                 const nB = COUNTRY_MAP[b]?.n || b;
@@ -296,7 +318,7 @@
             
             if(!code || !GLOBAL_DB || !GLOBAL_DB.regions[code]) {
                  heroEl.style.display = 'none';
-                 catDiv.innerHTML = '<div class="msg-box">Región no disponible.</div>';
+                 catDiv.innerHTML = '<div class="msg-box">N/A</div>';
                  return;
             }
             
@@ -316,21 +338,16 @@
                     <div style="padding:15px; background:var(--surface); border-radius:12px; margin-bottom:10px; border-left:4px solid var(--green-accent);">
                         <div style="font-weight:bold; color:#fff; margin-bottom:4px">${n.e}</div>
                         <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:6px">${n.t}</div>
-                        <div style="font-size:0.75rem; color:var(--green-accent); font-weight:700;">Agregado: ${n.d}</div>
+                        <div style="font-size:0.75rem; color:var(--green-accent); font-weight:700;">${T.added}: ${n.d}</div>
                     </div>
                 `).join('');
                 newsDiv.innerHTML = html;
             } else {
                 badge.style.display = 'none';
-                newsDiv.innerHTML = '<div class="msg-box">💤 Sin novedades recientes (90 días).</div>';
+                newsDiv.innerHTML = '<div class="msg-box">...</div>';
             }
 
             // CATALOGO
-            if(!data.seasons || data.seasons.length === 0) {
-                catDiv.innerHTML = '<div class="msg-box">Contenido no disponible.</div>';
-                return;
-            }
-
             let html = '';
             data.seasons.forEach((s, idx) => {
                 const isLast = idx === data.seasons.length - 1;
@@ -343,24 +360,23 @@
 
                     epsHtml += `
                         <div class="ep-card">
-                            <div class="ep-content">
-                                <div class="ep-head">
-                                    <div class="ep-title">${ep.t}</div>
-                                    <div class="ep-date">${ep.dt || 'N/A'}</div>
+                            <div class="ep-header-line">
+                                <div class="ep-num-pill">${ep.n}</div>
+                                <div class="ep-title">${ep.t}</div>
+                                <div class="ep-date">${ep.dt || 'N/A'}</div>
+                            </div>
+                            
+                            <div class="ep-desc" id="${descId}">${ep.ds || "..."}</div>
+                            <button class="desc-toggle-btn" onclick="toggleDesc('${descId}', this)">${T.view_desc}</button>
+                            
+                            <div class="tracks-area">
+                                <div class="track-row">
+                                    <div class="lang-label">${T.audio}</div>
+                                    <div class="badges-wrapper">${audios}</div>
                                 </div>
-                                
-                                <div class="ep-desc" id="${descId}">${ep.ds || "Sin descripción."}</div>
-                                <button class="desc-toggle-btn" onclick="toggleDesc('${descId}', this)">Ver sinopsis ▾</button>
-                                
-                                <div class="tracks-area">
-                                    <div class="track-row">
-                                        <div class="lang-label">Audio</div>
-                                        <div class="badges-wrapper">${audios}</div>
-                                    </div>
-                                    <div class="track-row">
-                                        <div class="lang-label">Subs</div>
-                                        <div class="badges-wrapper">${subs}</div>
-                                    </div>
+                                <div class="track-row">
+                                    <div class="lang-label">${T.subs}</div>
+                                    <div class="badges-wrapper">${subs}</div>
                                 </div>
                             </div>
                         </div>
@@ -370,7 +386,7 @@
                 html += `
                     <div class="season-block ${isLast ? 'open' : ''}">
                         <div class="season-header" onclick="this.parentElement.classList.toggle('open')">
-                            <span class="season-title">Temporada ${s.id}</span>
+                            <span class="season-title">${T.season} ${s.id}</span>
                             <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
                         <div class="season-body">${epsHtml}</div>
@@ -380,30 +396,49 @@
             catDiv.innerHTML = html;
         }
 
-        // LÓGICA DE ORDENAMIENTO (Corregida)
+        // LÓGICA DE ORDENAMIENTO (Tracks como Objetos {l:name, t:type})
         function sortAndFormatTracks(tracks, targetLangs, type) {
             if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
+            
+            // Si es audio, tracks es lista de strings. Si es sub, es lista de objetos {l, t}. Normalizamos.
+            let list = tracks.map(item => {
+                if (typeof item === 'string') return { name: item, tag: '' };
+                return { name: item.l, tag: item.t };
+            });
+
+            // De-duplicar por nombre
+            list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
+
             const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
-            let list = [...new Set(tracks.map(t => t.trim()))];
             
             list.sort((a, b) => {
-                let scoreA = 0; if(targets.some(t => a.includes(t))) scoreA = 2; else if(a.includes("English")) scoreA = 1;
-                let scoreB = 0; if(targets.some(t => b.includes(t))) scoreB = 2; else if(b.includes("English")) scoreB = 1;
+                let scoreA = 0; if(targets.some(t => a.name.includes(t))) scoreA = 2; else if(a.name.includes("English")) scoreA = 1;
+                let scoreB = 0; if(targets.some(t => b.name.includes(t))) scoreB = 2; else if(b.name.includes("English")) scoreB = 1;
+                
                 if (scoreA > scoreB) return -1;
                 if (scoreA < scoreB) return 1;
-                return a.localeCompare(b);
+                return a.name.localeCompare(b.name);
             });
 
             const primary = list[0];
             const others = list.slice(1);
-            let html = `<span class="pill primary">${primary}</span>`;
+            
+            // Render Tag Function
+            const renderBadge = (item) => {
+                let tagLabel = "";
+                if(item.tag === 'SDH') tagLabel = `<span class="type-tag">CC</span>`;
+                if(item.tag === 'FORCED') tagLabel = `<span class="type-tag">F</span>`;
+                return `<span class="pill ${type==='audio'?'primary':'secondary'}">${item.name}${tagLabel}</span>`;
+            };
+
+            let html = renderBadge(primary);
 
             if(others.length > 0) {
                 const id = "h-" + Math.random().toString(36).substr(2, 9);
                 html += `
                     <button class="expand-btn" onclick="document.getElementById('${id}').classList.toggle('show')">+${others.length}</button>
                     <div id="${id}" class="hidden-tracks">
-                        ${others.map(l => `<span class="pill secondary">${l}</span>`).join('')}
+                        ${others.map(item => renderBadge(item)).join('')}
                     </div>
                 `;
             }
@@ -414,10 +449,10 @@
             const el = document.getElementById(id);
             if (el.classList.contains('show')) {
                 el.classList.remove('show');
-                btn.innerText = "Ver sinopsis ▾";
+                btn.innerText = T.view_desc;
             } else {
                 el.classList.add('show');
-                btn.innerText = "Ocultar ▴";
+                btn.innerText = T.hide_desc;
             }
         }
 
