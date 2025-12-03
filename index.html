@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disney+ Tracker V28</title>
+    <title>Disney+ Tracker V29</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -155,76 +155,76 @@
         document.getElementById('optLoading').textContent = T.load;
         document.getElementById('lastUpdate').textContent = T.sync;
 
-        // MAPA COMPLETO CON STRINGS EXACTOS DE DISNEY+ (Importante)
+        // MAPA MAESTRO CON NOMBRES NATIVOS Y VARIACIONES
+        // Esto soluciona que los idiomas no se detecten al ordenarlos
         const COUNTRY_MAP = {
-            // Personalizados
-            "FK": {n:"Islas Malvinas (ARG)", l:["Español (Latinoamericano)", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
-            "GI": {n:"Gibraltar (ES)", l:["Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
-            "BO": {n:"Bolivia", l:["Español (Latinoamericano)", "Español"]},
+            "FK": {n:"Islas Malvinas (ARG)", l:["Spanish", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
+            "GI": {n:"Gibraltar (ES)", l:["Spanish", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
+            
+            // Europa (Nombres Nativos + Inglés + Español)
+            "DE": {n:"Alemania", l:["Deutsch", "German", "Alemán"]},
+            "FR": {n:"Francia", l:["Français", "French", "Francés"]},
+            "IT": {n:"Italia", l:["Italiano", "Italian", "Italiano"]},
+            "PT": {n:"Portugal", l:["Português", "Portuguese"]},
+            "NL": {n:"Países Bajos", l:["Nederlands", "Dutch"]},
+            "PL": {n:"Polonia", l:["Polski", "Polish"]},
+            "CZ": {n:"Rep. Checa", l:["Čeština", "Czech"]},
+            "DK": {n:"Dinamarca", l:["Dansk", "Danish"]},
+            "SE": {n:"Suecia", l:["Svenska", "Swedish"]},
+            "NO": {n:"Noruega", l:["Norsk", "Norwegian"]},
+            "FI": {n:"Finlandia", l:["Suomi", "Finnish"]},
+            "RO": {n:"Rumania", l:["Română", "Romanian"]},
+            "HU": {n:"Hungría", l:["Magyar", "Hungarian"]},
+            "TR": {n:"Turquía", l:["Türkçe", "Turkish", "Turco"]},
+            "GR": {n:"Grecia", l:["Greek", "Ελληνικά"]},
+            "ES": {n:"España", l:["Español", "Spanish", "Castilian"]}, 
 
-            // EUROPA (Strings Exactos)
-            "ES": {n:"España", l:["Español"]}, 
-            "FR": {n:"Francia", l:["Français"]},
-            "DE": {n:"Alemania", l:["Deutsch"]},
-            "IT": {n:"Italia", l:["Italiano"]},
-            "PT": {n:"Portugal", l:["Português"]},
-            "NL": {n:"Países Bajos", l:["Nederlands"]},
-            "PL": {n:"Polonia", l:["Polski"]},
-            "CZ": {n:"Rep. Checa", l:["Čeština"]},
-            "DK": {n:"Dinamarca", l:["Dansk"]},
-            "SE": {n:"Suecia", l:["Svenska"]},
-            "NO": {n:"Noruega", l:["Norsk"]},
-            "FI": {n:"Finlandia", l:["Suomi"]},
-            "RO": {n:"Rumania", l:["Română"]},
-            "HU": {n:"Hungría", l:["Magyar"]},
-            "TR": {n:"Turquía", l:["Türkçe"]},
-            "GR": {n:"Grecia", l:["Greek", "Ελληνικά"]}, // API varía
-
-            // LATAM (Strings Exactos)
-            "AR":{n:"Argentina",l:["Español (Latinoamericano)"]},
-            "MX":{n:"México",l:["Español (Latinoamericano)"]},
-            "CL":{n:"Chile",l:["Español (Latinoamericano)"]},
-            "CO":{n:"Colombia",l:["Español (Latinoamericano)"]},
-            "PE":{n:"Perú",l:["Español (Latinoamericano)"]},
-            "UY":{n:"Uruguay",l:["Español (Latinoamericano)"]},
-            "VE":{n:"Venezuela",l:["Español (Latinoamericano)"]},
-            "EC":{n:"Ecuador",l:["Español (Latinoamericano)"]},
-            "GT":{n:"Guatemala",l:["Español (Latinoamericano)"]},
-            "CR":{n:"Costa Rica",l:["Español (Latinoamericano)"]},
-            "PA":{n:"Panamá",l:["Español (Latinoamericano)"]},
-            "DO":{n:"Rep. Dominicana",l:["Español (Latinoamericano)"]},
-            "SV":{n:"El Salvador",l:["Español (Latinoamericano)"]},
-            "HN":{n:"Honduras",l:["Español (Latinoamericano)"]},
-            "NI":{n:"Nicaragua",l:["Español (Latinoamericano)"]},
-            "PY":{n:"Paraguay",l:["Español (Latinoamericano)"]},
-            "BR":{n:"Brasil",l:["Portugués", "Português"]},
-
-            // ASIA
-            "TW": {n:"Taiwán", l:["Taiwanese Mandarin", "Mandarin", "Chinese"]},
-            "HK": {n:"Hong Kong", l:["Cantonese"]},
+            // Asia (Nombres Nativos + Inglés)
+            "TW": {n:"Taiwán", l:["Mandarin", "Taiwanese", "Chinese"]},
+            "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
             "JP": {n:"Japón", l:["Japanese", "日本語"]},
-            "KR": {n:"Corea del Sur", l:["Korean"]},
-            "ID": {n:"Indonesia", l:["Indonesian"]},
-            "TH": {n:"Tailandia", l:["Thai"]},
-            "VN": {n:"Vietnam", l:["Vietnamese"]},
+            "KR": {n:"Corea del Sur", l:["Korean", "한국어"]},
+            "TH": {n:"Tailandia", l:["Thai", "ไทย"]},
+            "ID": {n:"Indonesia", l:["Indonesian", "Bahasa"]},
+            "VN": {n:"Vietnam", l:["Vietnamese", "Tiếng Việt"]},
+
+            // Latam (Variaciones de Español)
+            "AR":{n:"Argentina",l:["Latinoamericano", "Spanish"]},
+            "MX":{n:"México",l:["Latinoamericano", "Spanish"]},
+            "CL":{n:"Chile",l:["Latinoamericano", "Spanish"]},
+            "CO":{n:"Colombia",l:["Latinoamericano", "Spanish"]},
+            "PE":{n:"Perú",l:["Latinoamericano", "Spanish"]},
+            "UY":{n:"Uruguay",l:["Latinoamericano", "Spanish"]},
+            "VE":{n:"Venezuela",l:["Latinoamericano", "Spanish"]},
+            "EC":{n:"Ecuador",l:["Latinoamericano", "Spanish"]},
+            "GT":{n:"Guatemala",l:["Latinoamericano", "Spanish"]},
+            "CR":{n:"Costa Rica",l:["Latinoamericano", "Spanish"]},
+            "PA":{n:"Panamá",l:["Latinoamericano", "Spanish"]},
+            "DO":{n:"Rep. Dominicana",l:["Latinoamericano", "Spanish"]},
+            "SV":{n:"El Salvador",l:["Latinoamericano", "Spanish"]},
+            "HN":{n:"Honduras",l:["Latinoamericano", "Spanish"]},
+            "NI":{n:"Nicaragua",l:["Latinoamericano", "Spanish"]},
+            "PY":{n:"Paraguay",l:["Latinoamericano", "Spanish"]},
+            "BR":{n:"Brasil",l:["Português", "Portuguese"]},
+            "BO":{n:"Bolivia", l:["Latinoamericano", "Spanish"]},
 
             // Resto
             "US": {n:"Estados Unidos", l:["English"]},
             "GB": {n:"Reino Unido (R. U.)", l:["English"]},
-            "LI": {n:"Liechtenstein", l:["Deutsch"]},
+            "VI": {n:"Islas Vírgenes (EE. UU.)", l:["English"]},
+            "VG": {n:"Islas Vírgenes (R. U.)", l:["English"]},
+            "LI": {n:"Liechtenstein", l:["Deutsch", "German"]},
             "CA":{n:"Canadá",l:["English"]},"SG":{n:"Singapur",l:["English"]},"AU":{n:"Australia",l:["English"]},
-            "NZ":{n:"Nueva Zelanda",l:["English"]},"PR":{n:"Puerto Rico",l:["Español (Latinoamericano)"]},
-            "GY":{n:"Guyana",l:["English"]},"SR":{n:"Surinam",l:["English"]},"GF":{n:"Guayana Francesa",l:["Français"]},
-            "BE":{n:"Bélgica",l:["Français", "Nederlands"]},"CH":{n:"Suiza",l:["Deutsch", "Français"]},
-            "AT":{n:"Austria",l:["Deutsch"]},"IE":{n:"Irlanda",l:["English"]},"IS":{n:"Islandia",l:["English"]},
-            "LU":{n:"Luxemburgo",l:["Français", "Deutsch"]},"MC":{n:"Mónaco",l:["Français"]},
-            "MT":{n:"Malta",l:["English"]},"AD":{n:"Andorra",l:["Español"]},
+            "NZ":{n:"Nueva Zelanda",l:["English"]},"PR":{n:"Puerto Rico",l:["Spanish"]},
+            "GY":{n:"Guyana",l:["English"]},"SR":{n:"Surinam",l:["English"]},"GF":{n:"Guayana Francesa",l:["Français"]},"BE":{n:"Bélgica",l:["Français"]},
+            "CH":{n:"Suiza",l:["Deutsch"]},"AT":{n:"Austria",l:["Deutsch"]},"IE":{n:"Irlanda",l:["English"]},
+            "IS":{n:"Islandia",l:["English"]},"LU":{n:"Luxemburgo",l:["Français"]},
+            "MC":{n:"Mónaco",l:["Français"]},"MT":{n:"Malta",l:["English"]},"AD":{n:"Andorra",l:["Español"]},
             "SM":{n:"San Marino",l:["Italiano"]},"VA":{n:"Vaticano",l:["Italiano"]},"IM":{n:"Isla de Man",l:["English"]},
             "GG":{n:"Guernsey",l:["English"]},"JE":{n:"Jersey",l:["English"]},"FO":{n:"Islas Feroe",l:["Dansk"]},
-            "GL":{n:"Groenlandia",l:["Danish"]},"AX":{n:"Islas Åland",l:["Svenska"]},"SJ":{n:"Svalbard",l:["Norsk"]},
-            "CZ":{n:"Rep. Checa",l:["Čeština"]},"SK":{n:"Eslovaquia",l:["Slovak"]},"HU":{n:"Hungría",l:["Magyar"]},
-            "BG":{n:"Bulgaria",l:["Bulgarian"]},"HR":{n:"Croacia",l:["Croatian"]},"SI":{n:"Eslovenia",l:["Slovenian"]},
-            "EE":{n:"Estonia",l:["Estonian"]},"LV":{n:"Letonia",l:["Latvian"]},"LT":{n:"Lituania",l:["Lithuanian"]},
+            "GL":{n:"Groenlandia",l:["Dansk"]},"AX":{n:"Islas Åland",l:["Svenska"]},"SJ":{n:"Svalbard",l:["Norsk"]},
+            "SK":{n:"Eslovaquia",l:["Slovak"]},"BG":{n:"Bulgaria",l:["Bulgarian"]},"HR":{n:"Croacia",l:["Croatian"]},
+            "SI":{n:"Eslovenia",l:["Slovenian"]},"EE":{n:"Estonia",l:["Estonian"]},"LV":{n:"Letonia",l:["Latvian"]},"LT":{n:"Lituania",l:["Lithuanian"]},
             "CY":{n:"Chipre",l:["Greek"]},"AL":{n:"Albania",l:["Albanian"]},"MK":{n:"Macedonia del Norte",l:["Macedonian"]},
             "BA":{n:"Bosnia",l:["Croatian"]},"RS":{n:"Serbia",l:["Serbian"]},"ME":{n:"Montenegro",l:["Serbian"]},
             "NC":{n:"Nueva Caledonia",l:["Français"]},"PF":{n:"Polinesia Francesa",l:["Français"]},"WF":{n:"Wallis y Futuna",l:["Français"]},
@@ -237,9 +237,8 @@
             "HT":{n:"Haití",l:["Français"]},"AW":{n:"Aruba",l:["Nederlands"]},"CW":{n:"Curazao",l:["Nederlands"]},
             "SX":{n:"Sint Maarten",l:["Nederlands"]},"GP":{n:"Guadalupe",l:["Français"]},"MQ":{n:"Martinica",l:["Français"]},
             "BL":{n:"San Bartolomé",l:["Français"]},"MF":{n:"San Martín",l:["Français"]},"KY":{n:"Islas Caimán",l:["English"]},
-            "BM":{n:"Bermudas",l:["English"]},"VI":{n:"Islas Vírgenes (US)",l:["English"]},"VG":{n:"Islas Vírgenes (UK)",l:["English"]},
-            "TC":{n:"Turcas y Caicos",l:["English"]},"AI":{n:"Anguila",l:["English"]},"MS":{n:"Montserrat",l:["English"]},
-            "PM":{n:"San Pedro",l:["Français"]}
+            "BM":{n:"Bermudas",l:["English"]},"TC":{n:"Turcas y Caicos",l:["English"]},"AI":{n:"Anguila",l:["English"]},
+            "MS":{n:"Montserrat",l:["English"]},"PM":{n:"San Pedro",l:["Français"]}
         };
 
         async function init() {
@@ -357,7 +356,6 @@
                 let epsHtml = '';
                 
                 s.eps.forEach((ep, epIdx) => {
-                    // Pasar la lista de idiomas target a la función de ordenamiento
                     const audios = sortAndFormatTracks(ep.a, info.l, 'audio');
                     const subs = sortAndFormatTracks(ep.s, info.l, 'sub');
                     const descId = `desc-${s.id}-${epIdx}`;
@@ -400,31 +398,36 @@
             catDiv.innerHTML = html;
         }
 
-        // LÓGICA DE ORDENAMIENTO ESTRICTA (Listas)
+        // ORDENAMIENTO ROBUSTO (MULTIPLE MATCH)
         function sortAndFormatTracks(tracks, targetLangs, type) {
             if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
             
-            // Normalizar
+            // Normalize
             let list = tracks.map(item => {
                 if(typeof item === 'string') return {name: item, tag: ''};
                 return {name: item.l, tag: item.t};
             });
-
             list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
 
-            // Asegurar array de targets
             const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
             
             list.sort((a, b) => {
-                let scoreA = 0; 
-                // Coincidencia exacta o contiene el string
-                if(targets.some(t => a.name === t || a.name.includes(t))) scoreA = 2; 
-                else if(a.name.includes("English")) scoreA = 1;
-
-                let scoreB = 0; 
-                if(targets.some(t => b.name === t || b.name.includes(t))) scoreB = 2; 
-                else if(b.name.includes("English")) scoreB = 1;
+                // Match Insensible a mayúsculas
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
                 
+                let scoreA = 0;
+                let scoreB = 0;
+
+                // Loop para buscar cualquier target
+                for(let t of targets) {
+                    if(nameA.includes(t.toLowerCase())) scoreA = 100;
+                    if(nameB.includes(t.toLowerCase())) scoreB = 100;
+                }
+                
+                if(scoreA !== 100 && nameA.includes("english")) scoreA = 50;
+                if(scoreB !== 100 && nameB.includes("english")) scoreB = 50;
+
                 if (scoreA > scoreB) return -1;
                 if (scoreA < scoreB) return 1;
                 return a.name.localeCompare(b.name);
@@ -463,11 +466,6 @@
                 el.classList.add('show');
                 btn.innerText = T.hide_desc;
             }
-        }
-
-        function shareUrl() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("Enlace copiado");
         }
 
         init();
