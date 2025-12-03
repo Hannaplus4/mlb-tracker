@@ -155,6 +155,41 @@ def get_data():
 
         time.sleep(0.1)
 
+    # ---------------------------------------------------------
+    # ZONA DE PRUEBAS: SIMULACIÓN DE LANZAMIENTO
+    # ---------------------------------------------------------
+    # Elegimos un país para la prueba, por ejemplo: Argentina (AR)
+    PAIS_TEST = "AR"
+    
+    if PAIS_TEST in database["regions"]:
+        print(f"!!! INYECTANDO EPISODIO DE PRUEBA EN {PAIS_TEST} !!!")
+        
+        # Creamos un episodio falso con fecha de HOY
+        fake_news = {
+            "e": "T6 E01 (TEST)", 
+            "t": "🧪 EL GRAN LANZAMIENTO (Simulado)", 
+            "d": datetime.utcnow().strftime("%Y-%m-%d") # Fecha actual automática
+        }
+        
+        # Lo insertamos al principio de la lista de novedades
+        database["regions"][PAIS_TEST]["news"].insert(0, fake_news)
+        
+        # También lo agregamos a una temporada ficticia para el catálogo
+        fake_season = {
+            "id": 6,
+            "eps": [{
+                "n": 1,
+                "t": "🧪 EL GRAN LANZAMIENTO (Simulado)",
+                "ds": "Esta es una prueba técnica para verificar que el sistema de alertas de la web funciona correctamente al detectar un estreno mundial.",
+                "dt": datetime.utcnow().strftime("%Y-%m-%d"),
+                "a": ["Spanish (Latin American)", "French", "English"],
+                "s": ["Spanish", "English"]
+            }]
+        }
+        # Agregamos la temporada 6 falsa al principio
+        database["regions"][PAIS_TEST]["seasons"].insert(0, fake_season)
+    # ---------------------------------------------------------
+    
     return database
 
 if __name__ == "__main__":
