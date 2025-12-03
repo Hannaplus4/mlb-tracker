@@ -1,140 +1,35 @@
-import requests
-import json
-import time
-import sys # Necesario para forzar la impresión en pantalla
-from datetime import datetime
+name: Actualizador Disney
 
-# CONFIGURACIÓN
-SERIES_ID = "1CjTiHEJbLRC" # Miraculous
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Se ejecuta cada 6 horas
+  workflow_dispatch:      # Botón para ejecutar manualmente
 
-# LISTA OPTIMIZADA (Si alguno falla, el script lo saltará rápido)
-REGIONS = [
-    # Principales
-    {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
-    {"c":"US", "l":"en-US"}, {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"},
-    # Secundarios
-    {"c":"CL", "l":"es-419"}, {"c":"CO", "l":"es-419"}, {"c":"PE", "l":"es-419"},
-    {"c":"GB", "l":"en-GB"}, {"c":"DE", "l":"de-DE"}, {"c":"IT", "l":"it-IT"},
-    {"c":"PT", "l":"pt-PT"}, {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"},
-    {"c":"TR", "l":"tr-TR"}, {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
-    {"c":"CA", "l":"en-CA"}, {"c":"NL", "l":"nl-NL"}, {"c":"SE", "l":"sv-SE"},
-    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"PL", "l":"pl-PL"}
-]
+permissions:
+  contents: write
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'application/json'
-}
+jobs:
+  actualizar-datos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Descargar tu código
+        uses: actions/checkout@v3
 
-def log(msg):
-    # Esta función fuerza que el texto aparezca en GitHub Actions inmediatamente
-    print(msg, flush=True)
+      - name: 2. Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-def get_data():
-    database = {
-        "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") },
-        "regions": {}
-    }
+      - name: 3. Instalar Requests
+        run: pip install requests
 
-    log(f"--- INICIANDO ESCANEO DE {len(REGIONS)} PAISES ---")
+      - name: 4. Ejecutar Scan.py
+        run: python scan.py
 
-    for idx, reg in enumerate(REGIONS):
-        code = reg['c']
-        lang = reg['l']
-        
-        # Log visual para saber dónde estamos
-        log(f"[{idx+1}/{len(REGIONS)}] Analizando {code}...")
-
-        try:
-            # 1. BUNDLE (TIMEOUT DE 4 SEGUNDOS)
-            # Si tarda más de 4s, se cancela y pasa al siguiente
-            url_bundle = f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/encodedSeriesId/{SERIES_ID}"
-            
-            try:
-                r = requests.get(url_bundle, headers=HEADERS, timeout=4)
-            except requests.exceptions.Timeout:
-                log(f"   >>> TIMEOUT en {code} (Bundle). Saltando...")
-                continue
-            except Exception as e:
-                log(f"   >>> Error conexión en {code}: {e}")
-                continue
-
-            if r.status_code == 200:
-                data = r.json()
-                seasons = data.get('data', {}).get('DmcSeriesBundle', {}).get('seasons', {}).get('seasons', [])
-                
-                region_data = {"seasons": [], "news": []}
-                
-                # Si encontramos temporadas, buscamos episodios
-                if seasons:
-                    for s in seasons:
-                        s_id = s['seasonId']
-                        s_num = s.get('seasonSequenceNumber', 0)
-                        
-                        # 2. EPISODIOS (TIMEOUT DE 4 SEGUNDOS)
-                        url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
-                        
-                        try:
-                            r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
-                        except:
-                            log(f"   >>> Error cargando episodios T{s_num} en {code}")
-                            continue
-                        
-                        if r_eps.status_code == 200:
-                            eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
-                            clean_eps = []
-                            
-                            for ep in eps_raw:
-                                date_str = ep.get('availabilityDate', '')
-                                is_new = False
-                                if date_str:
-                                    try:
-                                        dt = datetime.strptime(date_str.split('T')[0], "%Y-%m-%d")
-                                        if 0 <= (datetime.utcnow() - dt).days <= 90: is_new = True
-                                    except: pass
-
-                                title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
-                                
-                                # Descripción corta para no llenar la memoria
-                                desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
-                                if not desc: desc = "..."
-
-                                ep_obj = {
-                                    "n": ep.get('sequenceNumber', 0),
-                                    "t": title,
-                                    "ds": desc[:200], # Limitamos descripción a 200 caracteres
-                                    "dt": date_str.split('T')[0] if date_str else "",
-                                    "a": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('audioTracks', [])][:4],
-                                    "s": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('captionTracks', [])][:4]
-                                }
-                                
-                                clean_eps.append(ep_obj)
-                                if is_new: 
-                                    region_data["news"].append({"e":f"T{s_num} E{ep_obj['n']}", "t":title, "d":ep_obj['dt']})
-
-                            region_data["seasons"].append({"id": s_num, "eps": clean_eps})
-
-                    database["regions"][code] = region_data
-                    log(f"   ✓ {code}: OK ({len(seasons)} temporadas)")
-                else:
-                    log(f"   - {code}: Sin temporadas.")
-            else:
-                log(f"   X {code}: Bloqueado o no disponible ({r.status_code})")
-
-        except Exception as e:
-            log(f"   !!! Error fatal en {code}: {e}")
-
-        # Pausa para respirar
-        time.sleep(0.5)
-
-    return database
-
-if __name__ == "__main__":
-    try:
-        data = get_data()
-        with open("database.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False)
-        log("--- ESCANEO FINALIZADO EXITOSAMENTE ---")
-    except Exception as e:
-        log(f"ERROR CRITICO: {e}")
-        exit(1)
+      - name: 5. Guardar Cambios
+        run: |
+          git config --global user.name 'DisneyBot'
+          git config --global user.email 'bot@noreply.github.com'
+          git add database.json
+          git commit -m "Datos actualizados" || echo "Sin cambios nuevos"
+          git push
