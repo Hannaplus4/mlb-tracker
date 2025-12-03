@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disney+ Tracker V26</title>
+    <title>Disney+ Tracker V28</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -23,10 +23,10 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
 
-        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 0; }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 10px 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         
-        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
         .brand span { color: var(--primary); }
         .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
@@ -34,17 +34,17 @@
         .controls select { width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
         .controls select:hover { border-color: var(--primary); }
 
-        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
+        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
         .tab-btn { flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: var(--primary); color: #fff; }
         .badge { background: #fff; color: var(--primary); padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
 
-        main { padding-top: 30px; }
+        main { padding-top: 40px; }
         .panel { display: none; animation: slideUp 0.3s ease-out; }
         .panel.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
         .flag-img { width: 42px; height: 30px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 1px solid #333; }
         .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
 
@@ -62,7 +62,6 @@
         
         .ep-header-line { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap; }
         .ep-num-pill { font-size: 0.75rem; font-weight: 800; background: #333; color: #fff; padding: 2px 8px; border-radius: 6px; }
-        
         .ep-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; }
         .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
         
@@ -105,7 +104,7 @@
         <div class="container">
             <div class="nav-wrapper">
                 <div class="brand"><span>🐞</span> Disney+ Tracker</div>
-                <div class="last-update" id="lastUpdate">Syncing...</div>
+                <div class="last-update" id="lastUpdate">Sincronizando...</div>
             </div>
             
             <div class="controls">
@@ -156,83 +155,91 @@
         document.getElementById('optLoading').textContent = T.load;
         document.getElementById('lastUpdate').textContent = T.sync;
 
-        // MAPA COMPLETO CON IDIOMAS TARGET EXACTOS
+        // MAPA COMPLETO CON STRINGS EXACTOS DE DISNEY+ (Importante)
         const COUNTRY_MAP = {
-            "FK": {n:"Islas Malvinas (ARG)", l:["Spanish (Latin American)", "Spanish"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
-            "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
-            "BO": {n:"Bolivia", l:["Spanish (Latin American)", "Spanish"]},
-            
-            // Prioridades de idioma
-            "AR":{n:"Argentina",l:["Spanish (Latin American)", "Spanish"]},
-            "MX":{n:"México",l:["Spanish (Latin American)", "Spanish"]},
-            "CL":{n:"Chile",l:["Spanish (Latin American)", "Spanish"]},
-            "CO":{n:"Colombia",l:["Spanish (Latin American)", "Spanish"]},
-            "PE":{n:"Perú",l:["Spanish (Latin American)", "Spanish"]},
-            "UY":{n:"Uruguay",l:["Spanish (Latin American)", "Spanish"]},
-            "VE":{n:"Venezuela",l:["Spanish (Latin American)", "Spanish"]},
-            "EC":{n:"Ecuador",l:["Spanish (Latin American)", "Spanish"]},
-            "GT":{n:"Guatemala",l:["Spanish (Latin American)", "Spanish"]},
-            "CR":{n:"Costa Rica",l:["Spanish (Latin American)", "Spanish"]},
-            "PA":{n:"Panamá",l:["Spanish (Latin American)", "Spanish"]},
-            "DO":{n:"Rep. Dominicana",l:["Spanish (Latin American)", "Spanish"]},
-            "SV":{n:"El Salvador",l:["Spanish (Latin American)", "Spanish"]},
-            "HN":{n:"Honduras",l:["Spanish (Latin American)", "Spanish"]},
-            "NI":{n:"Nicaragua",l:["Spanish (Latin American)", "Spanish"]},
-            "PY":{n:"Paraguay",l:["Spanish (Latin American)", "Spanish"]},
-            
-            "ES":{n:"España",l:["Castilian", "Spanish"]}, // Castilian suele ser el nombre de la pista de España
-            "BR": {n:"Brasil", l:"Portuguese"},
-            "PT": {n:"Portugal", l:"Portuguese"},
+            // Personalizados
+            "FK": {n:"Islas Malvinas (ARG)", l:["Español (Latinoamericano)", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
+            "GI": {n:"Gibraltar (ES)", l:["Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
+            "BO": {n:"Bolivia", l:["Español (Latinoamericano)", "Español"]},
 
-            "TW": {n:"Taiwán", l:["Mandarin", "Chinese", "Putonghua"]},
-            "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
-            "TR": {n:"Turquía", l:"Turkish"},
-            "GR": {n:"Grecia", l:"Greek"},
-            "FR": {n:"Francia", l:"French"},
-            "DE": {n:"Alemania", l:"German"},
-            "IT": {n:"Italia", l:"Italian"},
-            "JP": {n:"Japón", l:"Japanese"},
-            "KR": {n:"Corea del Sur", l:"Korean"},
-            "PL": {n:"Polonia", l:"Polish"},
-            "NL": {n:"Países Bajos", l:"Dutch"},
-            "RO": {n:"Rumania", l:"Romanian"},
-            "TH": {n:"Tailandia", l:"Thai"},
-            "VN": {n:"Vietnam", l:"Vietnamese"},
-            "ID": {n:"Indonesia", l:"Indonesian"},
-            
-            // Resto (Default English)
-            "US": {n:"Estados Unidos", l:"English"},
-            "GB": {n:"Reino Unido (R. U.)", l:"English"},
-            "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"},
-            "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
-            "LI": {n:"Liechtenstein", l:"German"},
-            "CA":{n:"Canadá",l:"English"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
-            "SE":{n:"Suecia",l:"Swedish"},"NO":{n:"Noruega",l:"Norwegian"},"DK":{n:"Dinamarca",l:"Danish"},
-            "NZ":{n:"Nueva Zelanda",l:"English"},"PR":{n:"Puerto Rico",l:"Spanish"},
-            "GY":{n:"Guyana",l:"English"},"SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},"BE":{n:"Bélgica",l:"French"},
-            "CH":{n:"Suiza",l:"German"},"AT":{n:"Austria",l:"German"},"IE":{n:"Irlanda",l:"English"},
-            "FI":{n:"Finlandia",l:"Finnish"},"IS":{n:"Islandia",l:"English"},"LU":{n:"Luxemburgo",l:"French"},
-            "MC":{n:"Mónaco",l:"French"},"MT":{n:"Malta",l:"English"},"AD":{n:"Andorra",l:"Spanish"},
-            "SM":{n:"San Marino",l:"Italian"},"VA":{n:"Vaticano",l:"Italian"},"IM":{n:"Isla de Man",l:"English"},
-            "GG":{n:"Guernsey",l:"English"},"JE":{n:"Jersey",l:"English"},"FO":{n:"Islas Feroe",l:"Danish"},
-            "GL":{n:"Groenlandia",l:"Danish"},"AX":{n:"Islas Åland",l:"Swedish"},"SJ":{n:"Svalbard",l:"Norwegian"},
-            "CZ":{n:"Rep. Checa",l:"Czech"},"SK":{n:"Eslovaquia",l:"Slovak"},"HU":{n:"Hungría",l:"Hungarian"},
-            "BG":{n:"Bulgaria",l:"Bulgarian"},"HR":{n:"Croacia",l:"Croatian"},"SI":{n:"Eslovenia",l:"Slovenian"},
-            "EE":{n:"Estonia",l:"Estonian"},"LV":{n:"Letonia",l:"Latvian"},"LT":{n:"Lituania",l:"Lithuanian"},
-            "CY":{n:"Chipre",l:"Greek"},"AL":{n:"Albania",l:"Albanian"},"MK":{n:"Macedonia del Norte",l:"Macedonian"},
-            "BA":{n:"Bosnia",l:"Croatian"},"RS":{n:"Serbia",l:"Serbian"},"ME":{n:"Montenegro",l:"Serbian"},
-            "NC":{n:"Nueva Caledonia",l:"French"},"PF":{n:"Polinesia Francesa",l:"French"},"WF":{n:"Wallis y Futuna",l:"French"},
-            "GU":{n:"Guam",l:"English"},"MP":{n:"Marianas del Norte",l:"English"},"AS":{n:"Samoa Americana",l:"English"},
-            "RE":{n:"Reunión",l:"French"},"YT":{n:"Mayotte",l:"French"},"MU":{n:"Mauricio",l:"English"},
-            "BS":{n:"Bahamas",l:"English"},"JM":{n:"Jamaica",l:"English"},"BB":{n:"Barbados",l:"English"},
-            "TT":{n:"Trinidad y Tobago",l:"English"},"AG":{n:"Antigua y Barbuda",l:"English"},
-            "DM":{n:"Dominica",l:"English"},"GD":{n:"Granada",l:"English"},"KN":{n:"San Cristóbal",l:"English"},
-            "LC":{n:"Santa Lucía",l:"English"},"VC":{n:"San Vicente",l:"English"},"BZ":{n:"Belice",l:"English"},
-            "HT":{n:"Haití",l:"French"},"AW":{n:"Aruba",l:"Dutch"},"CW":{n:"Curazao",l:"Dutch"},
-            "SX":{n:"Sint Maarten",l:"Dutch"},"GP":{n:"Guadalupe",l:"French"},"MQ":{n:"Martinica",l:"French"},
-            "BL":{n:"San Bartolomé",l:"French"},"MF":{n:"San Martín",l:"French"},"KY":{n:"Islas Caimán",l:"English"},
-            "BM":{n:"Bermudas",l:"English"},"TC":{n:"Turcas y Caicos",l:"English"},"AI":{n:"Anguila",l:"English"},
-            "MS":{n:"Montserrat",l:"English"},"PM":{n:"San Pedro",l:"French"}
+            // EUROPA (Strings Exactos)
+            "ES": {n:"España", l:["Español"]}, 
+            "FR": {n:"Francia", l:["Français"]},
+            "DE": {n:"Alemania", l:["Deutsch"]},
+            "IT": {n:"Italia", l:["Italiano"]},
+            "PT": {n:"Portugal", l:["Português"]},
+            "NL": {n:"Países Bajos", l:["Nederlands"]},
+            "PL": {n:"Polonia", l:["Polski"]},
+            "CZ": {n:"Rep. Checa", l:["Čeština"]},
+            "DK": {n:"Dinamarca", l:["Dansk"]},
+            "SE": {n:"Suecia", l:["Svenska"]},
+            "NO": {n:"Noruega", l:["Norsk"]},
+            "FI": {n:"Finlandia", l:["Suomi"]},
+            "RO": {n:"Rumania", l:["Română"]},
+            "HU": {n:"Hungría", l:["Magyar"]},
+            "TR": {n:"Turquía", l:["Türkçe"]},
+            "GR": {n:"Grecia", l:["Greek", "Ελληνικά"]}, // API varía
+
+            // LATAM (Strings Exactos)
+            "AR":{n:"Argentina",l:["Español (Latinoamericano)"]},
+            "MX":{n:"México",l:["Español (Latinoamericano)"]},
+            "CL":{n:"Chile",l:["Español (Latinoamericano)"]},
+            "CO":{n:"Colombia",l:["Español (Latinoamericano)"]},
+            "PE":{n:"Perú",l:["Español (Latinoamericano)"]},
+            "UY":{n:"Uruguay",l:["Español (Latinoamericano)"]},
+            "VE":{n:"Venezuela",l:["Español (Latinoamericano)"]},
+            "EC":{n:"Ecuador",l:["Español (Latinoamericano)"]},
+            "GT":{n:"Guatemala",l:["Español (Latinoamericano)"]},
+            "CR":{n:"Costa Rica",l:["Español (Latinoamericano)"]},
+            "PA":{n:"Panamá",l:["Español (Latinoamericano)"]},
+            "DO":{n:"Rep. Dominicana",l:["Español (Latinoamericano)"]},
+            "SV":{n:"El Salvador",l:["Español (Latinoamericano)"]},
+            "HN":{n:"Honduras",l:["Español (Latinoamericano)"]},
+            "NI":{n:"Nicaragua",l:["Español (Latinoamericano)"]},
+            "PY":{n:"Paraguay",l:["Español (Latinoamericano)"]},
+            "BR":{n:"Brasil",l:["Portugués", "Português"]},
+
+            // ASIA
+            "TW": {n:"Taiwán", l:["Taiwanese Mandarin", "Mandarin", "Chinese"]},
+            "HK": {n:"Hong Kong", l:["Cantonese"]},
+            "JP": {n:"Japón", l:["Japanese", "日本語"]},
+            "KR": {n:"Corea del Sur", l:["Korean"]},
+            "ID": {n:"Indonesia", l:["Indonesian"]},
+            "TH": {n:"Tailandia", l:["Thai"]},
+            "VN": {n:"Vietnam", l:["Vietnamese"]},
+
+            // Resto
+            "US": {n:"Estados Unidos", l:["English"]},
+            "GB": {n:"Reino Unido (R. U.)", l:["English"]},
+            "LI": {n:"Liechtenstein", l:["Deutsch"]},
+            "CA":{n:"Canadá",l:["English"]},"SG":{n:"Singapur",l:["English"]},"AU":{n:"Australia",l:["English"]},
+            "NZ":{n:"Nueva Zelanda",l:["English"]},"PR":{n:"Puerto Rico",l:["Español (Latinoamericano)"]},
+            "GY":{n:"Guyana",l:["English"]},"SR":{n:"Surinam",l:["English"]},"GF":{n:"Guayana Francesa",l:["Français"]},
+            "BE":{n:"Bélgica",l:["Français", "Nederlands"]},"CH":{n:"Suiza",l:["Deutsch", "Français"]},
+            "AT":{n:"Austria",l:["Deutsch"]},"IE":{n:"Irlanda",l:["English"]},"IS":{n:"Islandia",l:["English"]},
+            "LU":{n:"Luxemburgo",l:["Français", "Deutsch"]},"MC":{n:"Mónaco",l:["Français"]},
+            "MT":{n:"Malta",l:["English"]},"AD":{n:"Andorra",l:["Español"]},
+            "SM":{n:"San Marino",l:["Italiano"]},"VA":{n:"Vaticano",l:["Italiano"]},"IM":{n:"Isla de Man",l:["English"]},
+            "GG":{n:"Guernsey",l:["English"]},"JE":{n:"Jersey",l:["English"]},"FO":{n:"Islas Feroe",l:["Dansk"]},
+            "GL":{n:"Groenlandia",l:["Danish"]},"AX":{n:"Islas Åland",l:["Svenska"]},"SJ":{n:"Svalbard",l:["Norsk"]},
+            "CZ":{n:"Rep. Checa",l:["Čeština"]},"SK":{n:"Eslovaquia",l:["Slovak"]},"HU":{n:"Hungría",l:["Magyar"]},
+            "BG":{n:"Bulgaria",l:["Bulgarian"]},"HR":{n:"Croacia",l:["Croatian"]},"SI":{n:"Eslovenia",l:["Slovenian"]},
+            "EE":{n:"Estonia",l:["Estonian"]},"LV":{n:"Letonia",l:["Latvian"]},"LT":{n:"Lituania",l:["Lithuanian"]},
+            "CY":{n:"Chipre",l:["Greek"]},"AL":{n:"Albania",l:["Albanian"]},"MK":{n:"Macedonia del Norte",l:["Macedonian"]},
+            "BA":{n:"Bosnia",l:["Croatian"]},"RS":{n:"Serbia",l:["Serbian"]},"ME":{n:"Montenegro",l:["Serbian"]},
+            "NC":{n:"Nueva Caledonia",l:["Français"]},"PF":{n:"Polinesia Francesa",l:["Français"]},"WF":{n:"Wallis y Futuna",l:["Français"]},
+            "GU":{n:"Guam",l:["English"]},"MP":{n:"Marianas del Norte",l:["English"]},"AS":{n:"Samoa Americana",l:["English"]},
+            "RE":{n:"Reunión",l:["Français"]},"YT":{n:"Mayotte",l:["Français"]},"MU":{n:"Mauricio",l:["English"]},
+            "BS":{n:"Bahamas",l:["English"]},"JM":{n:"Jamaica",l:["English"]},"BB":{n:"Barbados",l:["English"]},
+            "TT":{n:"Trinidad y Tobago",l:["English"]},"AG":{n:"Antigua y Barbuda",l:["English"]},
+            "DM":{n:"Dominica",l:["English"]},"GD":{n:"Granada",l:["English"]},"KN":{n:"San Cristóbal",l:["English"]},
+            "LC":{n:"Santa Lucía",l:["English"]},"VC":{n:"San Vicente",l:["English"]},"BZ":{n:"Belice",l:["English"]},
+            "HT":{n:"Haití",l:["Français"]},"AW":{n:"Aruba",l:["Nederlands"]},"CW":{n:"Curazao",l:["Nederlands"]},
+            "SX":{n:"Sint Maarten",l:["Nederlands"]},"GP":{n:"Guadalupe",l:["Français"]},"MQ":{n:"Martinica",l:["Français"]},
+            "BL":{n:"San Bartolomé",l:["Français"]},"MF":{n:"San Martín",l:["Français"]},"KY":{n:"Islas Caimán",l:["English"]},
+            "BM":{n:"Bermudas",l:["English"]},"VI":{n:"Islas Vírgenes (US)",l:["English"]},"VG":{n:"Islas Vírgenes (UK)",l:["English"]},
+            "TC":{n:"Turcas y Caicos",l:["English"]},"AI":{n:"Anguila",l:["English"]},"MS":{n:"Montserrat",l:["English"]},
+            "PM":{n:"San Pedro",l:["Français"]}
         };
 
         async function init() {
@@ -319,7 +326,7 @@
             }
             
             const data = GLOBAL_DB.regions[code];
-            const info = COUNTRY_MAP[code] || {n: code, l: "English"};
+            const info = COUNTRY_MAP[code] || {n: code, l: ["English"]};
 
             heroEl.style.display = 'flex';
             heroFlag.src = info.flag ? info.flag : `https://flagcdn.com/w160/${code.toLowerCase()}.png`;
@@ -350,6 +357,7 @@
                 let epsHtml = '';
                 
                 s.eps.forEach((ep, epIdx) => {
+                    // Pasar la lista de idiomas target a la función de ordenamiento
                     const audios = sortAndFormatTracks(ep.a, info.l, 'audio');
                     const subs = sortAndFormatTracks(ep.s, info.l, 'sub');
                     const descId = `desc-${s.id}-${epIdx}`;
@@ -392,31 +400,30 @@
             catDiv.innerHTML = html;
         }
 
-        // ORDENAMIENTO ESTRICTO DE IDIOMAS (PUNTAJE 100)
+        // LÓGICA DE ORDENAMIENTO ESTRICTA (Listas)
         function sortAndFormatTracks(tracks, targetLangs, type) {
             if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
             
-            // Normalizar a objetos
+            // Normalizar
             let list = tracks.map(item => {
-                if (typeof item === 'string') return { name: item, tag: '' };
-                return { name: item.l, tag: item.t };
+                if(typeof item === 'string') return {name: item, tag: ''};
+                return {name: item.l, tag: item.t};
             });
 
-            // De-duplicar
             list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
 
+            // Asegurar array de targets
             const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
             
             list.sort((a, b) => {
-                // Sistema de Puntuación Estricto
                 let scoreA = 0; 
-                // Verificar coincidencia EXACTA o Parcial Fuerte
-                if(targets.some(t => a.name === t || a.name.includes(t))) scoreA = 100;
-                else if(a.name.includes("English")) scoreA = 50;
+                // Coincidencia exacta o contiene el string
+                if(targets.some(t => a.name === t || a.name.includes(t))) scoreA = 2; 
+                else if(a.name.includes("English")) scoreA = 1;
 
                 let scoreB = 0; 
-                if(targets.some(t => b.name === t || b.name.includes(t))) scoreB = 100;
-                else if(b.name.includes("English")) scoreB = 50;
+                if(targets.some(t => b.name === t || b.name.includes(t))) scoreB = 2; 
+                else if(b.name.includes("English")) scoreB = 1;
                 
                 if (scoreA > scoreB) return -1;
                 if (scoreA < scoreB) return 1;
@@ -466,4 +473,4 @@
         init();
     </script>
 </body>
-</html> 
+</html>
