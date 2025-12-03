@@ -2,32 +2,11 @@ import requests
 import json
 import time
 import sys
-from datetime import datetime
+import os
+from datetime import datetime, timedelta
 
-# --- CONFIGURACIÓN ---
+# CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
-
-# TÍTULOS QUE SIEMPRE SON NOVEDAD (Forzar detección)
-FORCED_NEW_TITLES = [
-    "mister agreste", "sleeping syren", "dark castle", 
-    "wrexkels driver", "wreckels driver", "yaksi gozen", 
-    "the dark castle", "sirena durmiente"
-]
-
-# REGIONES DACH (Para forzar Temporada 6 como nueva)
-DACH_CODES = ["DE", "AT", "CH", "LI"]
-
-# MAPA DE LIMPIEZA DE NOMBRES (Códigos -> Nombres Legibles)
-LANG_CODES = {
-    "es-419": "Spanish (Latin American)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
-    "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
-    "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
-    "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
-    "zh-HK": "Cantonese", "ru": "Russian", "pl": "Polish", "tr": "Turkish",
-    "nl": "Dutch", "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
-    "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai", "id": "Indonesian",
-    "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
-}
 
 # LISTA DE REGIONES
 REGIONS = [
@@ -38,8 +17,7 @@ REGIONS = [
     {"c":"GT", "l":"es-419"}, {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"},
     {"c":"DO", "l":"es-419"}, {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"},
     {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
-    {"c":"FK", "l":"es-419"}, 
-    
+    {"c":"FK", "l":"es-419"},
     # NORTE AMERICA & CARIBE
     {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"PR", "l":"es-419"}, {"c":"PM", "l":"fr-FR"},
     {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"},
@@ -52,7 +30,6 @@ REGIONS = [
     {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
     {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
     {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"},
-
     # EUROPA
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
     {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
@@ -71,8 +48,7 @@ REGIONS = [
     {"c":"LT", "l":"lt-LT"}, {"c":"CY", "l":"el-GR"}, {"c":"AL", "l":"sq-AL"},
     {"c":"MK", "l":"mk-MK"}, {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"},
     {"c":"ME", "l":"sr-ME"}, {"c":"TR", "l":"tr-TR"},
-
-    # ASIA / PACIFICO / OTROS
+    # ASIA / OTROS
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, {"c":"TW", "l":"zh-Hant-TW"},
     {"c":"HK", "l":"zh-Hant-HK"}, {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"},
@@ -81,29 +57,47 @@ REGIONS = [
     {"c":"MU", "l":"en-GB"}
 ]
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'application/json'
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
+
+# Mapa de limpieza
+LANG_CODES = {
+    "es-419": "Spanish (Latin American)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
+    "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
+    "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
+    "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
+    "zh-HK": "Cantonese", "ru": "Russian", "pl": "Polish", "tr": "Turkish",
+    "nl": "Dutch", "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
+    "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai", "id": "Indonesian",
+    "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
 }
 
 def log(msg):
     print(msg)
     sys.stdout.flush()
 
-def clean_name(code, raw_name):
-    # Traduce códigos técnicos (es-419) a nombres legibles
+def clean_sub_name(code, raw_name):
     if not raw_name or "--" in raw_name or raw_name == code:
         base = raw_name.split('--')[0] if raw_name else code
         return LANG_CODES.get(base, base)
     return raw_name
 
+def load_previous_db():
+    if os.path.exists("database.json"):
+        try:
+            with open("database.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        except: pass
+    return {"regions": {}}
+
 def get_data():
-    database = {
+    OLD_DB = load_previous_db()
+    
+    new_database = {
         "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") },
         "regions": {}
     }
 
-    log(f"🌍 INICIANDO ESCANEO... ({len(REGIONS)} regiones)")
+    log(f"🌍 INICIANDO ESCANEO INTELIGENTE (MEMORIA)...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -111,13 +105,19 @@ def get_data():
         
         if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
 
+        # CARGAR MEMORIA DE FECHAS
+        memory_map = {}
+        if code in OLD_DB.get("regions", {}):
+            for s in OLD_DB["regions"][code].get("seasons", []):
+                for ep in s.get("eps", []):
+                    # Usamos Título+Num como ID único para rastrear la fecha original
+                    unique_key = f"{s['id']}-{ep['n']}"
+                    memory_map[unique_key] = ep.get('dt', '')
+
         try:
-            # 1. Obtener Temporadas
             url_bundle = f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/encodedSeriesId/{SERIES_ID}"
-            try:
-                r = requests.get(url_bundle, headers=HEADERS, timeout=4)
-            except:
-                continue 
+            try: r = requests.get(url_bundle, headers=HEADERS, timeout=4)
+            except: continue 
 
             if r.status_code == 200:
                 data = r.json()
@@ -130,7 +130,6 @@ def get_data():
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
                         
-                        # 2. Obtener Episodios
                         url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
                         try:
                             r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
@@ -139,88 +138,69 @@ def get_data():
                                 clean_eps = []
                                 
                                 for i, ep in enumerate(eps_raw):
-                                    # --- CORRECCIÓN NUMERO EPISODIO ---
-                                    ep_num = ep.get('episodeSequenceNumber')
-                                    if not ep_num: ep_num = ep.get('sequenceNumber')
-                                    if not ep_num or ep_num == 0: ep_num = i + 1
-
-                                    # --- FECHA Y NOVEDAD ---
-                                    date_str = ep.get('availabilityDate', '')
-                                    is_new = False
-                                    ep_date_val = ""
+                                    ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
                                     
-                                    if date_str:
-                                        try:
-                                            ep_date_val = date_str.split('T')[0]
-                                            dt = datetime.strptime(ep_date_val, "%Y-%m-%d")
-                                            delta = (datetime.utcnow() - dt).days
-                                            # Rango: Próximos 60 días a Pasados 120 días
-                                            if -60 <= delta <= 120: is_new = True
-                                        except: pass
-
-                                    # --- TEXTOS ---
+                                    # --- LÓGICA DE PERSISTENCIA ---
+                                    unique_key = f"{s_num}-{ep_num}"
+                                    stored_date = memory_map.get(unique_key)
+                                    
+                                    if stored_date:
+                                        # Si ya existe, MANTENER la fecha original
+                                        final_date = stored_date
+                                    else:
+                                        # Si es nuevo, usar fecha de HOY
+                                        final_date = datetime.utcnow().strftime("%Y-%m-%d")
+                                    
+                                    # Extracción de datos
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
                                     if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
 
-                                    # --- REGLA FORZADA: TITULOS ESPECIFICOS ---
-                                    t_low = title.lower()
-                                    for forced_t in FORCED_NEW_TITLES:
-                                        if forced_t in t_low:
-                                            is_new = True
-                                            break
-                                    
-                                    # --- REGLA FORZADA: DACH TEMPORADA 6 ---
-                                    if code in DACH_CODES and s_num == 6:
-                                        is_new = True
-
-                                    # --- SUBTITULOS Y AUDIO ---
                                     meta = ep.get('mediaMetadata', {})
-                                    
                                     subs_list = []
                                     for sub in meta.get('captionTracks', []):
                                         ln = sub.get('language')
                                         rn = sub.get('renditionName')
-                                        cn = clean_name(ln, rn) # LIMPIEZA
-                                        subs_list.append({
-                                            "l": cn,
-                                            "t": sub.get('trackType', 'NORMAL')
-                                        })
+                                        cn = clean_sub_name(ln, rn)
+                                        subs_list.append({"l": cn, "t": sub.get('trackType', 'NORMAL')})
 
                                     audios_list = []
                                     for aud in meta.get('audioTracks', []):
                                         ln = aud.get('language')
                                         rn = aud.get('renditionName')
-                                        audios_list.append(clean_name(ln, rn)) # LIMPIEZA
+                                        audios_list.append(clean_sub_name(ln, rn))
 
                                     ep_obj = {
                                         "n": ep_num,
                                         "t": title,
                                         "ds": desc,
-                                        "dt": ep_date_val,
+                                        "dt": final_date, # Fecha Persistente
                                         "a": audios_list,
                                         "s": subs_list
                                     }
                                     clean_eps.append(ep_obj)
-                                    if is_new: 
-                                        region_data["news"].append({
-                                            "e": f"T{s_num} E{ep_num}", 
-                                            "t": title, 
-                                            "d": ep_date_val
-                                        })
+                                    
+                                    # --- DETERMINAR SI VA A NOVEDADES ---
+                                    # Si la fecha (sea vieja o nueva) tiene menos de 90 días, es novedad
+                                    try:
+                                        dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
+                                        days_diff = (datetime.utcnow() - dt_obj).days
+                                        if 0 <= days_diff <= 90:
+                                            region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                    except: pass
 
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
 
-                    database["regions"][code] = region_data
+                    new_database["regions"][code] = region_data
                     if len(region_data["news"]) > 0:
-                        log(f"   ✅ {code}: OK ({len(region_data['news'])} nuevos)")
+                        log(f"   ✅ {code}: OK ({len(region_data['news'])} en lista novedades)")
                     else:
                         log(f"   ✅ {code}: OK")
         except: pass
         time.sleep(0.1)
 
-    return database
+    return new_database
 
 if __name__ == "__main__":
     try:
