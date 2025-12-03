@@ -2,8 +2,8 @@ name: Actualizador Disney
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *' # Ejecutar cada 6 horas
+  workflow_dispatch:      # Botón manual
 
 permissions:
   contents: write
@@ -12,7 +12,7 @@ jobs:
   run-scan:
     runs-on: ubuntu-latest
     
-    # ESTA ES LA PARTE NUEVA QUE SOLUCIONA EL "CONGELAMIENTO" VISUAL
+    # Esto permite ver los mensajes de Python en tiempo real
     env:
       PYTHONUNBUFFERED: "1"
 
@@ -31,10 +31,17 @@ jobs:
       - name: Ejecutar Scanner
         run: python scan.py
 
-      - name: Guardar datos
+      - name: Guardar datos (Con Sincronización)
         run: |
-          git config --global user.name 'UpdateBot'
+          git config --global user.name 'DisneyBot'
           git config --global user.email 'bot@noreply.github.com'
+          
+          # Añadir cambios locales
           git add database.json
-          git commit -m "Update Data" || echo "Sin cambios"
+          git commit -m "Datos actualizados por el Bot" || echo "Sin cambios nuevos"
+          
+          # LA SOLUCIÓN: Descargar cambios remotos y mezclarlos antes de subir
+          git pull --rebase origin main
+          
+          # Subir cambios finales
           git push
