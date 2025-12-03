@@ -4,21 +4,54 @@ import time
 import sys
 from datetime import datetime
 
-# --- CONFIGURACIÓN ---
+# CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
 
-# Lista de regiones
+# LISTA FILTRADA (Sin Sudeste Asiático excepto SG, TW, HK, KR, JP)
 REGIONS = [
-    # Principales
+    # --- AMÉRICA ---
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
-    {"c":"US", "l":"en-US"}, {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"},
-    # Resto
     {"c":"CL", "l":"es-419"}, {"c":"CO", "l":"es-419"}, {"c":"PE", "l":"es-419"},
-    {"c":"GB", "l":"en-GB"}, {"c":"DE", "l":"de-DE"}, {"c":"IT", "l":"it-IT"},
-    {"c":"PT", "l":"pt-PT"}, {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"},
-    {"c":"TR", "l":"tr-TR"}, {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
-    {"c":"CA", "l":"en-CA"}, {"c":"NL", "l":"nl-NL"}, {"c":"SE", "l":"sv-SE"},
-    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"PL", "l":"pl-PL"}
+    {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"UY", "l":"es-419"},
+    {"c":"VE", "l":"es-419"}, {"c":"EC", "l":"es-419"}, {"c":"GT", "l":"es-419"},
+    {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"}, {"c":"DO", "l":"es-419"},
+    {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"}, {"c":"NI", "l":"es-419"},
+    {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"}, {"c":"PR", "l":"es-419"},
+    {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"},
+    {"c":"TT", "l":"en-US"}, {"c":"GY", "l":"en-US"}, {"c":"SR", "l":"en-US"},
+    {"c":"BZ", "l":"en-US"}, {"c":"FK", "l":"es-419"}, # Malvinas
+
+    # --- EUROPA ---
+    {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
+    {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
+    {"c":"NL", "l":"nl-NL"}, {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"},
+    {"c":"AT", "l":"de-AT"}, {"c":"IE", "l":"en-GB"}, {"c":"SE", "l":"sv-SE"},
+    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FL"},
+    {"c":"IS", "l":"en-GB"}, {"c":"PL", "l":"pl-PL"}, {"c":"CZ", "l":"cs-CZ"},
+    {"c":"SK", "l":"sk-SK"}, {"c":"HU", "l":"hu-HU"}, {"c":"RO", "l":"ro-RO"},
+    {"c":"BG", "l":"bg-BG"}, {"c":"HR", "l":"hr-HR"}, {"c":"GR", "l":"el-GR"},
+    {"c":"SI", "l":"sl-SI"}, {"c":"EE", "l":"et-EE"}, {"c":"LV", "l":"lv-LV"},
+    {"c":"LT", "l":"lt-LT"}, {"c":"MT", "l":"en-GB"}, {"c":"CY", "l":"el-GR"},
+    {"c":"TR", "l":"tr-TR"}, {"c":"AL", "l":"sq-AL"}, {"c":"MK", "l":"mk-MK"},
+    {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"}, {"c":"ME", "l":"sr-ME"},
+
+    # --- ASIA PACÍFICO (Solo seleccionados) ---
+    {"c":"JP", "l":"ja-JP"}, # Japón
+    {"c":"KR", "l":"ko-KR"}, # Corea del Sur
+    {"c":"TW", "l":"zh-Hant-TW"}, # Taiwán
+    {"c":"HK", "l":"zh-Hant-HK"}, # Hong Kong
+    {"c":"SG", "l":"en-SG"}, # Singapur
+    {"c":"AU", "l":"en-AU"}, # Australia
+    {"c":"NZ", "l":"en-NZ"}, # Nueva Zelanda
+    
+    # --- OTROS TERRITORIOS (Ultramar/Islas) ---
+    {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"}, {"c":"WF", "l":"fr-FR"}, 
+    {"c":"GU", "l":"en-US"}, {"c":"MP", "l":"en-US"}, {"c":"AS", "l":"en-US"},
+    {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"}, {"c":"ZA", "l":"en-ZA"},
+    {"c":"GP", "l":"fr-FR"}, {"c":"MQ", "l":"fr-FR"}, {"c":"BL", "l":"fr-FR"},
+    {"c":"MF", "l":"fr-FR"}, {"c":"PM", "l":"fr-FR"}, {"c":"AW", "l":"en-US"}, 
+    {"c":"CW", "l":"en-US"}, {"c":"SX", "l":"en-US"}, {"c":"KY", "l":"en-US"},
+    {"c":"BM", "l":"en-US"}, {"c":"VI", "l":"en-US"}, {"c":"TC", "l":"en-US"}
 ]
 
 HEADERS = {
@@ -26,10 +59,9 @@ HEADERS = {
     'Accept': 'application/json'
 }
 
-# Función para imprimir inmediatamente en la consola de GitHub
 def log(msg):
     print(msg)
-    sys.stdout.flush() # <--- ESTO FUERZA A QUE SE VEA EL TEXTO AL INSTANTE
+    sys.stdout.flush()
 
 def get_data():
     database = {
@@ -37,73 +69,75 @@ def get_data():
         "regions": {}
     }
 
-    log(f"🚀 INICIANDO ESCANEO DE {len(REGIONS)} PAISES...")
+    log(f"🌍 INICIANDO ESCANEO DE {len(REGIONS)} REGIONES...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
         lang = reg['l']
         
-        # Imprimimos ANTES de conectar para saber si se cuelga aquí
-        log(f"[{idx+1}/{len(REGIONS)}] Conectando a {code}...")
+        if idx % 5 == 0: log(f"Procesando bloque {idx}...")
 
         try:
-            # Timeout muy corto (3.05 segundos) para no atascarse
+            # Bundle
             url_bundle = f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/encodedSeriesId/{SERIES_ID}"
-            r = requests.get(url_bundle, headers=HEADERS, timeout=3.05)
+            try:
+                r = requests.get(url_bundle, headers=HEADERS, timeout=4)
+            except:
+                continue 
 
             if r.status_code == 200:
                 data = r.json()
                 seasons = data.get('data', {}).get('DmcSeriesBundle', {}).get('seasons', {}).get('seasons', [])
                 
-                region_data = {"seasons": [], "news": []}
-                log(f"   ✅ {code}: Encontradas {len(seasons)} temporadas.")
-
-                for s in seasons:
-                    s_id = s['seasonId']
-                    s_num = s.get('seasonSequenceNumber', 0)
+                if seasons:
+                    region_data = {"seasons": [], "news": []}
                     
-                    url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
-                    try:
-                        r_eps = requests.get(url_eps, headers=HEADERS, timeout=3.05)
-                        if r_eps.status_code == 200:
-                            eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
-                            clean_eps = []
-                            for ep in eps_raw:
-                                date_str = ep.get('availabilityDate', '')
-                                is_new = False
-                                if date_str:
-                                    try:
-                                        dt = datetime.strptime(date_str.split('T')[0], "%Y-%m-%d")
-                                        if 0 <= (datetime.utcnow() - dt).days <= 90: is_new = True
-                                    except: pass
+                    for s in seasons:
+                        s_id = s['seasonId']
+                        s_num = s.get('seasonSequenceNumber', 0)
+                        
+                        # Episodios
+                        url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
+                        try:
+                            r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
+                            if r_eps.status_code == 200:
+                                eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
+                                clean_eps = []
+                                
+                                for ep in eps_raw:
+                                    date_str = ep.get('availabilityDate', '')
+                                    is_new = False
+                                    if date_str:
+                                        try:
+                                            dt = datetime.strptime(date_str.split('T')[0], "%Y-%m-%d")
+                                            if 0 <= (datetime.utcnow() - dt).days <= 90: is_new = True
+                                        except: pass
 
-                                title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
-                                desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
-                                if not desc: desc = "..."
+                                    title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
+                                    desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
+                                    if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
 
-                                ep_obj = {
-                                    "n": ep.get('sequenceNumber', 0),
-                                    "t": title,
-                                    "ds": desc[:200], 
-                                    "dt": date_str.split('T')[0] if date_str else "",
-                                    "a": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('audioTracks', [])][:4],
-                                    "s": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('captionTracks', [])][:4]
-                                }
-                                clean_eps.append(ep_obj)
-                                if is_new: 
-                                    region_data["news"].append({"e":f"T{s_num} E{ep_obj['n']}", "t":title, "d":ep_obj['dt']})
+                                    ep_obj = {
+                                        "n": ep.get('sequenceNumber', 0),
+                                        "t": title,
+                                        "ds": desc,
+                                        "dt": date_str.split('T')[0] if date_str else "",
+                                        "a": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('audioTracks', [])],
+                                        "s": [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('captionTracks', [])]
+                                    }
+                                    clean_eps.append(ep_obj)
+                                    if is_new: region_data["news"].append({"e":f"T{s_num} E{ep_obj['n']}", "t":title, "d":ep_obj['dt']})
 
-                            region_data["seasons"].append({"id": s_num, "eps": clean_eps})
-                    except:
-                        pass # Si falla un episodio, seguimos
+                                region_data["seasons"].append({"id": s_num, "eps": clean_eps})
+                        except: pass
 
-                if region_data["seasons"]:
                     database["regions"][code] = region_data
-            else:
-                log(f"   ⚠️ {code}: Bloqueado o sin datos ({r.status_code})")
-
+                    log(f"   ✅ {code}: OK")
+            
         except Exception as e:
-            log(f"   ❌ {code}: Error o Timeout. Saltando...")
+            pass
+
+        time.sleep(0.2) 
 
     return database
 
@@ -112,6 +146,6 @@ if __name__ == "__main__":
         data = get_data()
         with open("database.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
-        log("🎉 BASE DE DATOS GUARDADA.")
+        log("🎉 BASE DE DATOS ACTUALIZADA.")
     except Exception as e:
-        log(f"💀 ERROR FATAL: {e}")
+        log(f"💀 ERROR: {e}")
