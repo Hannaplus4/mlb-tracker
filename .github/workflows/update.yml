@@ -1,0 +1,36 @@
+name: Actualizador Diario Miraculous
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Ejecutar cada 6 horas
+  workflow_dispatch: # Permite ejecutar manualmente con un botón
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permiso para guardar el archivo json
+
+    steps:
+    - name: Chequear código
+      uses: actions/checkout@v3
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Instalar librerías
+      run: |
+        pip install requests
+
+    - name: Ejecutar Scanner
+      run: python scan.py
+
+    - name: Guardar cambios (Commit & Push)
+      run: |
+        git config --global user.name 'Robot Miraculous'
+        git config --global user.email 'robot@bot.com'
+        git add database.json
+        git commit -m "Actualizacion automatica de datos" || exit 0
+        git push
