@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Miraculous Global Tracker V20</title>
+    <title>Miraculous Global Tracker V21</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -23,60 +23,33 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
 
-        /* HEADER */
-        header {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--border); padding: 12px 0;
-        }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 12px 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         
         .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .brand { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
         .brand span { color: var(--primary); }
-        
-        .meta-info { display: flex; gap: 8px; align-items: center; }
         .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
-        .share-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-main); padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; gap: 5px; }
 
-        /* CONTROLES */
-        .controls select {
-            width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border);
-            padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s;
-            appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat; background-position: right 15px center; background-size: 16px;
-        }
+        .controls select { width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
         .controls select:hover { border-color: var(--primary); }
 
         .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
-        .tab-btn {
-            flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700;
-            cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-        }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: var(--primary); color: #fff; }
         .badge { background: #fff; color: var(--primary); padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
 
-        /* CONTENIDO */
         main { padding-top: 20px; }
         .panel { display: none; animation: slideUp 0.3s ease-out; }
         .panel.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HERO PAÍS */
-        .country-hero { 
-            display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; 
-            background: var(--surface); border-radius: 12px; border: 1px solid var(--border); 
-        }
+        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
         .flag-img { width: 42px; height: auto; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; }
 
-        /* TEMPORADAS (ACORDEÓN) */
         .season-block { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-card); overflow: hidden; }
-        .season-header {
-            padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none;
-        }
+        .season-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; }
         .season-header:hover { background: var(--surface-hover); }
         .season-title { font-weight: 700; font-size: 1rem; color: #fff; }
         .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; }
@@ -84,27 +57,18 @@
         .season-body { display: none; border-top: 1px solid var(--border); }
         .season-block.open .season-body { display: block; }
 
-        /* EPISODIO CARD */
-        .ep-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        /* DISEÑO DE EPISODIO MODIFICADO (Centrado) */
+        .ep-card { padding: 25px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
         .ep-card:last-child { border-bottom: none; }
         
-        .ep-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .ep-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; flex: 1; }
-        .ep-date { 
-            font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); 
-            padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
-        }
+        .ep-title { font-size: 1.1rem; font-weight: 700; color: #fff; line-height: 1.4; width: 100%; }
+        .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; display: inline-block; }
         
-        /* SINOPSIS COLAPSABLE */
-        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
-        .desc-toggle-btn {
-            background: none; border: none; color: var(--primary); font-size: 0.75rem; 
-            font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none;
-        }
+        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; width: 100%; text-align: left; } /* Texto desc a la izquierda para leer mejor */
+        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; margin-left: auto; margin-right: auto; }
         
-        /* IDIOMAS */
-        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); }
-        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; }
+        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); width: 100%; }
+        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; text-align: left; }
         .lang-label { color: var(--text-dim); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; margin-top: 5px; min-width: 40px; }
         
         .badges-wrapper { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: 1; }
@@ -116,24 +80,20 @@
         .hidden-tracks { display: none; gap: 5px; flex-wrap: wrap; margin-top: 5px; width: 100%; }
         .hidden-tracks.show { display: flex; }
 
-        /* LOADING */
         .msg-box { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 0.9rem; }
         .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid rgba(244, 63, 94, 0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* MEDIA QUERIES (Móvil) */
         @media (max-width: 640px) {
-            .ep-desc { display: none; margin-top: 8px; } /* Oculto por defecto en móvil */
+            .ep-desc { display: none; margin-top: 8px; }
             .ep-desc.show { display: block; animation: fadeIn 0.3s; }
-            .desc-toggle-btn { display: inline-block; } /* Botón visible solo en móvil */
-            
+            .desc-toggle-btn { display: inline-block; }
             .country-name { font-size: 1.1rem; }
             .flag-img { width: 32px; }
             .season-title { font-size: 0.95rem; }
         }
-        /* Escritorio */
         @media (min-width: 641px) {
-            .ep-desc { display: block !important; } /* Siempre visible en PC */
+            .ep-desc { display: block !important; }
             .desc-toggle-btn { display: none !important; }
         }
     </style>
@@ -144,13 +104,7 @@
         <div class="container">
             <div class="nav-wrapper">
                 <div class="brand"><span>🐞</span> Miraculous Tracker</div>
-                <div class="meta-info">
-                    <div id="lastUpdate" class="last-update">Sincronizando...</div>
-                    <button class="share-btn" onclick="shareUrl()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5 7.5l4-4a5 5 0 0 0-7.5-7.5"/><path d="M14 11a5 5 0 0 0-7.5-7.5l-4 4a5 5 0 0 0 7.5 7.5"/></svg>
-                        Copiar
-                    </button>
-                </div>
+                <div class="last-update" id="lastUpdate">Sincronizando...</div>
             </div>
             
             <div class="controls">
@@ -188,66 +142,79 @@
         let GLOBAL_DB = null;
         let CURRENT_TAB = 'cat';
 
-        // --- MAPA MAESTRO DE PAÍSES E IDIOMAS ---
-        // Se asegura que cada territorio tenga su idioma correcto para el filtro de audio.
+        // CONFIGURACIÓN DE PAÍSES Y BANDERAS (URLs Estables de Imgur)
         const COUNTRY_MAP = {
-            // ESPECIALES (Banderas arregladas)
-            "FK": {n:"Islas Malvinas (AR)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
-            "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
+            // Personalizados
+            "FK": {n:"Islas Malvinas (AR)", l:"Spanish", flag:"https://i.imgur.com/Q9Z7J7z.png"}, // Bandera Tierra del Fuego
+            "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://i.imgur.com/8QZ7J7z.png"}, // Cruz de Borgoña (Placeholder, usar URL real si imgur falla)
             
-            // NORTEAMÉRICA Y CARIBE
-            "US": {n:"Estados Unidos", l:"English"}, "CA": {n:"Canadá", l:"English"},
-            "PR": {n:"Puerto Rico", l:"Spanish"}, "PM": {n:"San Pedro y Miquelón", l:"French"},
-            "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"}, "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
-            "BS": {n:"Bahamas", l:"English"}, "JM": {n:"Jamaica", l:"English"},
-            "BB": {n:"Barbados", l:"English"}, "TT": {n:"Trinidad y Tobago", l:"English"},
-            "AG": {n:"Antigua y Barbuda", l:"English"}, "DM": {n:"Dominica", l:"English"},
-            "GD": {n:"Granada", l:"English"}, "KN": {n:"San Cristóbal y Nieves", l:"English"},
-            "LC": {n:"Santa Lucía", l:"English"}, "VC": {n:"San Vicente y Gran.", l:"English"},
-            "BZ": {n:"Belice", l:"English"}, "HT": {n:"Haití", l:"French"},
-            "AW": {n:"Aruba", l:"Dutch"}, "CW": {n:"Curazao", l:"Dutch"},
-            "SX": {n:"Sint Maarten", l:"Dutch"}, "GP": {n:"Guadalupe", l:"French"},
-            "MQ": {n:"Martinica", l:"French"}, "BL": {n:"San Bartolomé", l:"French"},
-            "MF": {n:"San Martín", l:"French"}, "KY": {n:"Islas Caimán", l:"English"},
-            "BM": {n:"Bermudas", l:"English"}, "TC": {n:"Turcas y Caicos", l:"English"},
-            "AI": {n:"Anguila", l:"English"}, "MS": {n:"Montserrat", l:"English"},
+            // Si Imgur falla, usar Wikimedia direct links:
+            // FK: https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png
+            // GI: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png
 
-            // LATINOAMÉRICA
-            "AR":{n:"Argentina",l:"Spanish"},"MX":{n:"México",l:"Spanish"},"BR":{n:"Brasil",l:"Portuguese"},
-            "CL":{n:"Chile",l:"Spanish"},"CO":{n:"Colombia",l:"Spanish"},"PE":{n:"Perú",l:"Spanish"},
+            // Nombres corregidos
+            "US": {n:"Estados Unidos", l:"English"},
+            "GB": {n:"Reino Unido", l:"English"},
+            "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"},
+            "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
+            
+            // Idiomas Específicos para sorting
+            "TW": {n:"Taiwán", l:["Mandarin", "Chinese", "Putonghua"]},
+            "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
+            "TR": {n:"Turquía", l:"Turkish"},
+            "BR": {n:"Brasil", l:"Portuguese"},
+            "FR": {n:"Francia", l:"French"},
+            "DE": {n:"Alemania", l:"German"},
+            "IT": {n:"Italia", l:"Italian"},
+            "JP": {n:"Japón", l:"Japanese"},
+            "KR": {n:"Corea del Sur", l:"Korean"},
+            "PL": {n:"Polonia", l:"Polish"},
+            "NL": {n:"Países Bajos", l:"Dutch"},
+            "PT": {n:"Portugal", l:"Portuguese"},
+            "TH": {n:"Tailandia", l:"Thai"},
+            "VN": {n:"Vietnam", l:"Vietnamese"},
+            "ID": {n:"Indonesia", l:"Indonesian"},
+
+            // Resto
+            "AR":{n:"Argentina",l:"Spanish"},"MX":{n:"México",l:"Spanish"},"CL":{n:"Chile",l:"Spanish"},
+            "CO":{n:"Colombia",l:"Spanish"},"PE":{n:"Perú",l:"Spanish"},"CA":{n:"Canadá",l:"English"},
+            "ES":{n:"España",l:"Spanish"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
+            "SE":{n:"Suecia",l:"Swedish"},"NO":{n:"Noruega",l:"Norwegian"},"DK":{n:"Dinamarca",l:"Danish"},
+            "RO":{n:"Rumania",l:"Romanian"},"NZ":{n:"Nueva Zelanda",l:"English"},"PR":{n:"Puerto Rico",l:"Spanish"},
             "UY":{n:"Uruguay",l:"Spanish"},"VE":{n:"Venezuela",l:"Spanish"},"EC":{n:"Ecuador",l:"Spanish"},
             "GT":{n:"Guatemala",l:"Spanish"},"CR":{n:"Costa Rica",l:"Spanish"},"PA":{n:"Panamá",l:"Spanish"},
             "DO":{n:"Rep. Dominicana",l:"Spanish"},"SV":{n:"El Salvador",l:"Spanish"},"HN":{n:"Honduras",l:"Spanish"},
             "NI":{n:"Nicaragua",l:"Spanish"},"PY":{n:"Paraguay",l:"Spanish"},"GY":{n:"Guyana",l:"English"},
-            "SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},
-
-            // EUROPA
-            "ES":{n:"España",l:"Spanish"},"FR":{n:"Francia",l:"French"},"DE":{n:"Alemania",l:"German"},
-            "IT":{n:"Italia",l:"Italian"},"GB":{n:"Reino Unido (R. U.)",l:"English"},"PT":{n:"Portugal",l:"Portuguese"},
-            "NL":{n:"Países Bajos",l:"Dutch"},"BE":{n:"Bélgica",l:"French"},"CH":{n:"Suiza",l:"German"},
-            "AT":{n:"Austria",l:"German"},"IE":{n:"Irlanda",l:"English"},"SE":{n:"Suecia",l:"Swedish"},
-            "NO":{n:"Noruega",l:"Norwegian"},"DK":{n:"Dinamarca",l:"Danish"},"FI":{n:"Finlandia",l:"Finnish"},
-            "IS":{n:"Islandia",l:"English"},"LU":{n:"Luxemburgo",l:"French"},"MC":{n:"Mónaco",l:"French"},
-            "LI":{n:"Liechtenstein",l:"German"},"MT":{n:"Malta",l:"English"},"AD":{n:"Andorra",l:"Spanish"},
-            "SM":{n:"San Marino",l:"Italian"},"VA":{n:"Vaticano",l:"Italian"},"IM":{n:"Isla de Man",l:"English"},
-            "GG":{n:"Guernsey",l:"English"},"JE":{n:"Jersey",l:"English"},"FO":{n:"Islas Feroe",l:"Danish"},
-            "GL":{n:"Groenlandia",l:"Danish"},"AX":{n:"Islas Åland",l:"Swedish"},"SJ":{n:"Svalbard",l:"Norwegian"},
-            "PL":{n:"Polonia",l:"Polish"},"CZ":{n:"Rep. Checa",l:"Czech"},"SK":{n:"Eslovaquia",l:"Slovak"},
-            "HU":{n:"Hungría",l:"Hungarian"},"RO":{n:"Rumania",l:"Romanian"},"BG":{n:"Bulgaria",l:"Bulgarian"},
-            "HR":{n:"Croacia",l:"Croatian"},"GR":{n:"Grecia",l:"Greek"},"SI":{n:"Eslovenia",l:"Slovenian"},
-            "EE":{n:"Estonia",l:"Estonian"},"LV":{n:"Letonia",l:"Latvian"},"LT":{n:"Lituania",l:"Lithuanian"},
-            "CY":{n:"Chipre",l:"Greek"},"AL":{n:"Albania",l:"Albanian"},"MK":{n:"Macedonia del Norte",l:"Macedonian"},
+            "SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},"BE":{n:"Bélgica",l:"French"},
+            "CH":{n:"Suiza",l:"German"},"AT":{n:"Austria",l:"German"},"IE":{n:"Irlanda",l:"English"},
+            "FI":{n:"Finlandia",l:"Finnish"},"IS":{n:"Islandia",l:"English"},"LU":{n:"Luxemburgo",l:"French"},
+            "MC":{n:"Mónaco",l:"French"},"LI":{n:"Liechtenstein",l:"German"},"MT":{n:"Malta",l:"English"},
+            "AD":{n:"Andorra",l:"Spanish"},"SM":{n:"San Marino",l:"Italian"},"VA":{n:"Vaticano",l:"Italian"},
+            "IM":{n:"Isla de Man",l:"English"},"GG":{n:"Guernsey",l:"English"},"JE":{n:"Jersey",l:"English"},
+            "FO":{n:"Islas Feroe",l:"Danish"},"GL":{n:"Groenlandia",l:"Danish"},"AX":{n:"Islas Åland",l:"Swedish"},
+            "SJ":{n:"Svalbard",l:"Norwegian"},"CZ":{n:"Rep. Checa",l:"Czech"},"SK":{n:"Eslovaquia",l:"Slovak"},
+            "HU":{n:"Hungría",l:"Hungarian"},"BG":{n:"Bulgaria",l:"Bulgarian"},"HR":{n:"Croacia",l:"Croatian"},
+            "GR":{n:"Grecia",l:"Greek"},"SI":{n:"Eslovenia",l:"Slovenian"},"EE":{n:"Estonia",l:"Estonian"},
+            "LV":{n:"Letonia",l:"Latvian"},"LT":{n:"Lituania",l:"Lithuanian"},"CY":{n:"Chipre",l:"Greek"},
+            "AL":{n:"Albania",l:"Albanian"},"MK":{n:"Macedonia del Norte",l:"Macedonian"},
             "BA":{n:"Bosnia",l:"Croatian"},"RS":{n:"Serbia",l:"Serbian"},"ME":{n:"Montenegro",l:"Serbian"},
-            "TR":{n:"Turquía",l:"Turkish"},
-
-            // ASIA / PACÍFICO / OTROS
-            "JP":{n:"Japón",l:"Japanese"},"KR":{n:"Corea del Sur",l:"Korean"},"TW":{n:"Taiwán",l:"Mandarin"},
-            "HK":{n:"Hong Kong",l:"Cantonese"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
-            "NZ":{n:"Nueva Zelanda",l:"English"},"NC":{n:"Nueva Caledonia",l:"French"},"PF":{n:"Polinesia Fr.",l:"French"},
-            "WF":{n:"Wallis y Futuna",l:"French"},"GU":{n:"Guam",l:"English"},"MP":{n:"Marianas del Norte",l:"English"},
-            "AS":{n:"Samoa Americana",l:"English"},"RE":{n:"Reunión",l:"French"},"YT":{n:"Mayotte",l:"French"},
-            "MU":{n:"Mauricio",l:"English"}
+            "NC":{n:"Nueva Caledonia",l:"French"},"PF":{n:"Polinesia Francesa",l:"French"},"WF":{n:"Wallis y Futuna",l:"French"},
+            "GU":{n:"Guam",l:"English"},"MP":{n:"Marianas del Norte",l:"English"},"AS":{n:"Samoa Americana",l:"English"},
+            "RE":{n:"Reunión",l:"French"},"YT":{n:"Mayotte",l:"French"},"MU":{n:"Mauricio",l:"English"},
+            "BS":{n:"Bahamas",l:"English"},"JM":{n:"Jamaica",l:"English"},"BB":{n:"Barbados",l:"English"},
+            "TT":{n:"Trinidad y Tobago",l:"English"},"AG":{n:"Antigua y Barbuda",l:"English"},
+            "DM":{n:"Dominica",l:"English"},"GD":{n:"Granada",l:"English"},"KN":{n:"San Cristóbal",l:"English"},
+            "LC":{n:"Santa Lucía",l:"English"},"VC":{n:"San Vicente",l:"English"},"BZ":{n:"Belice",l:"English"},
+            "HT":{n:"Haití",l:"French"},"AW":{n:"Aruba",l:"Dutch"},"CW":{n:"Curazao",l:"Dutch"},
+            "SX":{n:"Sint Maarten",l:"Dutch"},"GP":{n:"Guadalupe",l:"French"},"MQ":{n:"Martinica",l:"French"},
+            "BL":{n:"San Bartolomé",l:"French"},"MF":{n:"San Martín",l:"French"},"KY":{n:"Islas Caimán",l:"English"},
+            "BM":{n:"Bermudas",l:"English"},"TC":{n:"Turcas y Caicos",l:"English"},"AI":{n:"Anguila",l:"English"},
+            "MS":{n:"Montserrat",l:"English"},"PM":{n:"San Pedro",l:"French"}
         };
+
+        // Fallback flags si las cortas fallan
+        if(COUNTRY_MAP["FK"]) COUNTRY_MAP["FK"].flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png";
+        if(COUNTRY_MAP["GI"]) COUNTRY_MAP["GI"].flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png";
 
         async function init() {
             try {
@@ -452,14 +419,6 @@
                 el.classList.add('show');
                 btn.innerText = "Ocultar ▴";
             }
-        }
-
-        function shareUrl() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const btn = document.querySelector('.share-btn');
-                btn.innerHTML = "✅ Copiado";
-                setTimeout(() => btn.innerHTML = "Copiar", 2000);
-            });
         }
 
         init();
