@@ -136,15 +136,76 @@
         let GLOBAL_DB = null;
 
         // Diccionario de Nombres Completos
-        const COUNTRY_NAMES = {
-            "AR": "Argentina 🇦🇷", "MX": "México 🇲🇽", "BR": "Brasil 🇧🇷", "CL": "Chile 🇨🇱",
-            "CO": "Colombia 🇨🇴", "PE": "Perú 🇵🇪", "US": "Estados Unidos 🇺🇸", "CA": "Canadá 🇨🇦",
-            "ES": "España 🇪🇸", "FR": "Francia 🇫🇷", "DE": "Alemania 🇩🇪", "IT": "Italia 🇮🇹",
-            "GB": "Reino Unido 🇬🇧", "PT": "Portugal 🇵🇹", "JP": "Japón 🇯🇵", "KR": "Corea del Sur 🇰🇷",
-            "TR": "Turquía 🇹🇷", "SG": "Singapur 🇸🇬", "AU": "Australia 🇦🇺", "FK": "Islas Malvinas 🇦🇷",
-            "NL": "Países Bajos 🇳🇱", "SE": "Suecia 🇸🇪", "NO": "Noruega 🇳🇴", "DK": "Dinamarca 🇩🇰",
-            "PL": "Polonia 🇵🇱", "RO": "Rumania 🇷🇴", "TW": "Taiwán 🇹🇼", "HK": "Hong Kong 🇭🇰",
-            "NZ": "Nueva Zelanda 🇳🇿", "PR": "Puerto Rico 🇵🇷", "UY": "Uruguay 🇺🇾", "VE": "Venezuela 🇻🇪"
+const COUNTRY_MAP = {
+            // AMERICA NORTE & CARIBE
+            "US": {n:"Estados Unidos", l:"English"}, "CA": {n:"Canadá", l:"English"},
+            "PR": {n:"Puerto Rico", l:"Spanish"}, "PM": {n:"San Pedro y Miquelón", l:"French"},
+            "BS": {n:"Bahamas", l:"English"}, "JM": {n:"Jamaica", l:"English"},
+            "BB": {n:"Barbados", l:"English"}, "TT": {n:"Trinidad y Tobago", l:"English"},
+            "AG": {n:"Antigua y Barbuda", l:"English"}, "DM": {n:"Dominica", l:"English"},
+            "GD": {n:"Granada", l:"English"}, "KN": {n:"San Cristóbal y Nieves", l:"English"},
+            "LC": {n:"Santa Lucía", l:"English"}, "VC": {n:"San Vicente y Granadinas", l:"English"},
+            "BZ": {n:"Belice", l:"English"}, "HT": {n:"Haití", l:"French"},
+            "AW": {n:"Aruba", l:"Dutch"}, "CW": {n:"Curazao", l:"Dutch"},
+            "SX": {n:"Sint Maarten", l:"Dutch"}, "GP": {n:"Guadalupe", l:"French"},
+            "MQ": {n:"Martinica", l:"French"}, "BL": {n:"San Bartolomé", l:"French"},
+            "MF": {n:"San Martín", l:"French"}, "KY": {n:"Islas Caimán", l:"English"},
+            "BM": {n:"Bermudas", l:"English"}, "VI": {n:"Islas Vírgenes (US)", l:"English"},
+            "VG": {n:"Islas Vírgenes (UK)", l:"English"}, "TC": {n:"Turcas y Caicos", l:"English"},
+            "AI": {n:"Anguila", l:"English"}, "MS": {n:"Montserrat", l:"English"},
+
+            // LATINOAMÉRICA
+            "AR": {n:"Argentina", l:"Spanish"}, "MX": {n:"México", l:"Spanish"},
+            "BR": {n:"Brasil", l:"Portuguese"}, "CL": {n:"Chile", l:"Spanish"},
+            "CO": {n:"Colombia", l:"Spanish"}, "PE": {n:"Perú", l:"Spanish"},
+            "UY": {n:"Uruguay", l:"Spanish"}, "VE": {n:"Venezuela", l:"Spanish"},
+            "EC": {n:"Ecuador", l:"Spanish"}, "GT": {n:"Guatemala", l:"Spanish"},
+            "BO": {n:"Bolivia", l:"Spanish"}, "CR": {n:"Costa Rica", l:"Spanish"},
+            "DO": {n:"Rep. Dominicana", l:"Spanish"}, "SV": {n:"El Salvador", l:"Spanish"},
+            "HN": {n:"Honduras", l:"Spanish"}, "NI": {n:"Nicaragua", l:"Spanish"},
+            "PA": {n:"Panamá", l:"Spanish"}, "PY": {n:"Paraguay", l:"Spanish"},
+            "GY": {n:"Guyana", l:"English"}, "SR": {n:"Surinam", l:"English"},
+            "GF": {n:"Guayana Francesa", l:"French"}, "FK": {n:"Islas Malvinas", l:"Spanish"},
+
+            // EUROPA
+            "ES": {n:"España", l:"Spanish"}, "FR": {n:"Francia", l:"French"},
+            "DE": {n:"Alemania", l:"German"}, "IT": {n:"Italia", l:"Italian"},
+            "GB": {n:"Reino Unido", l:"English"}, "PT": {n:"Portugal", l:"Portuguese"},
+            "NL": {n:"Países Bajos", l:"Dutch"}, "BE": {n:"Bélgica", l:"French"},
+            "CH": {n:"Suiza", l:"German"}, "AT": {n:"Austria", l:"German"},
+            "IE": {n:"Irlanda", l:"English"}, "SE": {n:"Suecia", l:"Swedish"},
+            "NO": {n:"Noruega", l:"Norwegian"}, "DK": {n:"Dinamarca", l:"Danish"},
+            "FI": {n:"Finlandia", l:"Finnish"}, "IS": {n:"Islandia", l:"English"},
+            "LU": {n:"Luxemburgo", l:"French"}, "MC": {n:"Mónaco", l:"French"},
+            "LI": {n:"Liechtenstein", l:"German"}, "MT": {n:"Malta", l:"English"},
+            "AD": {n:"Andorra", l:"Spanish"}, "SM": {n:"San Marino", l:"Italian"},
+            "VA": {n:"Vaticano", l:"Italian"}, "GI": {n:"Gibraltar", l:"English"},
+            "IM": {n:"Isla de Man", l:"English"}, "GG": {n:"Guernsey", l:"English"},
+            "JE": {n:"Jersey", l:"English"}, "FO": {n:"Islas Feroe", l:"Danish"},
+            "GL": {n:"Groenlandia", l:"Danish"}, "AX": {n:"Islas Åland", l:"Swedish"},
+            "SJ": {n:"Svalbard", l:"Norwegian"}, "PL": {n:"Polonia", l:"Polish"},
+            "CZ": {n:"Rep. Checa", l:"Czech"}, "SK": {n:"Eslovaquia", l:"Slovak"},
+            "HU": {n:"Hungría", l:"Hungarian"}, "RO": {n:"Rumania", l:"Romanian"},
+            "BG": {n:"Bulgaria", l:"Bulgarian"}, "HR": {n:"Croacia", l:"Croatian"},
+            "GR": {n:"Grecia", l:"Greek"}, "SI": {n:"Eslovenia", l:"Slovenian"},
+            "EE": {n:"Estonia", l:"Estonian"}, "LV": {n:"Letonia", l:"Latvian"},
+            "LT": {n:"Lituania", l:"Lithuanian"}, "CY": {n:"Chipre", l:"Greek"},
+            "AL": {n:"Albania", l:"Albanian"}, "MK": {n:"Macedonia del Norte", l:"Macedonian"},
+            "BA": {n:"Bosnia", l:"Croatian"}, "RS": {n:"Serbia", l:"Serbian"},
+            "ME": {n:"Montenegro", l:"Serbian"}, "TR": {n:"Turquía", l:"Turkish"},
+
+            // ASIA / PACÍFICO / OTROS
+            "JP": {n:"Japón", l:"Japanese"}, "KR": {n:"Corea del Sur", l:"Korean"},
+            "TW": {n:"Taiwán", l:"Chinese"}, "HK": {n:"Hong Kong", l:"Chinese"},
+            "SG": {n:"Singapur", l:"English"}, "AU": {n:"Australia", l:"English"},
+            "NZ": {n:"Nueva Zelanda", l:"English"}, "NC": {n:"Nueva Caledonia", l:"French"},
+            "PF": {n:"Polinesia Francesa", l:"French"}, "WF": {n:"Wallis y Futuna", l:"French"},
+            "GU": {n:"Guam", l:"English"}, "MP": {n:"Marianas del Norte", l:"English"},
+            "AS": {n:"Samoa Americana", l:"English"}, 
+            
+            // ISLAS ÍNDICO (Excepciones)
+            "RE": {n:"Reunión", l:"French"}, "YT": {n:"Mayotte", l:"French"},
+            "MU": {n:"Mauricio", l:"English"}
         };
 
         async function init() {
