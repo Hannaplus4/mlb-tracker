@@ -3,103 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miraculous Cloud Tracker</title>
+    <title>Miraculous Global Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #0f1014; color: #fff; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        select { background: #222; color: #fff; padding: 10px; border: 1px solid #444; width: 100%; margin-bottom: 20px; font-size: 1rem; }
-        .last-update { font-size: 0.8rem; color: #666; text-align: right; margin-bottom: 10px; }
-        .card { background: #1a1d29; border: 1px solid #333; margin-bottom: 10px; padding: 15px; border-radius: 8px; }
-        .ep-title { font-weight: bold; }
-        .ep-date { color: #00d2d3; font-size: 0.85rem; }
-        .lang-tag { font-size: 0.7rem; background: #333; padding: 2px 5px; border-radius: 4px; color: #aaa; }
-        h2 { border-bottom: 2px solid #e11d48; padding-bottom: 5px; }
+        :root {
+            --bg: #050505;
+            --surface: #121212;
+            --surface-light: #1e1e1e;
+            --border: #333;
+            --accent: #e11d48; /* Ladybug Red */
+            --accent-glow: rgba(225, 29, 72, 0.4);
+            --text-main: #ededed;
+            --text-muted: #a1a1aa;
+            --green: #10b981;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* HEADER */
+        header {
+            background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); padding: 20px; position: sticky; top: 0; z-index: 100;
+        }
+        .container { max-width: 900px; margin: 0 auto; width: 100%; }
+        
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { font-weight: 900; font-size: 1.5rem; letter-spacing: -0.05em; display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent-glow); }
+        
+        .update-info { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+
+        /* CONTROLS */
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+        select {
+            flex: 1; background: #000; color: #fff; border: 1px solid var(--border);
+            padding: 12px 16px; border-radius: 8px; font-size: 1rem; outline: none; cursor: pointer;
+            transition: 0.2s; min-width: 250px;
+        }
+        select:hover, select:focus { border-color: var(--accent); }
+
+        /* TABS */
+        .tabs { display: flex; gap: 5px; background: var(--surface); padding: 5px; border-radius: 10px; margin-top: 10px; }
+        .tab {
+            flex: 1; border: none; background: none; color: var(--text-muted); padding: 10px;
+            font-weight: 600; cursor: pointer; border-radius: 6px; transition: 0.2s; font-size: 0.9rem;
+        }
+        .tab.active { background: var(--bg); color: #fff; shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .badge { background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; }
+
+        /* CONTENT */
+        main { flex: 1; padding: 20px 0; }
+        .panel { display: none; animation: fadeIn 0.3s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS */
+        .season-group { margin-bottom: 25px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+        .season-header {
+            padding: 15px 20px; background: linear-gradient(to right, var(--surface), var(--surface-light));
+            font-weight: 800; font-size: 1.1rem; border-bottom: 1px solid var(--border);
+        }
+
+        .ep-row {
+            padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; align-items: flex-start;
+            transition: background 0.2s;
+        }
+        .ep-row:last-child { border-bottom: none; }
+        .ep-row:hover { background: var(--surface-light); }
+
+        .ep-num { font-size: 1.2rem; font-weight: 800; color: #444; min-width: 35px; text-align: center; padding-top: 2px; }
+        
+        .ep-main { flex: 1; }
+        .ep-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; display: block; }
+        .ep-date { font-size: 0.75rem; color: var(--green); font-weight: 600; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
+        
+        .meta-tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; color: #aaa; background: #000; }
+        .tag.audio { border-color: #1e3a8a; color: #60a5fa; } /* Azul */
+        
+        /* NEWS CARD */
+        .news-card {
+            background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* LOADING & EMPTY */
+        .status-msg { text-align: center; padding: 50px; color: var(--text-muted); }
+        .spinner { font-size: 2rem; margin-bottom: 10px; display: block; animation: spin 1s infinite linear; }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
     </style>
 </head>
 <body>
-    <h1>🐞 Miraculous Tracker (Cloud)</h1>
-    <div id="lastUpdate" class="last-update">Cargando datos...</div>
-    
-    <select id="countrySelect" onchange="renderPais()">
-        <option value="">Cargando base de datos...</option>
-    </select>
 
-    <div id="content"></div>
+    <header>
+        <div class="container">
+            <div class="nav-top">
+                <div class="logo"><div class="dot"></div> Miraculous Tracker</div>
+                <div id="lastUpdate" class="update-info">Cargando...</div>
+            </div>
+            
+            <div class="controls">
+                <select id="countrySelect" onchange="renderView()">
+                    <option value="">Cargando base de datos mundial...</option>
+                </select>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="setTab('cat')">Catálogo Completo</button>
+                <button class="tab" onclick="setTab('news')">Novedades <span id="newsBadge" class="badge">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="view-cat" class="panel active">
+            <div id="cat-content" class="status-msg">
+                <span class="spinner">🐞</span>
+                Descargando datos de la nube...
+            </div>
+        </div>
+
+        <div id="view-news" class="panel">
+            <div id="news-content" class="status-msg">Selecciona un país para ver sus novedades.</div>
+        </div>
+    </main>
 
     <script>
-        let GLOBAL_DATA = null;
+        let GLOBAL_DB = null;
 
-        // 1. CARGAR LA BASE DE DATOS JSON (Generada por el Robot)
-        async function loadDatabase() {
+        // Diccionario de Nombres de Países (ISO -> Nombre)
+        const ISO_NAMES = {
+            "AR":"Argentina","MX":"México","BR":"Brasil","CL":"Chile","CO":"Colombia","PE":"Perú",
+            "US":"Estados Unidos","CA":"Canadá","ES":"España","FR":"Francia","DE":"Alemania","IT":"Italia",
+            "GB":"Reino Unido","JP":"Japón","KR":"Corea del Sur","TR":"Turquía","SG":"Singapur","AU":"Australia",
+            "FK":"Islas Malvinas","PR":"Puerto Rico","UY":"Uruguay","VE":"Venezuela","EC":"Ecuador",
+            "GT":"Guatemala","CR":"Costa Rica","PA":"Panamá","DO":"Rep. Dominicana","PT":"Portugal",
+            "NL":"Países Bajos","SE":"Suecia","NO":"Noruega","DK":"Dinamarca","FI":"Finlandia","PL":"Polonia",
+            "CZ":"Rep. Checa","HU":"Hungría","RO":"Rumania","GR":"Grecia","TW":"Taiwán","HK":"Hong Kong",
+            "NZ":"Nueva Zelanda","ZA":"Sudáfrica"
+            // El script maneja fallbacks, así que no es necesario poner los 100, pero ayuda a la estética.
+        };
+
+        // 1. CARGA INICIAL
+        async function init() {
             try {
-                // Truco: Agregamos ?t=Date.now() para evitar caché del navegador
-                const resp = await fetch('database.json?t=' + Date.now());
-                if(!resp.ok) throw new Error("Aún no se ha generado la base de datos.");
-                GLOBAL_DATA = await resp.json();
+                // Cache busting para asegurar datos frescos
+                const r = await fetch('database.json?t=' + Date.now());
+                if(!r.ok) throw new Error("DB no encontrada");
+                GLOBAL_DB = await r.json();
                 
-                document.getElementById('lastUpdate').innerText = "Última actualización: " + GLOBAL_DATA.last_updated;
-                initMenu();
+                document.getElementById('lastUpdate').innerText = `Actualizado: ${GLOBAL_DB.meta.updated}`;
+                populateMenu();
+                
+                // Seleccionar Argentina por defecto si existe, o el primero
+                if(GLOBAL_DB.regions["AR"]) {
+                    document.getElementById('countrySelect').value = "AR";
+                    renderView();
+                } else {
+                    document.getElementById('cat-content').innerText = "Selecciona un país de la lista.";
+                }
+
             } catch(e) {
-                document.getElementById('content').innerHTML = `<div style="text-align:center; color:orange">
-                    🤖 El robot está trabajando...<br>
-                    La base de datos se está creando por primera vez.<br>
-                    Vuelve en 5 minutos.
-                </div>`;
+                document.getElementById('cat-content').innerHTML = `
+                    <div style="color:orange">
+                        ⚠️ <b>Base de datos generándose...</b><br><br>
+                        El robot de GitHub está escaneando los 100+ países.<br>
+                        Vuelve en unos minutos.
+                    </div>`;
             }
         }
 
-        function initMenu() {
+        function populateMenu() {
             const sel = document.getElementById('countrySelect');
-            sel.innerHTML = '<option value="">-- Selecciona País --</option>';
+            sel.innerHTML = '<option value="">-- Selecciona Región --</option>';
             
-            const regions = Object.keys(GLOBAL_DATA.regions).sort();
-            regions.forEach(r => {
+            const codes = Object.keys(GLOBAL_DB.regions).sort();
+            
+            codes.forEach(code => {
+                const name = ISO_NAMES[code] || code;
+                const flag = getFlagEmoji(code);
                 const opt = document.createElement('option');
-                opt.value = r;
-                opt.text = r; // Aquí podrías mapear AR -> Argentina si quieres
+                opt.value = code;
+                opt.text = `${flag} ${name}`;
                 sel.appendChild(opt);
             });
         }
 
-        function renderPais() {
+        // Función para convertir código ISO en Emoji de Bandera
+        function getFlagEmoji(countryCode) {
+            const codePoints = countryCode
+                .toUpperCase()
+                .split('')
+                .map(char =>  127397 + char.charCodeAt());
+            return String.fromCodePoint(...codePoints);
+        }
+
+        function setTab(mode) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if(mode === 'cat') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('view-cat').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('view-news').classList.add('active');
+            }
+        }
+
+        function renderView() {
             const code = document.getElementById('countrySelect').value;
-            const div = document.getElementById('content');
-            if(!code || !GLOBAL_DATA) return;
+            const catDiv = document.getElementById('cat-content');
+            const newsDiv = document.getElementById('news-content');
+            const badge = document.getElementById('newsBadge');
 
-            const data = GLOBAL_DATA.regions[code];
-            if(!data) { div.innerHTML = "Sin datos."; return; }
+            if(!code || !GLOBAL_DB) return;
 
-            let html = '';
-
-            // Novedades
-            if(data.news.length > 0) {
-                html += `<h2>🔥 Novedades (Últimos 90 días)</h2>`;
-                data.news.forEach(ep => html += makeCard(ep));
+            const data = GLOBAL_DB.regions[code];
+            
+            if(!data) {
+                catDiv.innerHTML = "Sin datos disponibles para esta región.";
+                return;
             }
 
-            // Temporadas
+            // 1. RENDER NOVEDADES
+            if(data.news && data.news.length > 0) {
+                badge.innerText = data.news.length;
+                badge.style.display = 'inline-block';
+                
+                // Ordenar novedades por fecha reciente
+                let sortedNews = [...data.news].sort((a,b) => new Date(b.d) - new Date(a.d));
+                
+                let newsHtml = '';
+                sortedNews.forEach(n => {
+                    newsHtml += `
+                        <div class="news-card">
+                            <div>
+                                <div style="font-weight:bold; font-size:1.1rem">${n.e}</div>
+                                <div style="color:#aaa; font-size:0.9rem">${n.t}</div>
+                            </div>
+                            <div class="ep-date">${n.d}</div>
+                        </div>
+                    `;
+                });
+                newsDiv.innerHTML = newsHtml;
+            } else {
+                badge.style.display = 'none';
+                newsDiv.innerHTML = '<div class="status-msg">💤 No hay estrenos recientes (últimos 90 días).</div>';
+            }
+
+            // 2. RENDER CATÁLOGO
+            if(data.seasons.length === 0) {
+                catDiv.innerHTML = '<div class="status-msg">No disponible en esta región.</div>';
+                return;
+            }
+
+            let catHtml = '';
             data.seasons.forEach(s => {
-                html += `<h3>Temporada ${s.num}</h3>`;
-                s.eps.forEach(ep => html += makeCard(ep));
+                let epsHtml = '';
+                s.eps.forEach(ep => {
+                    // Tags
+                    let audios = ep.a.map(l => `<span class="tag audio">🔊 ${l}</span>`).join('');
+                    let subs = ep.s.map(l => `<span class="tag sub">💬 ${l}</span>`).join('');
+                    
+                    epsHtml += `
+                        <div class="ep-row">
+                            <div class="ep-num">${ep.n}</div>
+                            <div class="ep-main">
+                                <span class="ep-title">${ep.t}</span>
+                                <span class="ep-date">${ep.d}</span>
+                                <div class="meta-tags">
+                                    ${audios} ${subs}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                catHtml += `
+                    <div class="season-group">
+                        <div class="season-header">Temporada ${s.id}</div>
+                        <div>${epsHtml}</div>
+                    </div>
+                `;
             });
-
-            div.innerHTML = html;
+            
+            catDiv.innerHTML = catHtml;
         }
 
-        function makeCard(ep) {
-            return `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between">
-                        <span class="ep-title">${ep.n}. ${ep.t}</span>
-                        <span class="ep-date">${ep.d.split('T')[0]}</span>
-                    </div>
-                    <div style="margin-top:5px">
-                        🔊 ${ep.a.join(', ')}
-                    </div>
-                </div>
-            `;
-        }
-
-        loadDatabase();
+        init();
     </script>
 </body>
 </html>
