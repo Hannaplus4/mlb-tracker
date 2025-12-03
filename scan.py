@@ -7,7 +7,7 @@ from datetime import datetime
 # CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
 
-# LISTA DE REGIONES (+90)
+# LISTA DE REGIONES
 REGIONS = [
     # AMÉRICA
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
@@ -27,7 +27,7 @@ REGIONS = [
     {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
     {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
     {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"}, {"c":"PM", "l":"fr-FR"},
-    {"c":"FK", "l":"es-419"}, # Malvinas
+    {"c":"FK", "l":"es-419"},
 
     # EUROPA
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
@@ -48,7 +48,7 @@ REGIONS = [
     {"c":"MK", "l":"mk-MK"}, {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"},
     {"c":"ME", "l":"sr-ME"}, {"c":"TR", "l":"tr-TR"},
 
-    # ASIA / PACÍFICO / OTROS
+    # ASIA / PACÍFICO
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
     {"c":"TW", "l":"zh-Hant-TW"}, {"c":"HK", "l":"zh-Hant-HK"},
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
@@ -73,7 +73,7 @@ def get_data():
         "regions": {}
     }
 
-    log(f"🌍 INICIANDO MEGA-ESCANEO ({len(REGIONS)} REGIONES)...")
+    log(f"🌍 INICIANDO ESCANEO...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -106,15 +106,14 @@ def get_data():
                                 eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
                                 clean_eps = []
                                 
+                                # Iterar con índice 'i' para forzar numero si falla la API
                                 for i, ep in enumerate(eps_raw):
-                                    # --- CORRECCIÓN NÚMERO DE EPISODIO ---
-                                    # Intentar varios campos, si falla, usar índice + 1
+                                    # 1. ARREGLO EPISODIOS
                                     ep_num = ep.get('episodeSequenceNumber')
-                                    if not ep_num:
-                                        ep_num = ep.get('sequenceNumber')
-                                    if not ep_num or ep_num == 0:
-                                        ep_num = i + 1
+                                    if not ep_num: ep_num = ep.get('sequenceNumber')
+                                    if not ep_num or ep_num == 0: ep_num = i + 1
 
+                                    # 2. FECHA
                                     date_str = ep.get('availabilityDate', '')
                                     is_new = False
                                     if date_str:
@@ -123,20 +122,24 @@ def get_data():
                                             if 0 <= (datetime.utcnow() - dt).days <= 90: is_new = True
                                         except: pass
 
+                                    # 3. TEXTOS
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
                                     if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
 
-                                    # --- CORRECCIÓN SUBTÍTULOS ---
+                                    # 4. ARREGLO SUBTITULOS Y AUDIO
+                                    meta = ep.get('mediaMetadata', {})
+                                    
+                                    # Subs: Guardamos objeto {l: idioma, t: tipo}
                                     subs_list = []
-                                    raw_subs = ep.get('mediaMetadata', {}).get('captionTracks', [])
-                                    for sub in raw_subs:
+                                    for sub in meta.get('captionTracks', []):
                                         subs_list.append({
                                             "l": sub.get('renditionName', sub.get('language', 'unk')),
                                             "t": sub.get('trackType', 'NORMAL')
                                         })
 
-                                    audios_list = [x.get('renditionName', x.get('language')) for x in ep.get('mediaMetadata', {}).get('audioTracks', [])]
+                                    # Audio: Lista simple de strings
+                                    audios_list = [x.get('renditionName', x.get('language')) for x in meta.get('audioTracks', [])]
 
                                     ep_obj = {
                                         "n": ep_num,
@@ -167,6 +170,6 @@ if __name__ == "__main__":
         data = get_data()
         with open("database.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
-        log("🎉 BASE DE DATOS ACTUALIZADA.")
+        log("🎉 BASE DE DATOS GUARDADA.")
     except Exception as e:
-        log(f"💀 ERROR: {e}") 
+        log(f"💀 ERROR: {e}")
