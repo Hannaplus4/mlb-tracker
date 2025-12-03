@@ -3,102 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disney+ Tracker V24</title>
+    <title>Disney+ Tracker V25</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f1014;
-            --surface: #1a1c24;
-            --surface-hover: #232530;
-            --primary: #00d2d3; /* Disney Blue/Cyan */
-            --primary-dim: rgba(0, 210, 211, 0.15);
-            --text: #f1f1f1;
-            --text-dim: #9ca3af;
-            --border: #2f3340;
+            --bg-body: #050505;
+            --surface: #121212;
+            --surface-card: #1c1c1f;
+            --surface-hover: #27272a;
+            --primary: #e11d48;
+            --primary-soft: rgba(225, 29, 72, 0.15);
+            --text-main: #f2f2f2;
+            --text-dim: #a1a1aa;
+            --border: #27272a;
+            --green-accent: #10b981;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
 
-        header { position: sticky; top: 0; z-index: 100; background: rgba(15, 16, 20, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 0; }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 10px 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         
-        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text); letter-spacing: -0.5px; }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
         .brand span { color: var(--primary); }
         .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
 
         .controls select { width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
         .controls select:hover { border-color: var(--primary); }
 
-        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
-        .tab-btn { flex: 1; background: transparent; border: none; padding: 10px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .tab-btn.active { background: var(--primary); color: #000; }
-        .badge { background: #000; color: var(--primary); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
+        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .badge { background: #fff; color: var(--primary); padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
 
-        main { padding-top: 20px; }
+        /* AJUSTE 1: Más espacio arriba entre tabs y contenido */
+        main { padding-top: 40px; }
         .panel { display: none; animation: slideUp 0.3s ease-out; }
         .panel.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* DISEÑO HERO PAÍS MEJORADO */
-        .country-hero { 
-            display: flex; align-items: center; gap: 20px; margin-bottom: 25px; padding: 25px; 
-            background: linear-gradient(135deg, var(--surface), #252836); 
-            border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .flag-img { width: 60px; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); border: 1px solid #333; }
-        .country-name { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: #fff; line-height: 1.1; }
+        /* DISEÑO COMPACTO DEL PAÍS (V23 base) */
+        /* AJUSTE 2: Menos espacio debajo del país */
+        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+        .flag-img { width: 42px; height: 30px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 1px solid #333; }
+        .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
 
-        /* TEMPORADAS */
-        .season-block { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; }
-        .season-header { padding: 15px 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; background: linear-gradient(90deg, var(--surface), #22242e); transition: 0.2s; user-select: none; position: relative; }
+        .season-block { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-card); overflow: hidden; }
+        
+        /* AJUSTE 3: Temporadas Centradas */
+        .season-header { 
+            padding: 12px 20px; cursor: pointer; display: flex; 
+            justify-content: center; /* CENTRADO */
+            align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; position: relative; 
+        }
         .season-header:hover { background: var(--surface-hover); }
-        .season-title { font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; position: absolute; right: 20px; }
+        .season-title { font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+        .toggle-icon { 
+            color: var(--text-dim); transition: transform 0.3s; width: 18px; 
+            position: absolute; right: 20px; /* Icono anclado a la derecha */
+        }
         .season-block.open .toggle-icon { transform: rotate(180deg); }
         .season-body { display: none; border-top: 1px solid var(--border); }
         .season-block.open .season-body { display: block; }
 
-        /* EPISODIO */
-        .ep-card { padding: 25px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+        .ep-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
         .ep-card:last-child { border-bottom: none; }
         
-        /* Línea superior: Num - Titulo - Fecha */
-        .ep-meta-line { display: flex; gap: 12px; align-items: center; width: 100%; justify-content: flex-start; }
-        .ep-pill { background: #333; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; min-width: 30px; text-align: center; }
-        .ep-date { margin-left: auto; font-size: 0.75rem; color: var(--primary); font-weight: 600; background: var(--primary-dim); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+        .ep-header-line { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap; }
+        .ep-num-pill { font-size: 0.75rem; font-weight: 800; background: #333; color: #fff; padding: 2px 8px; border-radius: 6px; }
         
-        .ep-title { font-size: 1.1rem; font-weight: 700; color: #fff; line-height: 1.4; text-align: left; width: 100%; }
+        .ep-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; }
+        .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
         
-        .ep-desc { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; width: 100%; text-align: left; margin-top: 5px; }
-        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; }
+        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; width: 100%; text-align: left; margin-top: 5px; }
+        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; margin-left: auto; margin-right: auto; }
         
-        /* IDIOMAS */
-        .tracks-area { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; padding-top: 15px; border-top: 1px dashed var(--border); width: 100%; }
-        .track-row { display: flex; align-items: flex-start; gap: 12px; font-size: 0.8rem; text-align: left; }
-        .lang-label { color: var(--text-dim); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; margin-top: 5px; min-width: 45px; }
+        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); width: 100%; }
+        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; text-align: left; }
+        .lang-label { color: var(--text-dim); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; margin-top: 5px; min-width: 40px; }
         
-        .badges-wrapper { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; }
-        .pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; }
-        .pill.primary { background: var(--primary-dim); border-color: var(--primary); color: #fff; }
+        .badges-wrapper { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: 1; }
+        .pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; }
+        .pill.primary { background: var(--primary-soft); border-color: var(--primary); color: #fda4af; }
         .pill.secondary { background: var(--surface); border-color: var(--border); color: var(--text-dim); }
-        .type-tag { font-size: 0.6rem; margin-left: 5px; opacity: 0.8; background: rgba(255,255,255,0.2); padding: 0 3px; border-radius: 3px; font-weight: bold; }
+        .type-tag { font-size: 0.6rem; margin-left: 4px; opacity: 0.7; border: 1px solid; padding: 0 2px; border-radius: 3px; font-weight: bold; background: rgba(255,255,255,0.1); }
         
         .expand-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; }
-        .hidden-tracks { display: none; gap: 6px; flex-wrap: wrap; margin-top: 6px; width: 100%; }
+        .hidden-tracks { display: none; gap: 5px; flex-wrap: wrap; margin-top: 5px; width: 100%; }
         .hidden-tracks.show { display: flex; }
 
         .msg-box { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 0.9rem; }
-        .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid rgba(0, 210, 211, 0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid rgba(244, 63, 94, 0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 640px) {
             .ep-desc { display: none; margin-top: 8px; }
             .ep-desc.show { display: block; animation: fadeIn 0.3s; }
             .desc-toggle-btn { display: inline-block; }
-            .country-name { font-size: 1.2rem; }
+            .country-name { font-size: 1.1rem; }
         }
         @media (min-width: 641px) {
             .ep-desc { display: block !important; }
@@ -112,7 +117,7 @@
         <div class="container">
             <div class="nav-wrapper">
                 <div class="brand"><span>🐞</span> Disney+ Tracker</div>
-                <div class="last-update" id="lastUpdate">Syncing...</div>
+                <div class="last-update" id="lastUpdate">Sincronizando...</div>
             </div>
             
             <div class="controls">
@@ -163,7 +168,7 @@
         document.getElementById('optLoading').textContent = T.load;
         document.getElementById('lastUpdate').textContent = T.sync;
 
-        // MAPA CONFIGURADO AL DETALLE
+        // MAPA COMPLETO CON IDIOMAS PREFERIDOS
         const COUNTRY_MAP = {
             "FK": {n:"Islas Malvinas (ARG)", l:["Spanish (Latin American)", "Spanish"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
             "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
@@ -175,7 +180,25 @@
             "LI": {n:"Liechtenstein", l:"German"},
             "BO": {n:"Bolivia", l:["Spanish (Latin American)", "Spanish"]},
 
-            // Asia y Europa Específicos
+            // Reglas específicas de idioma (Orden de prioridad)
+            "AR":{n:"Argentina",l:["Spanish (Latin American)", "Spanish"]},
+            "MX":{n:"México",l:["Spanish (Latin American)", "Spanish"]},
+            "CL":{n:"Chile",l:["Spanish (Latin American)", "Spanish"]},
+            "CO":{n:"Colombia",l:["Spanish (Latin American)", "Spanish"]},
+            "PE":{n:"Perú",l:["Spanish (Latin American)", "Spanish"]},
+            "UY":{n:"Uruguay",l:["Spanish (Latin American)", "Spanish"]},
+            "VE":{n:"Venezuela",l:["Spanish (Latin American)", "Spanish"]},
+            "EC":{n:"Ecuador",l:["Spanish (Latin American)", "Spanish"]},
+            "GT":{n:"Guatemala",l:["Spanish (Latin American)", "Spanish"]},
+            "CR":{n:"Costa Rica",l:["Spanish (Latin American)", "Spanish"]},
+            "PA":{n:"Panamá",l:["Spanish (Latin American)", "Spanish"]},
+            "DO":{n:"Rep. Dominicana",l:["Spanish (Latin American)", "Spanish"]},
+            "SV":{n:"El Salvador",l:["Spanish (Latin American)", "Spanish"]},
+            "HN":{n:"Honduras",l:["Spanish (Latin American)", "Spanish"]},
+            "NI":{n:"Nicaragua",l:["Spanish (Latin American)", "Spanish"]},
+            "PY":{n:"Paraguay",l:["Spanish (Latin American)", "Spanish"]},
+            "ES":{n:"España",l:["Spanish", "Castilian"]}, 
+
             "TW": {n:"Taiwán", l:["Mandarin", "Chinese", "Putonghua"]},
             "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
             "TR": {n:"Turquía", l:"Turkish"},
@@ -194,25 +217,11 @@
             "VN": {n:"Vietnam", l:"Vietnamese"},
             "ID": {n:"Indonesia", l:"Indonesian"},
             
-            // Latam
-            "AR":{n:"Argentina",l:["Spanish (Latin American)", "Spanish"]},
-            "MX":{n:"México",l:["Spanish (Latin American)", "Spanish"]},
-            "CL":{n:"Chile",l:["Spanish (Latin American)", "Spanish"]},
-            "CO":{n:"Colombia",l:["Spanish (Latin American)", "Spanish"]},
-            "PE":{n:"Perú",l:["Spanish (Latin American)", "Spanish"]},
-            "ES":{n:"España",l:["Spanish", "Castilian"]}, // Prioridad a "Spanish" simple
-
-            // Resto (Default English)
+            // Default Rest
             "CA":{n:"Canadá",l:"English"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
             "SE":{n:"Suecia",l:"Swedish"},"NO":{n:"Noruega",l:"Norwegian"},"DK":{n:"Dinamarca",l:"Danish"},
             "NZ":{n:"Nueva Zelanda",l:"English"},"PR":{n:"Puerto Rico",l:"Spanish"},
-            "UY":{n:"Uruguay",l:["Spanish (Latin American)"]},"VE":{n:"Venezuela",l:["Spanish (Latin American)"]},
-            "EC":{n:"Ecuador",l:["Spanish (Latin American)"]},"GT":{n:"Guatemala",l:["Spanish (Latin American)"]},
-            "CR":{n:"Costa Rica",l:["Spanish (Latin American)"]},"PA":{n:"Panamá",l:["Spanish (Latin American)"]},
-            "DO":{n:"Rep. Dominicana",l:["Spanish (Latin American)"]},"SV":{n:"El Salvador",l:["Spanish (Latin American)"]},
-            "HN":{n:"Honduras",l:["Spanish (Latin American)"]},"NI":{n:"Nicaragua",l:["Spanish (Latin American)"]},
-            "PY":{n:"Paraguay",l:["Spanish (Latin American)"]},"GY":{n:"Guyana",l:"English"},
-            "SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},"BE":{n:"Bélgica",l:"French"},
+            "GY":{n:"Guyana",l:"English"},"SR":{n:"Surinam",l:"English"},"GF":{n:"Guayana Francesa",l:"French"},"BE":{n:"Bélgica",l:"French"},
             "CH":{n:"Suiza",l:"German"},"AT":{n:"Austria",l:"German"},"IE":{n:"Irlanda",l:"English"},
             "FI":{n:"Finlandia",l:"Finnish"},"IS":{n:"Islandia",l:"English"},"LU":{n:"Luxemburgo",l:"French"},
             "MC":{n:"Mónaco",l:"French"},"MT":{n:"Malta",l:"English"},"AD":{n:"Andorra",l:"Spanish"},
@@ -395,23 +404,28 @@
             catDiv.innerHTML = html;
         }
 
-        // ORDENAMIENTO (Corregido para listas)
+        // LÓGICA DE ORDENAMIENTO (Listas)
         function sortAndFormatTracks(tracks, targetLangs, type) {
             if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
-            const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
             
-            // Si es audio es lista de strings, si es subs es lista de objetos. Normalizar.
             let list = tracks.map(item => {
                 if(typeof item === 'string') return {name: item, tag: ''};
                 return {name: item.l, tag: item.t};
             });
 
-            // De-duplicar
             list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
 
+            const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
+            
             list.sort((a, b) => {
-                let scoreA = 0; if(targets.some(t => a.name.includes(t))) scoreA = 2; else if(a.name.includes("English")) scoreA = 1;
-                let scoreB = 0; if(targets.some(t => b.name.includes(t))) scoreB = 2; else if(b.name.includes("English")) scoreB = 1;
+                let scoreA = 0; 
+                if(targets.some(t => a.name.includes(t))) scoreA = 2; 
+                else if(a.name.includes("English")) scoreA = 1;
+
+                let scoreB = 0; 
+                if(targets.some(t => b.name.includes(t))) scoreB = 2; 
+                else if(b.name.includes("English")) scoreB = 1;
+                
                 if (scoreA > scoreB) return -1;
                 if (scoreA < scoreB) return 1;
                 return a.name.localeCompare(b.name);
@@ -450,11 +464,6 @@
                 el.classList.add('show');
                 btn.innerText = T.hide_desc;
             }
-        }
-
-        function shareUrl() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("Enlace copiado");
         }
 
         init();
