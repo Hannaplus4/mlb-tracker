@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disney+ Tracker V25</title>
+    <title>Disney+ Tracker V26</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -23,10 +23,10 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
 
-        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 10px 0; }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 0; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         
-        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
         .brand span { color: var(--primary); }
         .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
@@ -34,37 +34,25 @@
         .controls select { width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
         .controls select:hover { border-color: var(--primary); }
 
-        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
         .tab-btn { flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: var(--primary); color: #fff; }
         .badge { background: #fff; color: var(--primary); padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
 
-        /* AJUSTE 1: Más espacio arriba entre tabs y contenido */
-        main { padding-top: 40px; }
+        main { padding-top: 30px; }
         .panel { display: none; animation: slideUp 0.3s ease-out; }
         .panel.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* DISEÑO COMPACTO DEL PAÍS (V23 base) */
-        /* AJUSTE 2: Menos espacio debajo del país */
-        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
         .flag-img { width: 42px; height: 30px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 1px solid #333; }
         .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
 
         .season-block { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-card); overflow: hidden; }
-        
-        /* AJUSTE 3: Temporadas Centradas */
-        .season-header { 
-            padding: 12px 20px; cursor: pointer; display: flex; 
-            justify-content: center; /* CENTRADO */
-            align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; position: relative; 
-        }
+        .season-header { padding: 12px 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; position: relative; }
         .season-header:hover { background: var(--surface-hover); }
         .season-title { font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
-        .toggle-icon { 
-            color: var(--text-dim); transition: transform 0.3s; width: 18px; 
-            position: absolute; right: 20px; /* Icono anclado a la derecha */
-        }
+        .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; position: absolute; right: 20px; }
         .season-block.open .toggle-icon { transform: rotate(180deg); }
         .season-body { display: none; border-top: 1px solid var(--border); }
         .season-block.open .season-body { display: block; }
@@ -117,7 +105,7 @@
         <div class="container">
             <div class="nav-wrapper">
                 <div class="brand"><span>🐞</span> Disney+ Tracker</div>
-                <div class="last-update" id="lastUpdate">Sincronizando...</div>
+                <div class="last-update" id="lastUpdate">Syncing...</div>
             </div>
             
             <div class="controls">
@@ -168,19 +156,13 @@
         document.getElementById('optLoading').textContent = T.load;
         document.getElementById('lastUpdate').textContent = T.sync;
 
-        // MAPA COMPLETO CON IDIOMAS PREFERIDOS
+        // MAPA COMPLETO CON IDIOMAS TARGET EXACTOS
         const COUNTRY_MAP = {
             "FK": {n:"Islas Malvinas (ARG)", l:["Spanish (Latin American)", "Spanish"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
             "GI": {n:"Gibraltar (ES)", l:"Spanish", flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
-            
-            "US": {n:"Estados Unidos", l:"English"},
-            "GB": {n:"Reino Unido (R. U.)", l:"English"},
-            "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"},
-            "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
-            "LI": {n:"Liechtenstein", l:"German"},
             "BO": {n:"Bolivia", l:["Spanish (Latin American)", "Spanish"]},
-
-            // Reglas específicas de idioma (Orden de prioridad)
+            
+            // Prioridades de idioma
             "AR":{n:"Argentina",l:["Spanish (Latin American)", "Spanish"]},
             "MX":{n:"México",l:["Spanish (Latin American)", "Spanish"]},
             "CL":{n:"Chile",l:["Spanish (Latin American)", "Spanish"]},
@@ -197,13 +179,15 @@
             "HN":{n:"Honduras",l:["Spanish (Latin American)", "Spanish"]},
             "NI":{n:"Nicaragua",l:["Spanish (Latin American)", "Spanish"]},
             "PY":{n:"Paraguay",l:["Spanish (Latin American)", "Spanish"]},
-            "ES":{n:"España",l:["Spanish", "Castilian"]}, 
+            
+            "ES":{n:"España",l:["Castilian", "Spanish"]}, // Castilian suele ser el nombre de la pista de España
+            "BR": {n:"Brasil", l:"Portuguese"},
+            "PT": {n:"Portugal", l:"Portuguese"},
 
             "TW": {n:"Taiwán", l:["Mandarin", "Chinese", "Putonghua"]},
             "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
             "TR": {n:"Turquía", l:"Turkish"},
             "GR": {n:"Grecia", l:"Greek"},
-            "BR": {n:"Brasil", l:"Portuguese"},
             "FR": {n:"Francia", l:"French"},
             "DE": {n:"Alemania", l:"German"},
             "IT": {n:"Italia", l:"Italian"},
@@ -211,13 +195,17 @@
             "KR": {n:"Corea del Sur", l:"Korean"},
             "PL": {n:"Polonia", l:"Polish"},
             "NL": {n:"Países Bajos", l:"Dutch"},
-            "PT": {n:"Portugal", l:"Portuguese"},
             "RO": {n:"Rumania", l:"Romanian"},
             "TH": {n:"Tailandia", l:"Thai"},
             "VN": {n:"Vietnam", l:"Vietnamese"},
             "ID": {n:"Indonesia", l:"Indonesian"},
             
-            // Default Rest
+            // Resto (Default English)
+            "US": {n:"Estados Unidos", l:"English"},
+            "GB": {n:"Reino Unido (R. U.)", l:"English"},
+            "VI": {n:"Islas Vírgenes (EE. UU.)", l:"English"},
+            "VG": {n:"Islas Vírgenes (R. U.)", l:"English"},
+            "LI": {n:"Liechtenstein", l:"German"},
             "CA":{n:"Canadá",l:"English"},"SG":{n:"Singapur",l:"English"},"AU":{n:"Australia",l:"English"},
             "SE":{n:"Suecia",l:"Swedish"},"NO":{n:"Noruega",l:"Norwegian"},"DK":{n:"Dinamarca",l:"Danish"},
             "NZ":{n:"Nueva Zelanda",l:"English"},"PR":{n:"Puerto Rico",l:"Spanish"},
@@ -404,27 +392,31 @@
             catDiv.innerHTML = html;
         }
 
-        // LÓGICA DE ORDENAMIENTO (Listas)
+        // ORDENAMIENTO ESTRICTO DE IDIOMAS (PUNTAJE 100)
         function sortAndFormatTracks(tracks, targetLangs, type) {
             if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
             
+            // Normalizar a objetos
             let list = tracks.map(item => {
-                if(typeof item === 'string') return {name: item, tag: ''};
-                return {name: item.l, tag: item.t};
+                if (typeof item === 'string') return { name: item, tag: '' };
+                return { name: item.l, tag: item.t };
             });
 
+            // De-duplicar
             list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
 
             const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
             
             list.sort((a, b) => {
+                // Sistema de Puntuación Estricto
                 let scoreA = 0; 
-                if(targets.some(t => a.name.includes(t))) scoreA = 2; 
-                else if(a.name.includes("English")) scoreA = 1;
+                // Verificar coincidencia EXACTA o Parcial Fuerte
+                if(targets.some(t => a.name === t || a.name.includes(t))) scoreA = 100;
+                else if(a.name.includes("English")) scoreA = 50;
 
                 let scoreB = 0; 
-                if(targets.some(t => b.name.includes(t))) scoreB = 2; 
-                else if(b.name.includes("English")) scoreB = 1;
+                if(targets.some(t => b.name === t || b.name.includes(t))) scoreB = 100;
+                else if(b.name.includes("English")) scoreB = 50;
                 
                 if (scoreA > scoreB) return -1;
                 if (scoreA < scoreB) return 1;
@@ -466,7 +458,12 @@
             }
         }
 
+        function shareUrl() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Enlace copiado");
+        }
+
         init();
     </script>
 </body>
-</html>
+</html> 
