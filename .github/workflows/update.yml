@@ -1,36 +1,308 @@
-name: Actualizador Diario Miraculous
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miraculous Global Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c15;
+            --surface: #151621;
+            --surface-hover: #1e1f2b;
+            --border: #2a2b38;
+            --accent: #ff0040; /* Ladybug Red */
+            --text-main: #fff;
+            --text-muted: #9ca3af;
+            --audio-tag: #3b82f6;
+            --sub-tag: #a855f7;
+        }
 
-on:
-  schedule:
-    - cron: '0 */6 * * *' # Ejecutar cada 6 horas
-  workflow_dispatch: # Permite ejecutar manualmente con un botón
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; }
+        
+        /* HEADER */
+        .app-header { max-width: 900px; margin: 0 auto 30px; display: flex; flex-direction: column; gap: 15px; }
+        .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent); }
+        .update-time { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Permiso para guardar el archivo json
+        /* CONTROLS */
+        .controls { display: flex; gap: 10px; background: var(--surface); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        select { 
+            flex: 1; background: transparent; color: #fff; border: none; padding: 12px; font-size: 1rem; outline: none; cursor: pointer; 
+        }
+        select option { background: #000; }
 
-    steps:
-    - name: Chequear código
-      uses: actions/checkout@v3
+        /* TABS */
+        .tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .tab-btn {
+            background: none; border: none; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; padding: 8px 12px; transition: 0.2s;
+        }
+        .tab-btn.active { color: #fff; border-bottom: 2px solid var(--accent); }
+        .tab-btn:hover { color: #fff; }
 
-    - name: Configurar Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+        /* CONTENT */
+        .container { max-width: 900px; margin: 0 auto; }
+        .view-panel { display: none; animation: fadeIn 0.4s ease; }
+        .view-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    - name: Instalar librerías
-      run: |
-        pip install requests
+        /* SEASON ACCORDION */
+        .season-block { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+        
+        .season-header {
+            padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(90deg, var(--surface), #1a1b26); user-select: none; transition: 0.2s;
+        }
+        .season-header:hover { background: var(--surface-hover); }
+        .season-title { font-weight: 800; font-size: 1.2rem; }
+        .toggle-icon { font-size: 0.8rem; color: var(--text-muted); transition: transform 0.3s; }
+        
+        .season-body { display: none; border-top: 1px solid var(--border); }
+        .season-block.open .season-body { display: block; }
+        .season-block.open .toggle-icon { transform: rotate(180deg); }
 
-    - name: Ejecutar Scanner
-      run: python scan.py
+        /* EPISODE CARD */
+        .ep-card { padding: 25px; border-bottom: 1px solid var(--border); display: flex; gap: 20px; }
+        .ep-card:last-child { border-bottom: none; }
+        
+        .ep-num { font-size: 1.5rem; font-weight: 900; color: #333; min-width: 45px; text-align: center; line-height: 1; }
+        
+        .ep-content { flex: 1; }
+        .ep-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .ep-title { font-weight: 700; font-size: 1.1rem; color: #fff; }
+        .ep-date { 
+            font-size: 0.75rem; color: #10b981; background: rgba(16, 185, 129, 0.1); 
+            padding: 4px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap;
+        }
+        
+        .ep-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; max-width: 90%; }
 
-    - name: Guardar cambios (Commit & Push)
-      run: |
-        git config --global user.name 'Robot Miraculous'
-        git config --global user.email 'robot@bot.com'
-        git add database.json
-        git commit -m "Actualizacion automatica de datos" || exit 0
-        git push
+        /* LANG TAGS */
+        .lang-section { display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; }
+        .lang-row { display: flex; gap: 10px; align-items: flex-start; }
+        .lang-label { color: #555; font-weight: bold; width: 50px; text-transform: uppercase; font-size: 0.7rem; margin-top: 4px; }
+        
+        .badges-wrapper { display: flex; flex-wrap: wrap; gap: 6px; }
+        .badge { padding: 3px 8px; border-radius: 4px; border: 1px solid; font-size: 0.75rem; font-weight: 600; }
+        .badge.audio { border-color: rgba(59, 130, 246, 0.4); color: var(--audio-tag); background: rgba(59, 130, 246, 0.1); }
+        .badge.sub { border-color: rgba(168, 85, 247, 0.4); color: var(--sub-tag); background: rgba(168, 85, 247, 0.1); }
+        
+        .more-btn { background: #222; border: 1px solid #444; color: #888; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+        .hidden-langs { display: none; }
+        .hidden-langs.show { display: inline; }
+
+        /* UTILS */
+        .msg { text-align: center; padding: 60px; color: #555; }
+        .loading { color: var(--accent); font-weight: bold; }
+        
+        @media (max-width: 600px) {
+            .ep-card { flex-direction: column; gap: 10px; }
+            .ep-num { text-align: left; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <div class="logo"><span>🐞</span> Miraculous Tracker</div>
+            <div id="updateTime" class="update-time">Cargando...</div>
+        </div>
+        
+        <div class="controls">
+            <select id="countrySelect" onchange="renderCountry()">
+                <option value="">Cargando base de datos global...</option>
+            </select>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setTab('cat')">Catálogo Completo</button>
+            <button class="tab-btn" onclick="setTab('news')">Novedades (90 días)</button>
+        </div>
+    </div>
+
+    <main class="container">
+        <div id="view-cat" class="view-panel active">
+            <div id="catalog-content" class="msg loading">Conectando a la nube de GitHub...</div>
+        </div>
+
+        <div id="view-news" class="view-panel">
+            <div id="news-content" class="msg">Selecciona un país primero.</div>
+        </div>
+    </main>
+
+    <script>
+        let GLOBAL_DB = null;
+
+        // Diccionario de Nombres Completos
+        const COUNTRY_NAMES = {
+            "AR": "Argentina 🇦🇷", "MX": "México 🇲🇽", "BR": "Brasil 🇧🇷", "CL": "Chile 🇨🇱",
+            "CO": "Colombia 🇨🇴", "PE": "Perú 🇵🇪", "US": "Estados Unidos 🇺🇸", "CA": "Canadá 🇨🇦",
+            "ES": "España 🇪🇸", "FR": "Francia 🇫🇷", "DE": "Alemania 🇩🇪", "IT": "Italia 🇮🇹",
+            "GB": "Reino Unido 🇬🇧", "PT": "Portugal 🇵🇹", "JP": "Japón 🇯🇵", "KR": "Corea del Sur 🇰🇷",
+            "TR": "Turquía 🇹🇷", "SG": "Singapur 🇸🇬", "AU": "Australia 🇦🇺", "FK": "Islas Malvinas 🇦🇷",
+            "NL": "Países Bajos 🇳🇱", "SE": "Suecia 🇸🇪", "NO": "Noruega 🇳🇴", "DK": "Dinamarca 🇩🇰",
+            "PL": "Polonia 🇵🇱", "RO": "Rumania 🇷🇴", "TW": "Taiwán 🇹🇼", "HK": "Hong Kong 🇭🇰",
+            "NZ": "Nueva Zelanda 🇳🇿", "PR": "Puerto Rico 🇵🇷", "UY": "Uruguay 🇺🇾", "VE": "Venezuela 🇻🇪"
+        };
+
+        async function init() {
+            try {
+                // Fetch con timestamp para evitar cache
+                const r = await fetch('database.json?t=' + Date.now());
+                if(!r.ok) throw new Error("Base de datos aún no generada.");
+                GLOBAL_DB = await r.json();
+                
+                document.getElementById('updateTime').innerText = `Actualizado: ${GLOBAL_DB.meta.updated}`;
+                populateMenu();
+                
+                // Auto-select Argentina si existe
+                if(GLOBAL_DB.regions["AR"]) {
+                    document.getElementById('countrySelect').value = "AR";
+                    renderCountry();
+                } else {
+                    document.getElementById('catalog-content').innerText = "Selecciona un país.";
+                }
+
+            } catch(e) {
+                document.getElementById('catalog-content').innerHTML = `
+                    <div style="color:orange">
+                        ⚠️ <b>Generando datos...</b><br><br>
+                        El robot está escaneando los servidores de Disney+.<br>
+                        Vuelve en 2 minutos.
+                    </div>`;
+            }
+        }
+
+        function populateMenu() {
+            const sel = document.getElementById('countrySelect');
+            sel.innerHTML = '<option value="">-- Selecciona Región --</option>';
+            
+            // Ordenar por nombre
+            const codes = Object.keys(GLOBAL_DB.regions).sort((a,b) => {
+                const nA = COUNTRY_NAMES[a] || a;
+                const nB = COUNTRY_NAMES[b] || b;
+                return nA.localeCompare(nB);
+            });
+
+            codes.forEach(code => {
+                const name = COUNTRY_NAMES[code] || `${code} (Región)`;
+                const opt = document.createElement('option');
+                opt.value = code;
+                opt.text = name;
+                sel.appendChild(opt);
+            });
+        }
+
+        function setTab(mode) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            
+            if(mode === 'cat') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('view-cat').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('view-news').classList.add('active');
+            }
+        }
+
+        function renderCountry() {
+            const code = document.getElementById('countrySelect').value;
+            const catDiv = document.getElementById('catalog-content');
+            const newsDiv = document.getElementById('news-content');
+            
+            if(!code || !GLOBAL_DB) return;
+            const data = GLOBAL_DB.regions[code];
+
+            // 1. Render Novedades
+            if(data.news && data.news.length > 0) {
+                let newsHtml = data.news.map(n => `
+                    <div style="padding:15px; background:#1a1b26; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--accent)">
+                        <div style="font-weight:bold; color:#fff">${n.e}</div>
+                        <div style="font-size:0.9rem; color:#aaa">${n.t}</div>
+                        <div style="font-size:0.8rem; color:#10b981; margin-top:5px">Agregado: ${n.d}</div>
+                    </div>
+                `).join('');
+                newsDiv.innerHTML = newsHtml;
+            } else {
+                newsDiv.innerHTML = '<div class="msg">💤 No hay estrenos recientes (90 días).</div>';
+            }
+
+            // 2. Render Catálogo (Acordeón)
+            if(!data.seasons || data.seasons.length === 0) {
+                catDiv.innerHTML = '<div class="msg">No hay temporadas disponibles.</div>';
+                return;
+            }
+
+            let html = '';
+            // Iterar temporadas
+            data.seasons.forEach((s, idx) => {
+                const isLast = idx === data.seasons.length - 1; // Abrir la última por defecto
+                
+                let epsHtml = '';
+                s.eps.forEach(ep => {
+                    epsHtml += `
+                        <div class="ep-card">
+                            <div class="ep-num">${ep.n}</div>
+                            <div class="ep-content">
+                                <div class="ep-header">
+                                    <div class="ep-title">${ep.t}</div>
+                                    <div class="ep-date">Added: ${ep.dt || "N/A"}</div>
+                                </div>
+                                <div class="ep-desc">${ep.ds || "Sin descripción disponible."}</div>
+                                
+                                <div class="lang-section">
+                                    <div class="lang-row">
+                                        <div class="lang-label">AUDIO</div>
+                                        <div class="badges-wrapper">${formatTags(ep.a, 'audio')}</div>
+                                    </div>
+                                    <div class="lang-row">
+                                        <div class="lang-label">SUBS</div>
+                                        <div class="badges-wrapper">${formatTags(ep.s, 'sub')}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div class="season-block ${isLast ? 'open' : ''}">
+                        <div class="season-header" onclick="this.parentElement.classList.toggle('open')">
+                            <span class="season-title">Temporada ${s.id}</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="season-body">${epsHtml}</div>
+                    </div>
+                `;
+            });
+            catDiv.innerHTML = html;
+        }
+
+        function formatTags(list, type) {
+            if(!list || list.length === 0) return '<span style="color:#555">-</span>';
+            
+            // Mostrar los primeros 3, ocultar el resto
+            const visible = list.slice(0, 3);
+            const hidden = list.slice(3);
+            
+            let html = visible.map(l => `<span class="badge ${type}">${l}</span>`).join('');
+            
+            if(hidden.length > 0) {
+                const hiddenId = `h-${Math.random().toString(36).substr(2, 9)}`;
+                html += `
+                    <button class="more-btn" onclick="document.getElementById('${hiddenId}').classList.toggle('show')">+${hidden.length}</button>
+                    <span id="${hiddenId}" class="hidden-langs">
+                        ${hidden.map(l => `<span class="badge ${type}">${l}</span>`).join('')}
+                    </span>
+                `;
+            }
+            return html;
+        }
+
+        init();
+    </script>
+</body>
+</html>
