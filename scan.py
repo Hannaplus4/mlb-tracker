@@ -7,8 +7,9 @@ from datetime import datetime, timedelta
 
 # CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
+DB_FILE = "database.json"
 
-# --- CONFIGURACIÓN DE HORARIOS Y FECHAS ---
+# --- CONFIGURACIÓN DE HORARIOS ---
 # Diferencia horaria aproximada respecto a UTC
 UTC_OFFSETS = {
     "US": -5, "CA": -5, "MX": -6, "AR": -3, "BR": -3, "CL": -3, "CO": -5, "PE": -5,
@@ -31,8 +32,6 @@ UTC_OFFSETS = {
 }
 
 # --- LISTA DE REGIONES ---
-# IMPORTANTE: 'l' (lenguaje) es para la URL de la API. Debe ser un código estándar (ej: zh-TW).
-# El código 'cmn-TW' lo usaremos para identificar el audio/subtítulo en el diccionario LANG_CODES.
 REGIONS = [
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
     {"c":"CL", "l":"es-419"}, {"c":"CO", "l":"es-419"}, {"c":"PE", "l":"es-419"},
@@ -72,7 +71,7 @@ REGIONS = [
     {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"}, {"c":"ME", "l":"sr-ME"}, 
     {"c":"TR", "l":"tr-TR"}, {"c":"XK", "l":"sq-AL"}, 
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
-    {"c":"TW", "l":"zh-TW"}, # API Standard (zh-TW) para conexión exitosa
+    {"c":"TW", "l":"zh-TW"}, 
     {"c":"HK", "l":"zh-HK"}, 
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
@@ -93,8 +92,7 @@ LANG_CODES = {
     "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
     "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
     "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
-    "zh-HK": "Cantonese", "zh-TW": "Mandarin (Taiwan)", 
-    "cmn-TW": "Mandarin (Taiwan)", # Agregado para mapear correctamente
+    "zh-HK": "Cantonese", "zh-TW": "Mandarin (Taiwan)", "cmn-TW": "Mandarin (Taiwan)",
     "ru": "Russian", "pl": "Polish", "tr": "Turkish", "nl": "Dutch", "da": "Danish", 
     "sv": "Swedish", "no": "Norwegian", "fi": "Finnish", "el": "Greek", "he": "Hebrew", 
     "ar": "Arabic", "th": "Thai", "id": "Indonesian", "vi": "Vietnamese", "ms": "Malay", 
@@ -117,31 +115,25 @@ def log(msg):
     sys.stdout.flush()
 
 def clean_sub_name(code, raw_name):
-    # Limpia nombres y busca en el diccionario
     if not raw_name or "--" in raw_name or raw_name == code:
         base = raw_name.split('--')[0] if raw_name else code
         return LANG_CODES.get(base, base)
     return raw_name
 
 def load_previous_db():
-    if os.path.exists("database.json"):
+    if os.path.exists(DB_FILE):
         try:
-            with open("database.json", "r", encoding="utf-8") as f:
+            with open(DB_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except: pass
     return {"regions": {}}
 
 def get_local_release_date(pacific_date_str, region_code):
-    """
-    Calcula la fecha local basada en las 12:00 AM (00:00) Hora del Pacífico.
-    00:00 PST = 08:00 UTC.
-    """
     if not pacific_date_str or region_code not in UTC_OFFSETS:
         return pacific_date_str
-        
     try:
         base_date = datetime.strptime(pacific_date_str, "%Y-%m-%d")
-        utc_release_time = base_date.replace(hour=8) # 00:00 PST = 08:00 UTC
+        utc_release_time = base_date.replace(hour=8) 
         offset = UTC_OFFSETS.get(region_code, 0)
         local_release_time = utc_release_time + timedelta(hours=offset)
         local_date_str = local_release_time.strftime("%Y-%m-%d")
@@ -150,9 +142,9 @@ def get_local_release_date(pacific_date_str, region_code):
         return pacific_date_str
 
 def get_data():
+    # Cargamos DB para tener memoria de ejecuciones pasadas
     OLD_DB = load_previous_db()
     
-    # Hora Actual en el Pacífico
     pacific_time_now = datetime.utcnow() - timedelta(hours=8)
     today_str = pacific_time_now.strftime("%Y-%m-%d")
     
@@ -163,7 +155,7 @@ def get_data():
     
     IS_FIX_WINDOW = (pacific_time_now <= FIX_EXPIRY_DATE)
     
-    log(f"🌍 INICIANDO ESCANEO (Fecha Ref. Pacífico: {today_str})...")
+    log(f"🌍 INICIANDO ESCANEO (Ref. Time: Pacific {today_str})...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -175,12 +167,13 @@ def get_data():
         new_eps_count = 0 
         total_eps_count = 0 
         memory_map = {}
-        
+
+        # Cargar memoria de la región
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
                 for ep in s.get("eps", []):
                     memory_map[f"{s['id']}-{ep['n']}"] = ep.get('dt', '')
-
+        
         try:
             url_bundle = f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/encodedSeriesId/{SERIES_ID}"
             r = requests.get(url_bundle, headers=HEADERS, timeout=4)
@@ -195,7 +188,6 @@ def get_data():
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
                         
-                        # PageSize 60 (Más seguro que 150)
                         url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
                         
                         try:
@@ -209,19 +201,30 @@ def get_data():
                                     ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     
+                                    # 1. Identificar si es el episodio objetivo
                                     is_target = False
                                     if IS_FIX_WINDOW:
                                         if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7: is_target = True
                                         t_clean = title.lower() if title else ""
                                         if any(ft in t_clean for ft in FIX_TITLES): is_target = True
 
+                                    # 2. Determinar Fecha Base (Raw)
                                     if is_target:
+                                        # Si es target -> 3 Diciembre
                                         raw_date = FIX_TARGET_DATE
                                     else:
+                                        # Si NO es target:
+                                        # - Si ya lo tenía en memoria -> Mantener fecha vieja
+                                        # - Si no lo tenía -> Poner fecha 2000 (para que no salte como nuevo hoy)
                                         stored_date = memory_map.get(f"{s_num}-{ep_num}")
-                                        raw_date = stored_date if stored_date else today_str
+                                        if stored_date:
+                                            raw_date = stored_date
+                                        else:
+                                            # Intento sacar fecha real API, sino 2000
+                                            api_date = ep.get('releases', [{}])[0].get('releaseDate', None)
+                                            raw_date = api_date if api_date else FIX_OLD_DATE
 
-                                    # Ajuste de Zona Horaria
+                                    # 3. Ajustar por Zona Horaria
                                     final_date = get_local_release_date(raw_date, code)
 
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
@@ -237,8 +240,9 @@ def get_data():
 
                                     clean_eps.append({"n": ep_num, "t": title, "ds": desc, "dt": final_date, "a": audios_list, "s": subs_list})
                                     
-                                    # Detección de Novedades
-                                    if final_date:
+                                    # 4. Detectar si es NUEVO (Ventana 90 días)
+                                    # Solo cuenta si la fecha es > 2024 (evita los del año 2000)
+                                    if final_date and "2025" in final_date: 
                                         try:
                                             dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
                                             offset = UTC_OFFSETS.get(code, 0)
@@ -254,7 +258,6 @@ def get_data():
                     
                     new_database["regions"][code] = region_data
                     
-                    # --- LOGGING: MOSTRAR SIEMPRE (Con o sin nuevos) ---
                     if new_eps_count > 0:
                         log(f"   ✨ {code}: OK ({total_eps_count} Total | {new_eps_count} Nuevos)")
                     else:
@@ -263,7 +266,7 @@ def get_data():
                 log(f"   ⚠️ {code}: Error API {r.status_code}")
                 
         except Exception as e: 
-            log(f"   ❌ {code}: Error conexión ({e})")
+            log(f"   ❌ {code}: Error ({e})")
         
         time.sleep(0.1)
         
