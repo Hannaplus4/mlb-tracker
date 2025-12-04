@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 SERIES_ID = "1CjTiHEJbLRC"
 
 # --- CONFIGURACIÓN DE HORARIOS Y FECHAS ---
-# Diferencia horaria aproximada respecto a UTC
+# Diferencia horaria aproximada respecto a UTC para calcular fecha local
 UTC_OFFSETS = {
     # América
     "US": -5, "CA": -5, "MX": -6, "AR": -3, "BR": -3, "CL": -3, "CO": -5, "PE": -5,
@@ -66,7 +66,6 @@ REGIONS = [
     # --- EUROPA ---
     # España y asociados (Castellano Puro)
     {"c":"ES", "l":"es-ES"}, {"c":"AD", "l":"es-ES"}, {"c":"GI", "l":"es-ES"},
-    
     {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"}, {"c":"IT", "l":"it-IT"}, 
     {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"}, {"c":"NL", "l":"nl-NL"}, 
     {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"}, {"c":"AT", "l":"de-AT"}, 
@@ -92,7 +91,8 @@ REGIONS = [
 
     # --- ASIA / PACÍFICO / OCEANÍA ---
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
-    {"c":"TW", "l":"zh-TW"}, {"c":"HK", "l":"zh-HK"}, 
+    {"c":"TW", "l":"cmn-TW"}, # Taiwán usa cmn-TW
+    {"c":"HK", "l":"zh-HK"}, 
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
     
@@ -111,12 +111,14 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0
 
 LANG_CODES = {
     "es-419": "Spanish (LatAm)", 
-    "es-ES": "Spanish", # Ajustado para ES, AD, GI
+    "es-ES": "Spanish",
     "es": "Spanish",
     "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
     "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
     "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
-    "zh-HK": "Cantonese", "zh-TW": "Taiwanese Mandarin", "ru": "Russian", "pl": "Polish", "tr": "Turkish",
+    "zh-HK": "Cantonese", "zh-TW": "Mandarin (Taiwan)", 
+    "cmn-TW": "Mandarin (Taiwan)", # Agregado para coincidir con la región TW
+    "ru": "Russian", "pl": "Polish", "tr": "Turkish",
     "nl": "Dutch", "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
     "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai", "id": "Indonesian",
     "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian",
@@ -153,8 +155,8 @@ def load_previous_db():
 
 def get_local_release_date(pacific_date_str, region_code):
     """
-    Calcula la fecha local basada en las 12:00 AM (Midnight) Hora del Pacífico.
-    Si la fecha resultante es diferente a la original, devuelve la nueva.
+    Calcula la fecha local basada en las 12:00 AM (00:00) Hora del Pacífico.
+    00:00 PST = 08:00 UTC.
     """
     if not pacific_date_str or region_code not in UTC_OFFSETS:
         return pacific_date_str
@@ -169,12 +171,10 @@ def get_local_release_date(pacific_date_str, region_code):
         offset = UTC_OFFSETS.get(region_code, 0)
         local_release_time = utc_release_time + timedelta(hours=offset)
         
-        # 3. Comparar fechas
+        # 3. Comparar fechas (Si cambió de día, devuelve la nueva fecha)
         local_date_str = local_release_time.strftime("%Y-%m-%d")
         
-        if local_date_str != pacific_date_str:
-            return local_date_str # Devuelve la fecha local si es diferente (ej. "Ayer" o "Mañana")
-        return pacific_date_str
+        return local_date_str
         
     except Exception:
         return pacific_date_str
@@ -182,7 +182,7 @@ def get_local_release_date(pacific_date_str, region_code):
 def get_data():
     OLD_DB = load_previous_db()
     
-    # Hora Actual en el Pacífico para lógica de "Nuevos Episodios"
+    # Hora Actual en el Pacífico
     pacific_time_now = datetime.utcnow() - timedelta(hours=8)
     today_str = pacific_time_now.strftime("%Y-%m-%d")
     
@@ -198,9 +198,13 @@ def get_data():
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
         lang = reg['l']
-        if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
+        
+        # Progreso visible en bloques de 10, solo para saber que está vivo
+        if idx % 10 == 0: 
+            log(f"--> Procesando bloque {idx+1}...")
 
         new_eps_count = 0 
+        total_eps_count = 0 # Contador total de episodios en la región
         memory_map = {}
         
         if code in OLD_DB.get("regions", {}):
@@ -222,13 +226,14 @@ def get_data():
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
                         
-                        # PageSize 150 para evitar episodios ocultos (HK)
+                        # PageSize 150 para evitar episodios ocultos
                         url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/150/page/1"
                         
                         try:
                             r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
                             if r_eps.status_code == 200:
                                 eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
+                                total_eps_count += len(eps_raw) # Sumar al total
                                 clean_eps = []
                                 
                                 for i, ep in enumerate(eps_raw):
@@ -264,14 +269,10 @@ def get_data():
 
                                     clean_eps.append({"n": ep_num, "t": title, "ds": desc, "dt": final_date, "a": audios_list, "s": subs_list})
                                     
-                                    # Detección de Novedades (Comparando contra fecha Pacífico actual)
+                                    # Detección de Novedades (Comparando contra fecha Pacífico actual + Offset local)
                                     if final_date:
                                         try:
-                                            # Para "news", usamos la fecha ajustada localmente
                                             dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
-                                            # Referencia para novedad: Pacífico - Ajuste Local
-                                            # Si la fecha local está entre hoy y hace 90 días
-                                            # Calculamos el "Hoy" local aproximado también
                                             offset = UTC_OFFSETS.get(code, 0)
                                             local_now = datetime.utcnow() + timedelta(hours=offset)
                                             
@@ -285,10 +286,13 @@ def get_data():
                     
                     new_database["regions"][code] = region_data
                     
-                    msg_extra = f"({new_eps_count} Nuevos)" if new_eps_count > 0 else "(0 Nuevos)"
+                    # SOLO IMPRIMIR SI HAY NUEVOS
                     if new_eps_count > 0:
-                        log(f"   ✅ {code}: OK {msg_extra}")
-        except: pass
+                        log(f"   ✨ {code}: OK ({total_eps_count} Total | {new_eps_count} Nuevos)")
+                        
+        except Exception as e: 
+            pass
+        
         time.sleep(0.1)
         
     return new_database
