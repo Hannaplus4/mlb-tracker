@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Miraculous Disney+ Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Lobster&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Lobster&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-body: #0f1014;
@@ -12,8 +12,11 @@
             --bg-card: rgba(30, 34, 45, 0.7);
             --bg-card-hover: rgba(40, 44, 58, 0.95);
             --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            
             --accent-brand: #3a86ff;
+            --accent-red: #e11d48; /* Rojo Ladybug */
             --accent-new: #10b981;
+            
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --radius: 12px;
@@ -26,13 +29,13 @@
             color: var(--text-main);
             margin: 0; padding: 0; min-height: 100vh;
             background-attachment: fixed;
-            -webkit-tap-highlight-color: transparent; /* Quita el recuadro azul al tocar en Android/iOS */
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* HEADER */
         header {
             text-align: center;
-            padding: 20px 20px;
+            padding: 15px 20px;
             background: rgba(15, 16, 20, 0.9);
             position: sticky; top: 0; z-index: 100;
             backdrop-filter: blur(20px);
@@ -41,25 +44,28 @@
         }
 
         .logo-img {
-            max-width: 180px;
+            max-width: 160px; /* Logo un poco más chico */
             height: auto;
             display: block;
-            margin: 0 auto 5px auto;
+            margin: 0 auto 4px auto;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
         }
 
         .tracker-title {
-            font-family: 'Lobster', cursive; /* FUENTE LOBSTER */
-            font-size: 1.8rem;
-            color: var(--accent-brand);
+            font-family: 'Lobster', cursive;
+            font-size: 1.4rem; /* Achicado */
+            color: var(--accent-red); /* Rojo */
             letter-spacing: 1px;
-            text-transform: none; /* Lobster se ve mejor natural */
-            margin-top: 5px;
+            text-transform: none;
+            margin-top: 0;
             display: block;
-            text-shadow: 0 0 10px rgba(58, 134, 255, 0.3);
+            
+            /* Contorno Blanco */
+            -webkit-text-stroke: 0.8px white;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         }
 
-        .last-update { font-size: 0.65rem; color: #666; margin-top: 5px; font-weight: 500; font-family: 'Inter', sans-serif; }
+        .last-update { font-size: 0.65rem; color: #888; margin-top: 5px; font-weight: 500; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* CONTROLES */
         .controls-wrapper {
@@ -79,11 +85,12 @@
             font-weight: 600; font-size: 0.95rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             font-family: 'Inter', sans-serif;
+            transition: 0.2s;
         }
         
         .select-btn:hover, .std-select:hover:not(:disabled) { background: #374151; border-color: rgba(255,255,255,0.3); }
         .select-btn img { width: 28px; margin-right: 12px; border-radius: 4px; object-fit: cover; }
-        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3e"); background-repeat: no-repeat; background-position: right 15px center; background-size: 14px; }
+        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 14px; }
 
         .options-list {
             position: absolute; top: 115%; left: 0; right: 0;
@@ -131,23 +138,13 @@
             box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
         }
 
-        /* SINOPSIS (Sin recuadro, sin +) */
+        /* SINOPSIS */
         details.ep-synopsis summary {
-            list-style: none; 
-            cursor: pointer; 
-            color: var(--accent-brand);
-            font-size: 0.9rem; font-weight: 600; 
-            user-select: none; 
-            padding: 10px 0; 
-            outline: none; /* Quita borde de foco */
-            width: fit-content;
+            list-style: none; cursor: pointer; color: var(--accent-brand);
+            font-size: 0.9rem; font-weight: 600; user-select: none; padding: 10px 0; outline: none; width: fit-content;
         }
-        details.ep-synopsis summary:focus { outline: none; } /* Asegura quitar borde */
-        
         details.ep-synopsis summary::-webkit-details-marker { display: none; }
-        /* Se quita el content del after para no mostrar + ni flechas */
         details.ep-synopsis summary::after { content: none; } 
-        
         .ep-desc { font-size: 0.95rem; color: #d1d5db; line-height: 1.6; margin-top: 0; padding-left: 0; }
 
         /* TAGS & AUDIO */
@@ -173,8 +170,8 @@
         /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
             header { padding: 15px; }
-            .logo-img { max-width: 160px; }
-            .tracker-title { font-size: 1.4rem; }
+            .logo-img { max-width: 150px; }
+            .tracker-title { font-size: 1.2rem; }
             .controls-wrapper { flex-direction: column; gap: 12px; }
             .ep-header { flex-direction: column; gap: 8px; }
             .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 6px; }
@@ -216,44 +213,41 @@
 <script>
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // --- MAPA COMPLETO AUDIO ---
+    // --- PRIORIDAD DE AUDIO ACTUALIZADA ---
     const AUDIO_PRIORITY = {
-        // AMÉRICA (SPA)
-        "AR": "Español (Latinoamericano)", "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
-        "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", "VE": "Español (Latinoamericano)",
-        "EC": "Español (Latinoamericano)", "GT": "Español (Latinoamericano)", "BO": "Español (Latinoamericano)",
-        "CR": "Español (Latinoamericano)", "DO": "Español (Latinoamericano)", "SV": "Español (Latinoamericano)",
-        "HN": "Español (Latinoamericano)", "NI": "Español (Latinoamericano)", "PA": "Español (Latinoamericano)",
-        "PY": "Español (Latinoamericano)", "UY": "Español (Latinoamericano)", "PR": "Español (Latinoamericano)",
-        "FK": "Español (Latinoamericano)", 
+        // AMÉRICA
+        "AR": "Español (Latinoamericano)", "FK": "Español (Latinoamericano)",
+        "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
+        "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", 
+        "VE": "Español (Latinoamericano)", "EC": "Español (Latinoamericano)",
+        "GT": "Español (Latinoamericano)", "BO": "Español (Latinoamericano)",
+        "CR": "Español (Latinoamericano)", "DO": "Español (Latinoamericano)",
+        "SV": "Español (Latinoamericano)", "HN": "Español (Latinoamericano)",
+        "NI": "Español (Latinoamericano)", "PA": "Español (Latinoamericano)",
+        "PY": "Español (Latinoamericano)", "UY": "Español (Latinoamericano)",
+        "PR": "Español (Latinoamericano)", 
 
-        // AMÉRICA (ENG/FR)
-        "US": "English", "CA": "English", "JM": "English", "BS": "English", "BB": "English", "TT": "English",
-        "PM": "Français", "HT": "Français", "GP": "Français", "MQ": "Français", "BL": "Français", "MF": "Français", "GF": "Français",
+        // PAÍSES BAJOS Y CARIBE NEERLANDÉS
+        "NL": "Nederlands", "CW": "Nederlands", "AW": "Nederlands", "SX": "Nederlands",
 
         // EUROPA
         "ES": "Español", "GI": "Español", "AD": "Español",
         "FR": "Français", "BE": "Français", "CH": "Français", "LU": "Français", "MC": "Français",
-        "GB": "English", "IE": "English", "MT": "English", "IM": "English", "GG": "English", "JE": "English",
         "DE": "Deutsch", "AT": "Deutsch", "LI": "Deutsch",
         "IT": "Italiano", "SM": "Italiano", "VA": "Italiano",
-        "PT": "Português", 
-        "NL": "Nederlands", 
+        "PT": "Português", "BR": "Português",
+        "RO": "Română",
         "SE": "Svenska", "AX": "Svenska",
         "NO": "Norsk", "SJ": "Norsk",
         "DK": "Dansk", "FO": "Dansk", "GL": "Dansk",
-        "FI": "Suomi",
-        "PL": "Polski",
-        "CZ": "Čeština", "SK": "Slovenčina",
-        "HU": "Magyar", "RO": "Română", "BG": "Bulgarian", "HR": "Croatian",
-        "TR": "Türkçe", "GR": "Greek", "CY": "Greek",
-        "EE": "Estonian", "LV": "Latvian", "LT": "Lithuanian", "SI": "Slovenian",
-        "AL": "Albanian", "MK": "Macedonian", "BA": "Croatian", "RS": "Serbian", "ME": "Montenegrin", "IS": "Icelandic",
+        "FI": "Suomi", "PL": "Polski", "CZ": "Čeština", "SK": "Slovenčina",
+        "HU": "Magyar", "TR": "Türkçe", "GR": "Greek", "CY": "Greek",
 
-        // ASIA / OCEANÍA
-        "JP": "Japanese", "KR": "Korean", "TW": "Taiwanese Mandarin", "HK": "Cantonese",
-        "AU": "English", "NZ": "English", "SG": "English", 
-        "NC": "Français", "PF": "Français", "WF": "Français", "RE": "Français", "YT": "Français"
+        // INGLÉS (UK, US, ETC)
+        "US": "English", "GB": "English", "IE": "English", "CA": "English", "AU": "English", "NZ": "English",
+        
+        // ASIA
+        "JP": "Japanese", "KR": "Korean", "TW": "Taiwanese Mandarin", "HK": "Cantonese"
     };
 
     const UI_TEXT = {
@@ -280,12 +274,18 @@
             const userLang = navigator.language || navigator.userLanguage;
             if (userLang.startsWith('es')) uiLang = 'es';
         }
+        
         applyTexts();
+
         try {
             const res = await fetch('database.json?v=' + Date.now());
             if(!res.ok) throw new Error("DB Error");
             db = await res.json();
-            document.getElementById('ui-loading').innerText = `UPDATED: ${db.meta.updated}`;
+            
+            // TRADUCCIÓN DEL LABEL DE CARGA
+            const updatedLabel = uiLang === 'es' ? "ACTUALIZADO" : "UPDATED";
+            document.getElementById('ui-loading').innerText = `${updatedLabel}: ${db.meta.updated}`;
+            
             buildDropdown();
             checkURL();
         } catch (e) {
@@ -356,7 +356,6 @@
         const txt = UI_TEXT[uiLang];
         const regionData = db.regions[selectedCountry];
 
-        // Lógica de Último Lanzamiento (Nuevo)
         let latestDateInRegion = "";
         regionData.seasons.forEach(s => {
             s.eps.forEach(e => {
@@ -379,31 +378,31 @@
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
                 const isNew = (dateVal && dateVal === latestDateInRegion);
 
-                // --- AUDIO LOGIC (NUEVA PRIORIDAD + FALLBACK INGLÉS) ---
+                // --- AUDIO LOGIC (FILTRO ANTI-DESCRIPTION) ---
                 const targetAudio = AUDIO_PRIORITY[selectedCountry];
                 let audios = [...ep.a];
                 let primary = null, others = [];
                 
-                // 1. Buscar Audio Local (Ej: Español en Argentina)
+                // 1. Buscar Audio Local (ignorar Audio Description)
                 let idx = -1;
-                if(targetAudio) idx = audios.findIndex(a => a.includes(targetAudio));
+                if(targetAudio) idx = audios.findIndex(a => a.includes(targetAudio) && !a.toLowerCase().includes("audio description"));
                 
                 if (idx !== -1) {
                     primary = audios[idx];
                     audios.splice(idx, 1);
                 } else {
-                    // 2. Fallback: Buscar Inglés si no hay local
-                    idx = audios.findIndex(a => a.includes("English"));
+                    // 2. Fallback: Inglés (ignorar Audio Description)
+                    idx = audios.findIndex(a => a.includes("English") && !a.toLowerCase().includes("audio description"));
                     if(idx !== -1) {
                         primary = audios[idx];
                         audios.splice(idx, 1);
                     } else if(audios.length > 0) {
-                        // 3. Fallback: El primero que haya
+                        // 3. Fallback: Primero disponible
                         primary = audios[0];
                         audios.shift();
                     }
                 }
-                others = audios; // Los que sobran
+                others = audios;
 
                 let audioHTML = '';
                 if(primary) audioHTML += `<div class="tag primary">${primary}</div>`;
@@ -417,7 +416,7 @@
                 if (dateVal) {
                     const d = new Date(dateVal + "T00:00:00");
                     dateDisplay = (uiLang === 'en') 
-                        ? d.toLocaleDateString('en-GB') 
+                        ? d.toLocaleDateString('en-US') // USA FORMAT
                         : d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
                 }
 
