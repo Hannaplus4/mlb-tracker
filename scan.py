@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 SERIES_ID = "1CjTiHEJbLRC"
 
 # --- LISTA DE REGIONES DEFINITIVA ---
-# Se excluyen: Hotstar SEA (ID, MY, TH, PH, VN), África Continental, MENA e Israel.
-# Se incluyen: Nuevas expansiones Europa 2022, Territorios de Ultramar y Microestados.
+# Excluye: Hotstar SEA, MENA, África Continental e Israel.
+# Incluye: Territorios de Ultramar, Microestados y Regiones Especiales.
 
 REGIONS = [
     # --- LATINOAMÉRICA (Idioma Base: es-419) ---
@@ -22,9 +22,9 @@ REGIONS = [
     {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
     {"c":"FK", "l":"es-419"}, # Islas Malvinas
 
-    # --- TERRITORIOS AUSTRALES VINCULADOS A LATAM (Solicitud Usuario) ---
-    # Islas Georgias del Sur y Sandwich del Sur (Reino Unido, pero forzado a es-419)
-    {"c":"GS", "l":"es-419"}, 
+    # --- TERRITORIOS AUSTRALES (Forzados a LATAM) ---
+    # Nota: GS es territorio británico, pero solicitaste audio/títulos en Latino.
+    {"c":"GS", "l":"es-419"}, # Islas Georgias del Sur y Sandwich del Sur
 
     # --- NORTEAMÉRICA Y CARIBE ---
     {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"PR", "l":"es-419"}, 
@@ -45,6 +45,7 @@ REGIONS = [
     {"c":"UM", "l":"en-US"}, # Islas menores alejadas de EE. UU.
 
     # --- EUROPA (Oeste, Este, Balcanes y Nórdicos) ---
+    # Nota: ES, AD y GI pueden reportar audios "Latino" por error en origen.
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
     {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
     {"c":"NL", "l":"nl-NL"}, {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"},
@@ -56,52 +57,47 @@ REGIONS = [
     {"c":"IM", "l":"en-GB"}, {"c":"GG", "l":"en-GB"}, {"c":"JE", "l":"en-GB"},
     
     # Regiones Nórdicas Especiales
+    {"c":"AX", "l":"sv-SE"}, # Åland (Confirmado)
     {"c":"FO", "l":"da-DK"}, # Islas Feroe
     {"c":"GL", "l":"da-DK"}, # Groenlandia
-    {"c":"AX", "l":"sv-SE"}, # Åland (Land)
     {"c":"SJ", "l":"no-NO"}, # Svalbard y Jan Mayen
     {"c":"BV", "l":"no-NO"}, # Isla Bouvet (Dependencia Noruega)
 
-    # Europa del Este y Balcanes (Junio 2022)
+    # Europa del Este y Balcanes
     {"c":"PL", "l":"pl-PL"}, {"c":"CZ", "l":"cs-CZ"}, {"c":"SK", "l":"sk-SK"}, 
     {"c":"HU", "l":"hu-HU"}, {"c":"RO", "l":"ro-RO"}, {"c":"BG", "l":"bg-BG"}, 
     {"c":"HR", "l":"hr-HR"}, {"c":"GR", "l":"el-GR"}, {"c":"SI", "l":"sl-SI"}, 
     {"c":"EE", "l":"et-EE"}, {"c":"LV", "l":"lv-LV"}, {"c":"LT", "l":"lt-LT"}, 
     {"c":"CY", "l":"el-GR"}, {"c":"AL", "l":"sq-AL"}, {"c":"MK", "l":"mk-MK"}, 
     {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"}, {"c":"ME", "l":"sr-ME"}, 
-    {"c":"TR", "l":"tr-TR"},
-    {"c":"XK", "l":"sq-AL"}, # Kosovo
+    {"c":"TR", "l":"tr-TR"}, {"c":"XK", "l":"sq-AL"}, 
 
     # --- ASIA / PACÍFICO / OCEANÍA ---
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
+    # Nota: TW a menudo carece de metadata traducida
     {"c":"TW", "l":"zh-TW"}, {"c":"HK", "l":"zh-HK"}, 
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
     
     # Territorios del Pacífico y Océano Índico
-    {"c":"NC", "l":"fr-FR"}, # Nueva Caledonia
-    {"c":"PF", "l":"fr-FR"}, # Polinesia Francesa
-    {"c":"WF", "l":"fr-FR"}, # Wallis y Futuna
-    {"c":"GU", "l":"en-US"}, # Guam
-    {"c":"MP", "l":"en-US"}, # Islas Marianas del Norte
-    {"c":"AS", "l":"en-US"}, # Samoa Americana
-    {"c":"RE", "l":"fr-FR"}, # Reunión
-    {"c":"YT", "l":"fr-FR"}, # Mayotte
-    {"c":"MU", "l":"en-GB"}, # Mauricio
+    {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"}, {"c":"WF", "l":"fr-FR"}, 
+    {"c":"GU", "l":"en-US"}, {"c":"MP", "l":"en-US"}, {"c":"AS", "l":"en-US"}, 
+    {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"}, {"c":"MU", "l":"en-GB"},
     
-    # Territorios Británicos de Ultramar (Islados)
-    {"c":"PN", "l":"en-GB"}, # Islas Pitcairn
-    {"c":"SH", "l":"en-GB"}, # Santa Elena, Ascensión y Tristán de Acuña
-    {"c":"IO", "l":"en-GB"}, # Territorio Británico del Océano Índico
+    # Asociados a Nueva Zelanda (Posibles)
+    {"c":"CK", "l":"en-NZ"}, # Islas Cook
+    {"c":"NU", "l":"en-NZ"}, # Niue
+    {"c":"TK", "l":"en-NZ"}, # Tokelau
+
+    # Territorios Británicos de Ultramar
+    {"c":"PN", "l":"en-GB"}, {"c":"SH", "l":"en-GB"}, {"c":"IO", "l":"en-GB"}, 
     
     # Territorios Franceses Australes
-    {"c":"TF", "l":"fr-FR"}, # Tierras Australes y Antárticas Francesas
+    {"c":"TF", "l":"fr-FR"}, 
 
-    # Territorios Externos de Australia (NUEVOS ENCONTRADOS)
-    {"c":"CC", "l":"en-AU"}, # Islas Cocos (Keeling)
-    {"c":"CX", "l":"en-AU"}, # Isla de Navidad
-    {"c":"NF", "l":"en-AU"}, # Isla Norfolk
-    {"c":"HM", "l":"en-AU"}  # Islas Heard y McDonald
+    # Territorios Externos de Australia
+    {"c":"CC", "l":"en-AU"}, {"c":"CX", "l":"en-AU"}, 
+    {"c":"NF", "l":"en-AU"}, {"c":"HM", "l":"en-AU"}  
 ]
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
@@ -153,7 +149,7 @@ def get_data():
     OLD_DB = load_previous_db()
     new_database = { "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") }, "regions": {} }
     
-    log(f"🌍 INICIANDO ESCANEO...")
+    log(f"🌍 INICIANDO ESCANEO GLOBAL...")
     today_obj = datetime.utcnow()
     today_str = today_obj.strftime("%Y-%m-%d")
     IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
@@ -163,6 +159,7 @@ def get_data():
         lang = reg['l']
         if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
 
+        new_eps_count = 0 
         memory_map = {}
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
@@ -215,12 +212,16 @@ def get_data():
                                     if final_date:
                                         try:
                                             dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
-                                            if 0 <= (today_obj - dt_obj).days <= 90: region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                            if 0 <= (today_obj - dt_obj).days <= 90: 
+                                                region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                                new_eps_count += 1
                                         except: pass
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
                     new_database["regions"][code] = region_data
-                    log(f"   ✅ {code}: OK")
+                    
+                    msg_extra = f"({new_eps_count} Nuevos)" if new_eps_count > 0 else "(0 Nuevos)"
+                    log(f"   ✅ {code}: OK {msg_extra}")
         except: pass
         time.sleep(0.1)
     return new_database
