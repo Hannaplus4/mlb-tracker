@@ -10,6 +10,7 @@ SERIES_ID = "1CjTiHEJbLRC"
 DB_FILE = "database.json"
 
 # --- CONFIGURACIÓN DE HORARIOS ---
+# Diferencia horaria aproximada respecto a UTC
 UTC_OFFSETS = {
     "US": -5, "CA": -5, "MX": -6, "AR": -3, "BR": -3, "CL": -3, "CO": -5, "PE": -5,
     "UY": -3, "VE": -4, "EC": -5, "GT": -6, "BO": -4, "CR": -6, "DO": -4, "SV": -6,
@@ -101,7 +102,7 @@ LANG_CODES = {
 }
 
 FIX_TARGET_DATE = "2025-12-03" 
-FIX_OLD_DATE = "2000-01-01"    
+FIX_OLD_DATE = "2021-01-01"    
 FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
 FIX_TITLES = [
     "mister agreste", "sleeping syren", "the dark castle", "wreckless driver", "yaksi gozen",
@@ -113,7 +114,10 @@ def log(msg):
     print(msg)
     sys.stdout.flush()
 
-def clean_sub_name(code, raw_name):
+def clean_sub_name(code, raw_name, region_code=None):
+    if region_code in ['ES', 'AD', 'GI'] and (code == 'es-419' or raw_name == 'es-419'):
+        return "Spanish"
+        
     if not raw_name or "--" in raw_name or raw_name == code:
         base = raw_name.split('--')[0] if raw_name else code
         return LANG_CODES.get(base, base)
@@ -128,19 +132,15 @@ def load_previous_db():
     return {"regions": {}}
 
 def get_local_release_date(pacific_date_str, region_code):
-    """
-    Calcula la fecha local basada en las 12:00 AM (00:00) Hora del Pacífico.
-    """
     if not pacific_date_str or region_code not in UTC_OFFSETS:
         return pacific_date_str
     try:
         base_date = datetime.strptime(pacific_date_str, "%Y-%m-%d")
-        utc_release_time = base_date.replace(hour=8) # 00:00 PST = 08:00 UTC
+        utc_release_time = base_date.replace(hour=8) 
         offset = UTC_OFFSETS.get(region_code, 0)
         local_release_time = utc_release_time + timedelta(hours=offset)
-        local_date_str = local_release_time.strftime("%Y-%m-%d")
-        return local_date_str
-    except Exception:
+        return local_release_time.strftime("%Y-%m-%d")
+    except:
         return pacific_date_str
 
 def get_data():
@@ -204,40 +204,32 @@ def get_data():
                                     episode_key = f"{s_num}-{ep_num}"
                                     stored_date = memory_map.get(episode_key)
 
-                                    # --- LOGICA DE FECHAS AJUSTADA ---
+                                    # --- LOGICA DE FECHAS (SIN API) ---
                                     
-                                    # 1. Determinar si es Target (Evento especial)
-                                    is_target = False
-                                    if IS_FIX_WINDOW:
-                                        if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7: is_target = True
-                                        t_clean = title.lower() if title else ""
-                                        if any(ft in t_clean for ft in FIX_TITLES): is_target = True
-
-                                    # 2. Asignar fecha RAW
+                                    # Caso 1: Ya lo conocemos -> Mantenemos fecha
                                     if stored_date:
-                                        # Si ya estaba en la DB, respetar su fecha
                                         raw_date = stored_date
-                                    elif is_target:
-                                        # Si es el evento especial, forzar 3 Dic
-                                        raw_date = FIX_TARGET_DATE
-                                    elif IS_FIX_WINDOW:
-                                        # Estamos en ventana de fix, pero NO es target y NO estaba en DB.
-                                        # Esto pasa cuando borraste la DB.
-                                        # Para no marcar temporadas viejas como "Nuevas hoy":
-                                        api_date = ep.get('releases', [{}])[0].get('releaseDate', None)
-                                        
-                                        # Si la API tiene fecha y es de 2024/2025, la usamos (es nuevo).
-                                        # Si no, usamos fecha vieja.
-                                        if api_date and ("2024" in api_date or "2025" in api_date):
-                                            raw_date = api_date
-                                        else:
-                                            raw_date = FIX_OLD_DATE
+                                        is_new_detection = False
+                                    
+                                    # Caso 2: Es nuevo (no estaba en BD)
                                     else:
-                                        # MODO NORMAL (Después del 7 Dic):
-                                        # Si no estaba en la DB, es NUEVO para nosotros -> Fecha Hoy.
-                                        raw_date = today_str
+                                        is_new_detection = True
+                                        if IS_FIX_WINDOW:
+                                            # Detectar si es target especial
+                                            is_target = False
+                                            if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7: is_target = True
+                                            t_clean = title.lower() if title else ""
+                                            if any(ft in t_clean for ft in FIX_TITLES): is_target = True
+                                            
+                                            if is_target:
+                                                raw_date = FIX_TARGET_DATE # 3 Dic
+                                            else:
+                                                raw_date = FIX_OLD_DATE    # 2021 (Viejo)
+                                        else:
+                                            # Despues del 8 de Dic: Fecha Escaneo
+                                            raw_date = today_str
 
-                                    # 3. Ajustar Zona Horaria
+                                    # Ajuste final de Zona Horaria
                                     final_date = get_local_release_date(raw_date, code)
 
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
@@ -246,24 +238,17 @@ def get_data():
                                     meta = ep.get('mediaMetadata', {})
                                     subs_list = []
                                     for sub in meta.get('captionTracks', []):
-                                        subs_list.append({"l": clean_sub_name(sub.get('language'), sub.get('renditionName')), "t": sub.get('trackType', 'NORMAL')})
+                                        subs_list.append({"l": clean_sub_name(sub.get('language'), sub.get('renditionName'), code), "t": sub.get('trackType', 'NORMAL')})
                                     audios_list = []
                                     for aud in meta.get('audioTracks', []):
-                                        audios_list.append(clean_sub_name(aud.get('language'), aud.get('renditionName')))
+                                        audios_list.append(clean_sub_name(aud.get('language'), aud.get('renditionName'), code))
 
                                     clean_eps.append({"n": ep_num, "t": title, "ds": desc, "dt": final_date, "a": audios_list, "s": subs_list})
                                     
-                                    # 4. Detección de Novedades (Ventana 90 días)
-                                    if final_date and final_date != FIX_OLD_DATE:
-                                        try:
-                                            dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
-                                            offset = UTC_OFFSETS.get(code, 0)
-                                            local_now = datetime.utcnow() + timedelta(hours=offset)
-                                            
-                                            if 0 <= (local_now - dt_obj_local).days <= 90: 
-                                                region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
-                                                new_eps_count += 1
-                                        except: pass
+                                    # Reportar si es NUEVO y la fecha no es antigua
+                                    if is_new_detection and final_date and "2025" in final_date:
+                                        region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                        new_eps_count += 1
                                 
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
@@ -278,7 +263,7 @@ def get_data():
                 log(f"   ⚠️ {code}: Error API {r.status_code}")
                 
         except Exception as e: 
-            log(f"   ❌ {code}: Error ({e})")
+            pass
         
         time.sleep(0.1)
         
