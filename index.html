@@ -2,473 +2,448 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disney+ Tracker V29</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miraculous Global Tracker v4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- VARIABLES DE COLOR (TEMA OSCURO) --- */
         :root {
-            --bg-body: #050505;
-            --surface: #121212;
-            --surface-card: #1c1c1f;
-            --surface-hover: #27272a;
-            --primary: #e11d48;
-            --primary-soft: rgba(225, 29, 72, 0.15);
-            --text-main: #f2f2f2;
-            --text-dim: #a1a1aa;
-            --border: #27272a;
-            --green-accent: #10b981;
+            --bg-main: #121212; /* Fondo principal más oscuro */
+            --bg-card: #1e1e2e; /* Fondo de las tarjetas */
+            --accent: #ff4757; /* Rojo Miraculous (Ladybug) */
+            --accent-sec: #2ed573; /* Verde para nuevos (Chat Noir eyes) */
+            --text-primary: #ffffff;
+            --text-secondary: #a4b0be;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
-        * { box-sizing: border-box; }
-
-        header { position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 10px 0; }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
-        
-        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .brand { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); letter-spacing: -0.02em; }
-        .brand span { color: var(--primary); }
-        .last-update { font-size: 0.65rem; color: var(--text-dim); background: var(--surface); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; }
-
-        .controls select { width: 100%; background: var(--surface); color: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
-        .controls select:hover { border-color: var(--primary); }
-
-        .tabs { display: flex; gap: 8px; background: var(--surface); padding: 4px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
-        .tab-btn { flex: 1; background: transparent; border: none; padding: 8px; color: var(--text-dim); font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .tab-btn.active { background: var(--primary); color: #fff; }
-        .badge { background: #fff; color: var(--primary); padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; }
-
-        main { padding-top: 40px; }
-        .panel { display: none; animation: slideUp 0.3s ease-out; }
-        .panel.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .country-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; padding: 12px 15px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
-        .flag-img { width: 42px; height: 30px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 1px solid #333; }
-        .country-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
-
-        .season-block { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-card); overflow: hidden; }
-        .season-header { padding: 12px 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; background: linear-gradient(90deg, var(--surface-card), var(--surface)); transition: 0.2s; user-select: none; position: relative; }
-        .season-header:hover { background: var(--surface-hover); }
-        .season-title { font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
-        .toggle-icon { color: var(--text-dim); transition: transform 0.3s; width: 18px; position: absolute; right: 20px; }
-        .season-block.open .toggle-icon { transform: rotate(180deg); }
-        .season-body { display: none; border-top: 1px solid var(--border); }
-        .season-block.open .season-body { display: block; }
-
-        .ep-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
-        .ep-card:last-child { border-bottom: none; }
-        
-        .ep-header-line { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap; }
-        .ep-num-pill { font-size: 0.75rem; font-weight: 800; background: #333; color: #fff; padding: 2px 8px; border-radius: 6px; }
-        .ep-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; }
-        .ep-date { font-size: 0.7rem; color: var(--green-accent); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
-        
-        .ep-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; width: 100%; text-align: left; margin-top: 5px; }
-        .desc-toggle-btn { background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 0; cursor: pointer; margin-top: 5px; display: none; margin-left: auto; margin-right: auto; }
-        
-        .tracks-area { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); width: 100%; }
-        .track-row { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; text-align: left; }
-        .lang-label { color: var(--text-dim); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; margin-top: 5px; min-width: 40px; }
-        
-        .badges-wrapper { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: 1; }
-        .pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; }
-        .pill.primary { background: var(--primary-soft); border-color: var(--primary); color: #fda4af; }
-        .pill.secondary { background: var(--surface); border-color: var(--border); color: var(--text-dim); }
-        .type-tag { font-size: 0.6rem; margin-left: 4px; opacity: 0.7; border: 1px solid; padding: 0 2px; border-radius: 3px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        
-        .expand-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; }
-        .hidden-tracks { display: none; gap: 5px; flex-wrap: wrap; margin-top: 5px; width: 100%; }
-        .hidden-tracks.show { display: flex; }
-
-        .msg-box { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 0.9rem; }
-        .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid rgba(244, 63, 94, 0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 640px) {
-            .ep-desc { display: none; margin-top: 8px; }
-            .ep-desc.show { display: block; animation: fadeIn 0.3s; }
-            .desc-toggle-btn { display: inline-block; }
-            .country-name { font-size: 1.1rem; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
         }
-        @media (min-width: 641px) {
-            .ep-desc { display: block !important; }
-            .desc-toggle-btn { display: none !important; }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+        }
+        
+        h1 { 
+            margin: 0; 
+            color: var(--accent); 
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        h1 .bug { font-size: 1.2em; vertical-align: middle; }
+        .last-update { font-size: 0.85rem; color: var(--text-secondary); margin-top: 10px; }
+
+        /* CONTROLES (SELECTORES) */
+        .controls-container {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 250px;
+            flex: 1;
+        }
+
+        label { font-size: 0.9rem; color: var(--accent); margin-bottom: 5px; font-weight: 600;}
+
+        select {
+            padding: 12px 15px;
+            background: var(--bg-main);
+            border: 2px solid #333;
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            appearance: none; /* Reset nativo */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+        select:focus { outline: none; border-color: var(--accent); }
+
+        /* BANDERAS EN SELECTOR */
+        .flag-icon { width: 24px; height: 18px; object-fit: cover; border-radius: 3px; vertical-align: middle; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
+        /* Ajuste para banderas personalizadas que pueden tener otras proporciones */
+        .flag-icon.custom-flag { width: auto; height: 20px; }
+
+
+        /* BANNER DE NOVEDADES */
+        #news-banner {
+            background: linear-gradient(135deg, var(--accent), #ff6b81);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: none; /* Oculto por defecto */
+            animation: slideDown 0.5s ease;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+        }
+        #news-banner h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: white; display: flex; align-items: center;}
+        .news-fire { margin-right: 8px; font-size: 1.3rem; }
+        .news-pill { 
+            background: rgba(0,0,0,0.3); 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            margin: 5px; 
+            font-size: 0.9rem; 
+            color: white;
+            font-weight: 500;
+        }
+
+        /* --- TARJETAS DE EPISODIOS --- */
+        .season-separator {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin: 30px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333;
+            font-weight: 700;
+        }
+
+        .ep-card {
+            background-color: var(--bg-card);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 5px solid transparent; /* Borde izquierdo para estado */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ep-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); background-color: #25253a;}
+
+        /* Estado: NUEVO */
+        .ep-card.is-new {
+            border-left-color: var(--accent-sec);
+            background: linear-gradient(to right, rgba(46, 213, 115, 0.1), var(--bg-card) 40%);
+        }
+
+        /* LAYOUT DEL ENCABEZADO DEL EPISODIO (Flexbox) */
+        .ep-header {
+            display: flex;
+            justify-content: space-between; /* PC: Título izquierda, fecha derecha */
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap; /* Permite que baje en móvil */
+        }
+
+        .ep-title-group {
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex-grow: 1; /* Ocupa el espacio disponible */
+            margin-right: 15px;
+        }
+        .ep-num { color: var(--accent); margin-right: 8px; }
+
+        .ep-date-group {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            white-space: nowrap; /* Evita que la fecha se parta en dos líneas */
+        }
+
+        /* Badge "NUEVO" parpadeante */
+        .new-badge {
+            background-color: var(--accent-sec);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite ease-in-out;
+            box-shadow: 0 0 5px var(--accent-sec);
+        }
+
+        .ep-desc {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Limita a 3 líneas la descripción */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* --- TAGS (Audios/Subtítulos) --- */
+        .tags-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+        .tag-group {
+            background: #151520;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+        .tag-icon { margin-right: 6px; }
+        .tag-lang { color: white; font-weight: 500; margin-left: 4px;}
+
+        /* --- ANIMACIONES --- */
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.8; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           📱 MEDIA QUERY PARA MÓVILES (Responsive)
+           ========================================= */
+        @media (max-width: 768px) {
+            /* En pantallas pequeñas, cambiamos la dirección del flex header */
+            .ep-header {
+                flex-direction: column; /* Apilar verticalmente */
+                align-items: flex-start; /* Alinear todo a la izquierda */
+            }
+
+            .ep-title-group {
+                margin-right: 0;
+                margin-bottom: 5px; /* Espacio entre título y fecha */
+                width: 100%;
+            }
+
+            .ep-date-group {
+                width: 100%;
+                /* La fecha queda debajo del título */
+            }
+
+            .controls-container { flex-direction: column; }
+            .control-group { min-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container">
-            <div class="nav-wrapper">
-                <div class="brand"><span>🐞</span> Disney+ Tracker</div>
-                <div class="last-update" id="lastUpdate">Sincronizando...</div>
-            </div>
+<header>
+    <h1><span class="bug">🐞</span> Miraculous Global Tracker</h1>
+    <div class="last-update" id="last-update">Conectando con la base de datos...</div>
+</header>
+
+<div class="controls-container">
+    <div class="control-group">
+        <label for="country-select">Selecciona Región/Territorio:</label>
+        <select id="country-select" onchange="handleCountryChange()">
+            <option value="" disabled selected>Cargando regiones...</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label for="season-select">Filtrar Temporada:</label>
+        <select id="season-select" onchange="renderEpisodes()" disabled>
+            <option value="all">✨ Mostrar Todo</option>
+        </select>
+    </div>
+</div>
+
+<div id="news-banner">
+    <h3><span class="news-fire">🔥</span> Novedades detectadas (< 90 días):</h3>
+    <div id="news-list"></div>
+</div>
+
+<div id="episodes-container"></div>
+
+<script>
+    // =================CONFIGURACIÓN=================
+    // Fecha marcador para ocultar fechas viejas (debe coincidir con el Python)
+    const HIDDEN_DATE_MARKER = "2000-01-01"; 
+    const DAYS_FOR_NEW = 90; // Días para considerar algo "NUEVO"
+    
+    // 1. MAPA DE NOMBRES PERSONALIZADOS (Tus correcciones)
+    const customCountryNames = {
+        "GB": "Reino Unido", // Corrección del (R.U)
+        "FK": "Islas Malvinas (Arg.)", // Nombre específico
+        // Puedes añadir más aquí: "US": "Estados Unidos", etc.
+    };
+
+    // 2. MAPA DE BANDERAS PERSONALIZADAS (SVG específicos)
+    const customFlagURLs = {
+        // Bandera de Tierra del Fuego para Malvinas
+        "FK": "https://upload.wikimedia.org/wikipedia/commons/9/97/Flag_of_Tierra_del_Fuego_province_in_Argentina.svg",
+        // Cruz de Borgoña para Gibraltar
+        "GI": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Flag_of_Cross_of_Burgundy.svg"
+    };
+    // ===============================================
+
+    let dbData = null;
+    let currentRegion = null;
+    const regionNames = new Intl.DisplayNames(['es'], { type: 'region' });
+
+    // --- FUNCIONES AUXILIARES ---
+
+    // Obtener nombre del país (con override personalizado)
+    function getDisplayName(code) {
+        if (customCountryNames[code]) return customCountryNames[code];
+        try { return regionNames.of(code); } catch(e) { return code; }
+    }
+
+    // Generar HTML de la bandera (CDN estándar o personalizada)
+    function getFlagHTML(code) {
+        if (customFlagURLs[code]) {
+             // Bandera personalizada con clase extra para ajuste de tamaño
+            return `<img src="${customFlagURLs[code]}" alt="${code}" class="flag-icon custom-flag">`;
+        }
+        // Bandera estándar de flagcdn
+        return `<img src="https://flagcdn.com/24x18/${code.toLowerCase()}.png" alt="${code}" class="flag-icon">`;
+    }
+
+    // Formatear fecha (YYYY-MM-DD -> DD/MM/YYYY)
+    function formatDate(dateStr) {
+        if (!dateStr || dateStr === HIDDEN_DATE_MARKER) return "";
+        const [y, m, d] = dateStr.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // Verificar si es nuevo
+    function isNewEpisode(dateStr) {
+        if (!dateStr || dateStr === HIDDEN_DATE_MARKER) return false;
+        const epDate = new Date(dateStr);
+        const today = new Date();
+        const diffTime = Math.abs(today - epDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        return diffDays <= DAYS_FOR_NEW;
+    }
+
+    // --- LÓGICA PRINCIPAL ---
+
+    async function init() {
+        try {
+            const response = await fetch('database.json?v=' + new Date().getTime()); // Evitar caché
+            if (!response.ok) throw new Error("No se pudo cargar database.json");
+            dbData = await response.json();
             
-            <div class="controls">
-                <select id="countrySelect" onchange="updateState(this.value, getCurrentTab())">
-                    <option value="" id="optLoading">Loading...</option>
-                </select>
-            </div>
+            document.getElementById('last-update').textContent = `📅 Última actualización de datos: ${dbData.meta.updated}`;
+            populateCountrySelect();
+        } catch (error) {
+            document.getElementById('last-update').innerHTML = `<span style="color:red">Error: ${error.message}. Verifica que database.json esté en la carpeta.</span>`;
+        }
+    }
 
-            <div class="tabs">
-                <button id="btn-cat" class="tab-btn active" onclick="updateState(null, 'cat')">Catalog</button>
-                <button id="btn-news" class="tab-btn" onclick="updateState(null, 'news')">New Releases <span id="newsBadge" class="badge">0</span></button>
-            </div>
-        </div>
-    </header>
-
-    <main class="container">
-        <div id="countryHero" class="country-hero" style="display:none">
-            <img id="heroFlag" src="" class="flag-img">
-            <div id="heroName" class="country-name"></div>
-        </div>
-
-        <div id="view-cat" class="panel active">
-            <div id="catContent" class="msg-box">
-                <div class="loading-spinner"></div>
-                <div>Connecting to database...</div>
-            </div>
-        </div>
-
-        <div id="view-news" class="panel">
-            <div id="newsContent" class="msg-box">Select a region.</div>
-        </div>
-    </main>
-
-    <script>
-        let GLOBAL_DB = null;
-        let CURRENT_TAB = 'cat';
+    function populateCountrySelect() {
+        const countrySelect = document.getElementById('country-select');
+        countrySelect.innerHTML = '<option value="" disabled selected>Selecciona una región...</option>';
         
-        const USER_LANG = navigator.language.startsWith('es') ? 'es' : 'en';
+        const regionCodes = Object.keys(dbData.regions).sort((a, b) => {
+            return getDisplayName(a).localeCompare(getDisplayName(b));
+        });
 
-        const UI_TEXTS = {
-            es: { cat: "Catálogo", news: "Novedades", load: "Cargando...", sel: "-- Selecciona Región --", audio: "AUDIO", subs: "SUBS", added: "Agregado", sync: "Sincronizando...", view_desc: "Ver sinopsis ▾", hide_desc: "Ocultar ▴", season: "TEMPORADA" },
-            en: { cat: "Catalog", news: "New Releases", load: "Loading...", sel: "-- Select Region --", audio: "AUDIO", subs: "SUBS", added: "Added", sync: "Syncing...", view_desc: "View synopsis ▾", hide_desc: "Hide ▴", season: "SEASON" }
-        };
-        const T = UI_TEXTS[USER_LANG];
+        regionCodes.forEach(code => {
+            const option = document.createElement('option');
+            option.value = code;
+            // Nota: Los <option> nativos no soportan imágenes (banderas) fácilmente.
+            // El nombre se muestra corregido.
+            option.textContent = getDisplayName(code); 
+            countrySelect.appendChild(option);
+        });
+    }
 
-        document.getElementById('btn-cat').childNodes[0].textContent = T.cat;
-        document.getElementById('btn-news').childNodes[0].textContent = T.news;
-        document.getElementById('optLoading').textContent = T.load;
-        document.getElementById('lastUpdate').textContent = T.sync;
+    function handleCountryChange() {
+        currentRegion = document.getElementById('country-select').value;
+        const seasonSelect = document.getElementById('season-select');
+        seasonSelect.disabled = false;
+        
+        // Poblar selector de temporadas
+        const seasons = dbData.regions[currentRegion].seasons.map(s => s.id);
+        seasonSelect.innerHTML = '<option value="all">✨ Mostrar Todo</option>';
+        seasons.forEach(sId => {
+            seasonSelect.innerHTML += `<option value="${sId}">Temporada ${sId}</option>`;
+        });
 
-        // MAPA MAESTRO CON NOMBRES NATIVOS Y VARIACIONES
-        // Esto soluciona que los idiomas no se detecten al ordenarlos
-        const COUNTRY_MAP = {
-            "FK": {n:"Islas Malvinas (ARG)", l:["Spanish", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/320px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png"},
-            "GI": {n:"Gibraltar (ES)", l:["Spanish", "Español"], flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"},
-            
-            // Europa (Nombres Nativos + Inglés + Español)
-            "DE": {n:"Alemania", l:["Deutsch", "German", "Alemán"]},
-            "FR": {n:"Francia", l:["Français", "French", "Francés"]},
-            "IT": {n:"Italia", l:["Italiano", "Italian", "Italiano"]},
-            "PT": {n:"Portugal", l:["Português", "Portuguese"]},
-            "NL": {n:"Países Bajos", l:["Nederlands", "Dutch"]},
-            "PL": {n:"Polonia", l:["Polski", "Polish"]},
-            "CZ": {n:"Rep. Checa", l:["Čeština", "Czech"]},
-            "DK": {n:"Dinamarca", l:["Dansk", "Danish"]},
-            "SE": {n:"Suecia", l:["Svenska", "Swedish"]},
-            "NO": {n:"Noruega", l:["Norsk", "Norwegian"]},
-            "FI": {n:"Finlandia", l:["Suomi", "Finnish"]},
-            "RO": {n:"Rumania", l:["Română", "Romanian"]},
-            "HU": {n:"Hungría", l:["Magyar", "Hungarian"]},
-            "TR": {n:"Turquía", l:["Türkçe", "Turkish", "Turco"]},
-            "GR": {n:"Grecia", l:["Greek", "Ελληνικά"]},
-            "ES": {n:"España", l:["Español", "Spanish", "Castilian"]}, 
+        renderNewsBanner();
+        renderEpisodes();
+    }
 
-            // Asia (Nombres Nativos + Inglés)
-            "TW": {n:"Taiwán", l:["Mandarin", "Taiwanese", "Chinese"]},
-            "HK": {n:"Hong Kong", l:["Cantonese", "Chinese"]},
-            "JP": {n:"Japón", l:["Japanese", "日本語"]},
-            "KR": {n:"Corea del Sur", l:["Korean", "한국어"]},
-            "TH": {n:"Tailandia", l:["Thai", "ไทย"]},
-            "ID": {n:"Indonesia", l:["Indonesian", "Bahasa"]},
-            "VN": {n:"Vietnam", l:["Vietnamese", "Tiếng Việt"]},
+    function renderNewsBanner() {
+        const banner = document.getElementById('news-banner');
+        const list = document.getElementById('news-list');
+        const news = dbData.regions[currentRegion].news || [];
 
-            // Latam (Variaciones de Español)
-            "AR":{n:"Argentina",l:["Latinoamericano", "Spanish"]},
-            "MX":{n:"México",l:["Latinoamericano", "Spanish"]},
-            "CL":{n:"Chile",l:["Latinoamericano", "Spanish"]},
-            "CO":{n:"Colombia",l:["Latinoamericano", "Spanish"]},
-            "PE":{n:"Perú",l:["Latinoamericano", "Spanish"]},
-            "UY":{n:"Uruguay",l:["Latinoamericano", "Spanish"]},
-            "VE":{n:"Venezuela",l:["Latinoamericano", "Spanish"]},
-            "EC":{n:"Ecuador",l:["Latinoamericano", "Spanish"]},
-            "GT":{n:"Guatemala",l:["Latinoamericano", "Spanish"]},
-            "CR":{n:"Costa Rica",l:["Latinoamericano", "Spanish"]},
-            "PA":{n:"Panamá",l:["Latinoamericano", "Spanish"]},
-            "DO":{n:"Rep. Dominicana",l:["Latinoamericano", "Spanish"]},
-            "SV":{n:"El Salvador",l:["Latinoamericano", "Spanish"]},
-            "HN":{n:"Honduras",l:["Latinoamericano", "Spanish"]},
-            "NI":{n:"Nicaragua",l:["Latinoamericano", "Spanish"]},
-            "PY":{n:"Paraguay",l:["Latinoamericano", "Spanish"]},
-            "BR":{n:"Brasil",l:["Português", "Portuguese"]},
-            "BO":{n:"Bolivia", l:["Latinoamericano", "Spanish"]},
+        if (news.length === 0) {
+            banner.style.display = 'none';
+            return;
+        }
 
-            // Resto
-            "US": {n:"Estados Unidos", l:["English"]},
-            "GB": {n:"Reino Unido (R. U.)", l:["English"]},
-            "VI": {n:"Islas Vírgenes (EE. UU.)", l:["English"]},
-            "VG": {n:"Islas Vírgenes (R. U.)", l:["English"]},
-            "LI": {n:"Liechtenstein", l:["Deutsch", "German"]},
-            "CA":{n:"Canadá",l:["English"]},"SG":{n:"Singapur",l:["English"]},"AU":{n:"Australia",l:["English"]},
-            "NZ":{n:"Nueva Zelanda",l:["English"]},"PR":{n:"Puerto Rico",l:["Spanish"]},
-            "GY":{n:"Guyana",l:["English"]},"SR":{n:"Surinam",l:["English"]},"GF":{n:"Guayana Francesa",l:["Français"]},"BE":{n:"Bélgica",l:["Français"]},
-            "CH":{n:"Suiza",l:["Deutsch"]},"AT":{n:"Austria",l:["Deutsch"]},"IE":{n:"Irlanda",l:["English"]},
-            "IS":{n:"Islandia",l:["English"]},"LU":{n:"Luxemburgo",l:["Français"]},
-            "MC":{n:"Mónaco",l:["Français"]},"MT":{n:"Malta",l:["English"]},"AD":{n:"Andorra",l:["Español"]},
-            "SM":{n:"San Marino",l:["Italiano"]},"VA":{n:"Vaticano",l:["Italiano"]},"IM":{n:"Isla de Man",l:["English"]},
-            "GG":{n:"Guernsey",l:["English"]},"JE":{n:"Jersey",l:["English"]},"FO":{n:"Islas Feroe",l:["Dansk"]},
-            "GL":{n:"Groenlandia",l:["Dansk"]},"AX":{n:"Islas Åland",l:["Svenska"]},"SJ":{n:"Svalbard",l:["Norsk"]},
-            "SK":{n:"Eslovaquia",l:["Slovak"]},"BG":{n:"Bulgaria",l:["Bulgarian"]},"HR":{n:"Croacia",l:["Croatian"]},
-            "SI":{n:"Eslovenia",l:["Slovenian"]},"EE":{n:"Estonia",l:["Estonian"]},"LV":{n:"Letonia",l:["Latvian"]},"LT":{n:"Lituania",l:["Lithuanian"]},
-            "CY":{n:"Chipre",l:["Greek"]},"AL":{n:"Albania",l:["Albanian"]},"MK":{n:"Macedonia del Norte",l:["Macedonian"]},
-            "BA":{n:"Bosnia",l:["Croatian"]},"RS":{n:"Serbia",l:["Serbian"]},"ME":{n:"Montenegro",l:["Serbian"]},
-            "NC":{n:"Nueva Caledonia",l:["Français"]},"PF":{n:"Polinesia Francesa",l:["Français"]},"WF":{n:"Wallis y Futuna",l:["Français"]},
-            "GU":{n:"Guam",l:["English"]},"MP":{n:"Marianas del Norte",l:["English"]},"AS":{n:"Samoa Americana",l:["English"]},
-            "RE":{n:"Reunión",l:["Français"]},"YT":{n:"Mayotte",l:["Français"]},"MU":{n:"Mauricio",l:["English"]},
-            "BS":{n:"Bahamas",l:["English"]},"JM":{n:"Jamaica",l:["English"]},"BB":{n:"Barbados",l:["English"]},
-            "TT":{n:"Trinidad y Tobago",l:["English"]},"AG":{n:"Antigua y Barbuda",l:["English"]},
-            "DM":{n:"Dominica",l:["English"]},"GD":{n:"Granada",l:["English"]},"KN":{n:"San Cristóbal",l:["English"]},
-            "LC":{n:"Santa Lucía",l:["English"]},"VC":{n:"San Vicente",l:["English"]},"BZ":{n:"Belice",l:["English"]},
-            "HT":{n:"Haití",l:["Français"]},"AW":{n:"Aruba",l:["Nederlands"]},"CW":{n:"Curazao",l:["Nederlands"]},
-            "SX":{n:"Sint Maarten",l:["Nederlands"]},"GP":{n:"Guadalupe",l:["Français"]},"MQ":{n:"Martinica",l:["Français"]},
-            "BL":{n:"San Bartolomé",l:["Français"]},"MF":{n:"San Martín",l:["Français"]},"KY":{n:"Islas Caimán",l:["English"]},
-            "BM":{n:"Bermudas",l:["English"]},"TC":{n:"Turcas y Caicos",l:["English"]},"AI":{n:"Anguila",l:["English"]},
-            "MS":{n:"Montserrat",l:["English"]},"PM":{n:"San Pedro",l:["Français"]}
-        };
+        list.innerHTML = '';
+        // Mostrar solo las últimas 5 novedades para no saturar
+        news.slice(0, 5).forEach(item => {
+            list.innerHTML += `<span class="news-pill">${item.e} - ${item.t} (${formatDate(item.d)})</span>`;
+        });
+        banner.style.display = 'block';
+    }
 
-        async function init() {
-            try {
-                const r = await fetch('database.json?t=' + Date.now());
-                if(!r.ok) throw new Error("DB Missing");
-                GLOBAL_DB = await r.json();
-                document.getElementById('lastUpdate').innerText = `${T.sync} ${GLOBAL_DB.meta.updated}`;
-                populateMenu();
+    function renderEpisodes() {
+        const container = document.getElementById('episodes-container');
+        container.innerHTML = '';
+        
+        const selectedSeasonStr = document.getElementById('season-select').value;
+        const regionData = dbData.regions[currentRegion];
+
+        regionData.seasons.forEach(season => {
+            if (selectedSeasonStr !== 'all' && season.id.toString() !== selectedSeasonStr) return;
+
+            container.innerHTML += `<div class="season-separator">Temporada ${season.id}</div>`;
+
+            season.eps.forEach(ep => {
+                const isNew = isNewEpisode(ep.dt);
+                const displayDate = formatDate(ep.dt);
                 
-                const params = new URLSearchParams(window.location.search);
-                const urlCountry = params.get('country');
-                const urlTab = params.get('tab');
-
-                let targetCountry = "AR"; 
-                if(urlCountry && GLOBAL_DB.regions[urlCountry]) targetCountry = urlCountry;
-                else if(GLOBAL_DB.regions["ES"]) targetCountry = "ES";
-                else if(!GLOBAL_DB.regions["AR"]) targetCountry = Object.keys(GLOBAL_DB.regions)[0];
-
-                if(urlTab === 'news') CURRENT_TAB = 'news';
-
-                document.getElementById('countrySelect').value = targetCountry;
-                updateState(targetCountry, CURRENT_TAB, false);
-
-            } catch(e) {
-                document.getElementById('catContent').innerHTML = `<div class="msg-box" style="color:var(--primary)">⚠️ ${T.sync}</div>`;
-            }
-        }
-
-        function populateMenu() {
-            const sel = document.getElementById('countrySelect');
-            sel.innerHTML = `<option value="">${T.sel}</option>`;
-            const codes = Object.keys(GLOBAL_DB.regions).sort((a,b) => {
-                const nA = COUNTRY_MAP[a]?.n || a;
-                const nB = COUNTRY_MAP[b]?.n || b;
-                return nA.localeCompare(nB);
-            });
-            codes.forEach(code => {
-                const info = COUNTRY_MAP[code] || {n: code};
-                const opt = document.createElement('option');
-                opt.value = code;
-                opt.text = info.n;
-                sel.appendChild(opt);
-            });
-        }
-
-        function updateState(countryCode, tabId, pushHistory = true) {
-            if(!countryCode) countryCode = document.getElementById('countrySelect').value;
-            if(!tabId) tabId = CURRENT_TAB;
-            CURRENT_TAB = tabId;
-
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            
-            if(tabId === 'cat') {
-                document.getElementById('btn-cat').classList.add('active');
-                document.getElementById('view-cat').classList.add('active');
-            } else {
-                document.getElementById('btn-news').classList.add('active');
-                document.getElementById('view-news').classList.add('active');
-            }
-
-            renderView(countryCode);
-
-            if(pushHistory && countryCode) {
-                const newUrl = `${window.location.pathname}?country=${countryCode}&tab=${tabId}`;
-                window.history.pushState({path:newUrl}, '', newUrl);
-            }
-        }
-
-        function getCurrentTab() { return CURRENT_TAB; }
-
-        function renderView(code) {
-            const catDiv = document.getElementById('catContent');
-            const newsDiv = document.getElementById('newsContent');
-            const heroEl = document.getElementById('countryHero');
-            const heroFlag = document.getElementById('heroFlag');
-            const heroName = document.getElementById('heroName');
-            
-            if(!code || !GLOBAL_DB || !GLOBAL_DB.regions[code]) {
-                 heroEl.style.display = 'none';
-                 catDiv.innerHTML = '<div class="msg-box">N/A</div>';
-                 return;
-            }
-            
-            const data = GLOBAL_DB.regions[code];
-            const info = COUNTRY_MAP[code] || {n: code, l: ["English"]};
-
-            heroEl.style.display = 'flex';
-            heroFlag.src = info.flag ? info.flag : `https://flagcdn.com/w160/${code.toLowerCase()}.png`;
-            heroName.innerText = info.n;
-
-            // NOVEDADES
-            const badge = document.getElementById('newsBadge');
-            if(data.news && data.news.length > 0) {
-                badge.innerText = data.news.length;
-                badge.style.display = 'inline-block';
-                let html = data.news.map(n => `
-                    <div style="padding:15px; background:var(--surface); border-radius:12px; margin-bottom:10px; border-left:4px solid var(--green-accent);">
-                        <div style="font-weight:bold; color:#fff; margin-bottom:4px">${n.e}</div>
-                        <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:6px">${n.t}</div>
-                        <div style="font-size:0.75rem; color:var(--green-accent); font-weight:700;">${T.added}: ${n.d}</div>
-                    </div>
-                `).join('');
-                newsDiv.innerHTML = html;
-            } else {
-                badge.style.display = 'none';
-                newsDiv.innerHTML = '<div class="msg-box">💤 ...</div>';
-            }
-
-            // CATALOGO
-            let html = '';
-            data.seasons.forEach((s, idx) => {
-                const isLast = idx === data.seasons.length - 1;
-                let epsHtml = '';
-                
-                s.eps.forEach((ep, epIdx) => {
-                    const audios = sortAndFormatTracks(ep.a, info.l, 'audio');
-                    const subs = sortAndFormatTracks(ep.s, info.l, 'sub');
-                    const descId = `desc-${s.id}-${epIdx}`;
-
-                    epsHtml += `
-                        <div class="ep-card">
-                            <div class="ep-header-line">
-                                <div class="ep-num-pill">${ep.n}</div>
-                                <div class="ep-title">${ep.t}</div>
-                                <div class="ep-date">${ep.dt || 'N/A'}</div>
-                            </div>
-                            
-                            <div class="ep-desc" id="${descId}">${ep.ds || "..."}</div>
-                            <button class="desc-toggle-btn" onclick="toggleDesc('${descId}', this)">${T.view_desc}</button>
-                            
-                            <div class="tracks-area">
-                                <div class="track-row">
-                                    <div class="lang-label">${T.audio}</div>
-                                    <div class="badges-wrapper">${audios}</div>
-                                </div>
-                                <div class="track-row">
-                                    <div class="lang-label">${T.subs}</div>
-                                    <div class="badges-wrapper">${subs}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `
-                    <div class="season-block ${isLast ? 'open' : ''}">
-                        <div class="season-header" onclick="this.parentElement.classList.toggle('open')">
-                            <span class="season-title">${T.season} ${s.id}</span>
-                            <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </div>
-                        <div class="season-body">${epsHtml}</div>
-                    </div>
-                `;
-            });
-            catDiv.innerHTML = html;
-        }
-
-        // ORDENAMIENTO ROBUSTO (MULTIPLE MATCH)
-        function sortAndFormatTracks(tracks, targetLangs, type) {
-            if(!tracks || tracks.length === 0) return '<span style="color:var(--text-dim); font-size:0.85rem">-</span>';
-            
-            // Normalize
-            let list = tracks.map(item => {
-                if(typeof item === 'string') return {name: item, tag: ''};
-                return {name: item.l, tag: item.t};
-            });
-            list = list.filter((v,i,a)=>a.findIndex(t=>(t.name===v.name))===i);
-
-            const targets = Array.isArray(targetLangs) ? targetLangs : [targetLangs];
-            
-            list.sort((a, b) => {
-                // Match Insensible a mayúsculas
-                const nameA = a.name.toLowerCase();
-                const nameB = b.name.toLowerCase();
-                
-                let scoreA = 0;
-                let scoreB = 0;
-
-                // Loop para buscar cualquier target
-                for(let t of targets) {
-                    if(nameA.includes(t.toLowerCase())) scoreA = 100;
-                    if(nameB.includes(t.toLowerCase())) scoreB = 100;
+                // HTML de la fecha: Si está oculta, no se muestra nada.
+                let dateHTML = '';
+                if (displayDate) {
+                    const newBadgeHtml = isNew ? '<span class="new-badge">¡NUEVO!</span>' : '';
+                    dateHTML = `<div class="ep-date-group">${newBadgeHtml}📅 ${displayDate}</div>`;
                 }
-                
-                if(scoreA !== 100 && nameA.includes("english")) scoreA = 50;
-                if(scoreB !== 100 && nameB.includes("english")) scoreB = 50;
 
-                if (scoreA > scoreB) return -1;
-                if (scoreA < scoreB) return 1;
-                return a.name.localeCompare(b.name);
-            });
+                let audiosHTML = ep.a.length ? `<div class="tag-group"><span class="tag-icon">🔊</span> ${ep.a.map(a => `<span class="tag-lang">${a}</span>`).join(', ')}</div>` : '';
+                let subsHTML = ep.s.length ? `<div class="tag-group"><span class="tag-icon">📝</span> ${ep.s.map(s => `<span class="tag-lang">${s.l}</span>`).join(', ')}</div>` : '';
 
-            const primary = list[0];
-            const others = list.slice(1);
-            
-            const renderBadge = (item) => {
-                let tagLabel = "";
-                if(item.tag === 'SDH') tagLabel = `<span class="type-tag">CC</span>`;
-                if(item.tag === 'FORCED') tagLabel = `<span class="type-tag">F</span>`;
-                return `<span class="pill ${type==='audio'?'primary':'secondary'}">${item.name}${tagLabel}</span>`;
-            };
-
-            let html = renderBadge(primary);
-
-            if(others.length > 0) {
-                const id = "h-" + Math.random().toString(36).substr(2, 9);
-                html += `
-                    <button class="expand-btn" onclick="document.getElementById('${id}').classList.toggle('show')">+${others.length}</button>
-                    <div id="${id}" class="hidden-tracks">
-                        ${others.map(item => renderBadge(item)).join('')}
+                const cardHtml = `
+                    <div class="ep-card ${isNew ? 'is-new' : ''}">
+                        <div class="ep-header">
+                            <div class="ep-title-group">
+                                <span class="ep-num">T${season.id} E${ep.n}</span> ${ep.t}
+                            </div>
+                            ${dateHTML} </div>
+                        <div class="ep-desc">${ep.ds || 'Sin descripción disponible.'}</div>
+                        <div class="tags-container">
+                            ${audiosHTML}
+                            ${subsHTML}
+                        </div>
                     </div>
                 `;
-            }
-            return html;
-        }
+                container.innerHTML += cardHtml;
+            });
+        });
+    }
 
-        function toggleDesc(id, btn) {
-            const el = document.getElementById(id);
-            if (el.classList.contains('show')) {
-                el.classList.remove('show');
-                btn.innerText = T.view_desc;
-            } else {
-                el.classList.add('show');
-                btn.innerText = T.hide_desc;
-            }
-        }
+    // Iniciar APP
+    init();
 
-        init();
-    </script>
+</script>
 </body>
 </html>
