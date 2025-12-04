@@ -6,156 +6,201 @@
     <title>Miraculous Disney+ Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
+        /* --- TEMA PREMIUM MODERN --- */
         :root {
-            --bg-body: #1a1d29;
-            --bg-card: #2c3040;
-            --bg-card-hover: #373b4d;
-            --accent-brand: #0072d2;
-            --accent-new: #4cd137;
-            --text-main: #f9f9f9;
-            --text-muted: #cacaca;
-            --radius: 8px;
+            --bg-body: #0f1014;
+            --bg-gradient: radial-gradient(circle at top center, #1b2030 0%, #0f1014 80%);
+            
+            /* Tarjetas Glassmorphism */
+            --bg-card: rgba(30, 34, 45, 0.7);
+            --bg-card-hover: rgba(40, 44, 58, 0.9);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* Colores de Marca */
+            --accent-brand: #3a86ff;
+            --accent-gradient: linear-gradient(135deg, #3a86ff 0%, #0056b3 100%);
+            --accent-red: #e11d48; /* Rojo Miraculous elegante */
+            --accent-new: #10b981; /* Verde esmeralda */
+            
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --radius: 12px;
+            --shadow-soft: 0 8px 24px rgba(0,0,0,0.2);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            background-image: linear-gradient(to bottom, #0f1014 0%, #1a1d29 100%);
+            background: var(--bg-body);
+            background-image: var(--bg-gradient);
             color: var(--text-main);
             margin: 0; padding: 0; min-height: 100vh;
+            background-attachment: fixed;
         }
 
         /* HEADER */
         header {
             text-align: center;
-            padding: 20px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 20px;
+            background: rgba(15, 16, 20, 0.8);
             position: sticky; top: 0; z-index: 100;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
+            border-bottom: var(--border-glass);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
         .logo-img {
-            max-width: 200px; /* Ajusta el tamaño del logo aquí */
+            max-width: 220px; /* Tamaño ajustado del logo */
             height: auto;
             display: block;
             margin: 0 auto;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.15));
+            transition: transform 0.3s;
         }
+        .logo-img:hover { transform: scale(1.02); }
 
-        .last-update { font-size: 0.7rem; color: #666; margin-top: 10px; font-weight: 500; }
+        .last-update { font-size: 0.7rem; color: var(--text-muted); margin-top: 10px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;}
 
         /* CONTROLES */
         .controls-wrapper {
-            max-width: 800px; margin: 15px auto; padding: 0 15px;
-            display: flex; gap: 12px;
+            max-width: 850px; margin: 30px auto; padding: 0 20px;
+            display: flex; gap: 15px;
         }
         .custom-select-container { position: relative; flex: 2; }
         
-        .select-btn {
-            background: #3a3d4a; border: 1px solid rgba(255,255,255,0.15); color: white;
-            padding: 12px 15px; border-radius: var(--radius); cursor: pointer;
+        .select-btn, .std-select {
+            background: #1f2937;
+            border: var(--border-glass);
+            color: white;
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
             display: flex; align-items: center; justify-content: space-between;
-            font-weight: 500; transition: 0.2s;
+            font-weight: 600; font-size: 0.95rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .select-btn:active { background: #4a4d5a; }
-        .select-btn img { width: 28px; margin-right: 12px; border-radius: 3px; }
         
-        .options-list {
-            position: absolute; top: 105%; left: 0; right: 0;
-            background: #1e212b; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius);
-            max-height: 60vh; overflow-y: auto; display: none; z-index: 200;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        .select-btn:hover, .std-select:hover:not(:disabled) {
+            background: #374151;
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
         }
-        .custom-select-container.active .options-list { display: block; }
-        .option {
-            padding: 12px 15px; cursor: pointer; display: flex; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .option:hover { background: var(--accent-brand); }
-        .option img { width: 28px; margin-right: 12px; border-radius: 3px; }
+        
+        .select-btn img { width: 30px; margin-right: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); object-fit: cover; }
 
-        .std-select {
-            flex: 1; background: #3a3d4a; border: 1px solid rgba(255,255,255,0.15);
-            color: white; padding: 12px; border-radius: var(--radius); font-size: 1rem; cursor: pointer;
+        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
+
+        /* Dropdown Options */
+        .options-list {
+            position: absolute; top: 120%; left: 0; right: 0;
+            background: #1f2937;
+            border: var(--border-glass); border-radius: var(--radius);
+            max-height: 60vh; overflow-y: auto; display: none; z-index: 200;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
+        .custom-select-container.active .options-list { display: block; animation: slideDown 0.2s ease; }
+        
+        .option {
+            padding: 12px 20px; cursor: pointer; display: flex; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        }
+        .option:hover { background: var(--accent-brand); color: white; }
+        .option img { width: 30px; margin-right: 12px; border-radius: 4px; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* EPISODIOS */
-        #main-container { max-width: 800px; margin: 0 auto; padding: 0 15px 80px; }
+        #main-container { max-width: 850px; margin: 0 auto; padding: 0 20px 80px; }
 
         .season-divider {
-            margin: 35px 0 15px; font-size: 1.1rem; font-weight: 800;
-            color: var(--text-main); border-left: 4px solid var(--accent-brand);
-            padding-left: 12px; text-transform: uppercase;
+            margin: 50px 0 20px; font-size: 1.4rem; font-weight: 800;
+            background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            border-left: 5px solid var(--accent-red);
+            padding-left: 15px; text-transform: uppercase; letter-spacing: 1px;
         }
 
         .ep-card {
-            background: var(--bg-card); border-radius: var(--radius);
-            padding: 18px; margin-bottom: 12px; border: 1px solid transparent; transition: 0.2s;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 22px; margin-bottom: 16px;
+            border: var(--border-glass);
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s, background 0.2s;
         }
+        .ep-card:hover { transform: scale(1.01); background: var(--bg-card-hover); border-color: rgba(255,255,255,0.2); }
+        
         .ep-card.is-new {
-            background: linear-gradient(90deg, rgba(76, 209, 55, 0.08), var(--bg-card) 70%);
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), var(--bg-card) 60%);
             border-left: 3px solid var(--accent-new);
         }
 
         .ep-header {
             display: flex; justify-content: space-between; align-items: flex-start;
-            gap: 15px; margin-bottom: 8px;
+            gap: 15px; margin-bottom: 12px;
         }
         .ep-info { flex: 1; }
-        .ep-num { display: block; font-size: 0.8rem; color: #888; font-weight: 600; margin-bottom: 2px; }
-        .ep-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: #fff; }
+        .ep-num { display: block; font-size: 0.8rem; color: var(--accent-brand); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ep-title { font-size: 1.15rem; font-weight: 700; line-height: 1.4; color: #fff; }
         
         .ep-meta {
             text-align: right; display: flex; flex-direction: column;
             align-items: flex-end; min-width: 100px;
         }
-        .date-display { font-size: 0.8rem; color: #bbb; font-weight: 500; white-space: nowrap; }
+        .date-display { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
         .new-badge {
-            background: var(--accent-new); color: #000; font-size: 0.65rem; font-weight: 900;
-            padding: 3px 6px; border-radius: 4px; text-transform: uppercase; margin-bottom: 4px; display: inline-block;
+            background: var(--accent-new); color: #000; font-size: 0.7rem; font-weight: 900;
+            padding: 4px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 6px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
         }
 
         /* SINOPSIS */
         details.ep-synopsis summary {
             list-style: none; cursor: pointer; color: var(--accent-brand);
-            font-size: 0.85rem; font-weight: 600; user-select: none; padding: 5px 0; outline: none;
+            font-size: 0.9rem; font-weight: 600; user-select: none; padding: 8px 0; outline: none;
+            transition: color 0.2s; display: inline-block;
         }
+        details.ep-synopsis summary:hover { color: #fff; }
         details.ep-synopsis summary::-webkit-details-marker { display: none; }
-        details.ep-synopsis summary::after { content: " ▼"; font-size: 0.8em; }
+        details.ep-synopsis summary::after { content: " ▼"; font-size: 0.8em; margin-left: 5px; }
         details.ep-synopsis[open] summary::after { content: " ▲"; }
-        .ep-desc { font-size: 0.9rem; color: #ccc; line-height: 1.5; margin-top: 5px; }
+        .ep-desc { font-size: 0.95rem; color: #d1d5db; line-height: 1.6; margin-top: 5px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.1); }
 
         /* TAGS & AUDIO */
         .tags-container {
-            display: flex; flex-wrap: wrap; gap: 6px; padding-top: 12px;
+            display: flex; flex-wrap: wrap; gap: 8px; padding-top: 15px;
             border-top: 1px solid rgba(255,255,255,0.08); align-items: center;
         }
         .tag {
-            background: rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 4px;
-            font-size: 0.75rem; color: #ddd; display: inline-flex; align-items: center;
+            background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 8px;
+            font-size: 0.8rem; color: #e5e7eb; display: inline-flex; align-items: center; font-weight: 500;
         }
         .tag.primary {
-            background: rgba(0, 114, 210, 0.25); border: 1px solid rgba(0, 114, 210, 0.5);
-            color: white; font-weight: 600;
+            background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa; font-weight: 700;
         }
         .more-trigger {
-            color: #aaa; font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 4px;
+            color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
+            font-weight: 600; padding: 6px 10px; border-radius: 8px;
+            transition: 0.2s; border: 1px solid transparent; text-decoration: none;
         }
-        .more-trigger:hover { color: white; }
+        .more-trigger:hover { background: rgba(255,255,255,0.1); color: white; }
+        
         .hidden-group { display: none; }
-        .hidden-group.show { display: contents; }
+        .hidden-group.show { display: flex; flex-wrap: wrap; gap: 8px; }
 
         /* MOBILE */
         @media (max-width: 768px) {
             .controls-wrapper { flex-direction: column; }
-            .ep-header { flex-direction: column; gap: 5px; }
-            .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 4px; }
-            .new-badge { margin-bottom: 0; margin-right: 8px; }
+            .ep-header { flex-direction: column; gap: 8px; }
+            .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 5px; }
+            .new-badge { margin-bottom: 0; margin-right: 12px; }
+            .logo-img { max-width: 160px; }
         }
         /* PC */
         @media (min-width: 769px) {
             details.ep-synopsis summary { display: none; }
-            details.ep-synopsis .ep-desc { display: block; }
+            details.ep-synopsis .ep-desc { display: block; border: none; padding: 0; }
             details.ep-synopsis { pointer-events: none; }
         }
     </style>
@@ -163,7 +208,7 @@
 <body>
 
 <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Miraculous_Tales_of_Ladybug_%26_Cat_Noir_Logo.svg" alt="Miraculous Logo" class="logo-img">
+    <img src="https://www.miraculousladybug.com/wp-content/uploads/2023/02/MIR_CLASSIC_logo_rgb_web-1536x657.png" alt="Miraculous Logo" class="logo-img">
     <div class="last-update" id="ui-loading">Conectando...</div>
 </header>
 
@@ -187,14 +232,12 @@
 <script>
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // --- LÓGICA DE AUDIOS ---
+    // --- PRIORIDADES DE AUDIO ---
     const AUDIO_PRIORITY = {
-        // Latam + Malvinas
         "AR": "Español (Latinoamericano)", "FK": "Español (Latinoamericano)",
         "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
         "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", 
         "VE": "Español (Latinoamericano)",
-        // Europa + Gibraltar
         "ES": "Español", "GI": "Español",
         "FR": "Français", "BE": "Français", "CH": "Français",
         "DE": "Deutsch", "AT": "Deutsch", "IT": "Italiano", 
@@ -207,12 +250,12 @@
         es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", synop: "Ver Sinopsis", sub: "Subt.", more: "más...", less: "ver menos", seasonPre: "T" }
     };
 
-    const CUSTOM_NAMES = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "Estados Unidos" };
-    
-    // --- BANDERAS AJUSTADAS (Argentina para Malvinas, España para Gibraltar) ---
+    // --- BANDERAS ESPECÍFICAS (WIKIMEDIA) ---
     const CUSTOM_FLAGS = {
-        "FK": "https://flagcdn.com/w40/ar.png", 
-        "GI": "https://flagcdn.com/w40/es.png" 
+        // Bandera de Tierra del Fuego (Oficial Malvinas Arg)
+        "FK": "https://upload.wikimedia.org/wikipedia/commons/9/94/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg", 
+        // Cruz de Borgoña (Gibraltar en este contexto)
+        "GI": "https://upload.wikimedia.org/wikipedia/commons/8/84/Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png"
     };
 
     let db = null;
@@ -221,9 +264,8 @@
     const isMobile = window.innerWidth <= 768;
 
     async function init() {
-        // DETECTOR DE IDIOMA Y TRUCO PARA PROBAR INGLÉS
-        // Si quieres probar inglés añade ?lang=en a la URL
         const params = new URLSearchParams(window.location.search);
+        // Detección de idioma
         if (params.get('lang') === 'en') {
             uiLang = 'en';
         } else {
@@ -251,6 +293,22 @@
         document.querySelector('#season-select option[value="all"]').innerText = t.allS;
     }
 
+    // --- LOGICA NOMBRE DE PAÍS (CUSTOM + IDIOMA) ---
+    function getName(code) {
+        // Malvinas: Lógica específica por idioma
+        if (code === "FK") {
+            return uiLang === 'es' ? "Islas Malvinas (Arg.)" : "Malvinas Islands (Arg.)";
+        }
+        // Otros customs fijos
+        const customs = { "GB": "Reino Unido", "US": "Estados Unidos" };
+        if (customs[code]) return customs[code];
+
+        // Default Intl
+        try { return new Intl.DisplayNames([uiLang], {type:'region'}).of(code); } 
+        catch { return code; }
+    }
+
+    // --- RENDERIZADO ---
     function buildDropdown() {
         const list = document.getElementById('options-list');
         const sortedCodes = Object.keys(db.regions).sort((a,b) => getName(a).localeCompare(getName(b)));
@@ -282,7 +340,11 @@
         const sSelect = document.getElementById('season-select');
         sSelect.innerHTML = `<option value="all">${UI_TEXT[uiLang].allS}</option>`;
         sSelect.disabled = false;
-        db.regions[code].seasons.forEach(s => sSelect.innerHTML += `<option value="${s.id}">${UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season'} ${s.id}</option>`);
+        
+        db.regions[code].seasons.forEach(s => {
+            const prefix = UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season';
+            sSelect.innerHTML += `<option value="${s.id}">${prefix} ${s.id}</option>`;
+        });
         
         if(updateHistory) updateURL(code, 'all');
         renderEpisodes();
@@ -305,14 +367,15 @@
 
             const h = document.createElement('div');
             h.className = 'season-divider';
-            h.innerText = `${txt.seasonPre === 'T' ? 'Temporada' : 'Season'} ${season.id}`;
+            const prefix = txt.seasonPre === 'T' ? 'Temporada' : 'Season';
+            h.innerText = `${prefix} ${season.id}`;
             container.appendChild(h);
 
             season.eps.forEach(ep => {
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
                 const isNew = checkNew(dateVal);
 
-                // AUDIO
+                // AUDIO LOGIC
                 const targetAudio = AUDIO_PRIORITY[selectedCountry] || "English";
                 let audios = [...ep.a];
                 let primary = null, others = [];
@@ -323,14 +386,13 @@
                 let audioHTML = '';
                 if(primary) audioHTML += `<div class="tag primary">${primary}</div>`;
                 
-                // LÓGICA DE DESPLEGADO (TOGGLE)
+                // TOGGLE LOGIC
                 if(others.length) {
                     const uid = `aud-${season.id}-${ep.n}`;
                     audioHTML += `<div id="${uid}" class="hidden-group">${others.map(a => `<div class="tag">${a}</div>`).join('')}</div>
                                   <div class="more-trigger" onclick="toggleAudio(this, '${uid}', ${others.length})">+${others.length} ${txt.more}</div>`;
                 }
 
-                // FECHA
                 let dateDisplay = "";
                 if (dateVal) {
                     const d = new Date(dateVal + "T00:00:00");
@@ -370,18 +432,18 @@
         });
     }
 
-    // --- FUNCIONES AUXILIARES ---
-    
-    // Función para plegar/desplegar audios sin borrar el botón
+    // --- FUNCION TOGGLE AUDIO (EXPANDIR/CONTRAER) ---
     window.toggleAudio = function(btn, id, count) {
         const el = document.getElementById(id);
+        const isHidden = !el.classList.contains('show'); // Estado actual
         const txt = UI_TEXT[uiLang];
-        el.classList.toggle('show');
-        
-        if (el.classList.contains('show')) {
-            btn.innerText = `[-] ${txt.less}`;
+
+        if (isHidden) {
+            el.classList.add('show');
+            btn.innerText = `[-] ${txt.less}`; // Cambiar texto a "ver menos"
         } else {
-            btn.innerText = `+${count} ${txt.more}`;
+            el.classList.remove('show');
+            btn.innerText = `+${count} ${txt.more}`; // Volver a "más..."
         }
     }
 
@@ -396,11 +458,9 @@
         }
     }
     function updateURL(c, s) { 
-        // Mantener el parámetro de idioma si existe
         const langParam = (new URLSearchParams(window.location.search).get('lang') === 'en') ? '&lang=en' : '';
         window.history.replaceState(null, '', `?c=${c}&s=${s}${langParam}`); 
     }
-    function getName(c) { return CUSTOM_NAMES[c] || new Intl.DisplayNames([uiLang], {type:'region'}).of(c); }
     function checkNew(d) { if(!d) return false; return (new Date() - new Date(d))/(1000*3600*24) <= 90; }
 
     init();
