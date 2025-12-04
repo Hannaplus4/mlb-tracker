@@ -10,7 +10,7 @@ SERIES_ID = "1CjTiHEJbLRC"
 DB_FILE = "database.json"
 
 # --- CONFIGURACIÓN DE HORARIOS ---
-# Diferencia horaria aproximada respecto a UTC
+# Diferencia horaria respecto a UTC
 UTC_OFFSETS = {
     "US": -5, "CA": -5, "MX": -6, "AR": -3, "BR": -3, "CL": -3, "CO": -5, "PE": -5,
     "UY": -3, "VE": -4, "EC": -5, "GT": -6, "BO": -4, "CR": -6, "DO": -4, "SV": -6,
@@ -71,7 +71,7 @@ REGIONS = [
     {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"}, {"c":"ME", "l":"sr-ME"}, 
     {"c":"TR", "l":"tr-TR"}, {"c":"XK", "l":"sq-AL"}, 
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
-    {"c":"TW", "l":"zh-TW"}, 
+    {"c":"TW", "l":"zh-TW"}, # URL Standard
     {"c":"HK", "l":"zh-HK"}, 
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
@@ -101,15 +101,6 @@ LANG_CODES = {
     "et": "Estonian", "lv": "Latvian", "lt": "Lithuanian"
 }
 
-FIX_TARGET_DATE = "2025-12-03" 
-FIX_OLD_DATE = "2000-01-01"    
-FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
-FIX_TITLES = [
-    "mister agreste", "sleeping syren", "the dark castle", "wreckless driver", "yaksi gozen",
-    "senor agreste", "señor agreste", "sirena durmiente", "el castillo oscuro", "conductor temerario"
-]
-FIX_EXPIRY_DATE = datetime(2025, 12, 7, 23, 59, 59)
-
 def log(msg):
     print(msg)
     sys.stdout.flush()
@@ -128,34 +119,39 @@ def load_previous_db():
         except: pass
     return {"regions": {}}
 
-def get_local_release_date(pacific_date_str, region_code):
-    if not pacific_date_str or region_code not in UTC_OFFSETS:
-        return pacific_date_str
+def calculate_local_date(pacific_scan_date, region_code):
+    """
+    Toma la fecha del escaneo (Hora Pacífico) y la ajusta
+    si en la región de destino ya es el día siguiente a las 12:00 AM PT.
+    """
     try:
-        base_date = datetime.strptime(pacific_date_str, "%Y-%m-%d")
-        utc_release_time = base_date.replace(hour=8) 
+        # Asumimos que la "fecha de escaneo" corresponde a las 00:00 PT de ese día
+        base_date = datetime.strptime(pacific_scan_date, "%Y-%m-%d")
+        
+        # 00:00 PT = 08:00 UTC (aproximado estándar)
+        utc_time = base_date.replace(hour=8) 
+        
         offset = UTC_OFFSETS.get(region_code, 0)
-        local_release_time = utc_release_time + timedelta(hours=offset)
-        local_date_str = local_release_time.strftime("%Y-%m-%d")
-        return local_date_str
-    except Exception:
-        return pacific_date_str
+        local_time = utc_time + timedelta(hours=offset)
+        
+        return local_time.strftime("%Y-%m-%d")
+    except:
+        return pacific_scan_date
 
 def get_data():
-    # Cargamos DB para tener memoria de ejecuciones pasadas
+    # 1. CARGAR BASE DE DATOS (Para comparar qué es nuevo)
     OLD_DB = load_previous_db()
     
+    # 2. OBTENER FECHA REFERENCIA DE ESCANEO (Hora Pacífico)
     pacific_time_now = datetime.utcnow() - timedelta(hours=8)
-    today_str = pacific_time_now.strftime("%Y-%m-%d")
+    scan_date_str = pacific_time_now.strftime("%Y-%m-%d")
     
     new_database = { 
         "meta": { "updated": pacific_time_now.strftime("%d/%m/%Y %H:%M PT") }, 
         "regions": {} 
     }
     
-    IS_FIX_WINDOW = (pacific_time_now <= FIX_EXPIRY_DATE)
-    
-    log(f"🌍 INICIANDO ESCANEO (Ref. Time: Pacific {today_str})...")
+    log(f"🌍 INICIANDO ESCANEO (Ref. Fecha Pacífico: {scan_date_str})...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -168,7 +164,7 @@ def get_data():
         total_eps_count = 0 
         memory_map = {}
 
-        # Cargar memoria de la región
+        # Mapa de memoria: { "Season-Episode": "FechaOriginal" }
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
                 for ep in s.get("eps", []):
@@ -201,31 +197,18 @@ def get_data():
                                     ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     
-                                    # 1. Identificar si es el episodio objetivo
-                                    is_target = False
-                                    if IS_FIX_WINDOW:
-                                        if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7: is_target = True
-                                        t_clean = title.lower() if title else ""
-                                        if any(ft in t_clean for ft in FIX_TITLES): is_target = True
+                                    # --- LÓGICA DE FECHAS ---
+                                    episode_key = f"{s_num}-{ep_num}"
+                                    stored_date = memory_map.get(episode_key)
 
-                                    # 2. Determinar Fecha Base (Raw)
-                                    if is_target:
-                                        # Si es target -> 3 Diciembre
-                                        raw_date = FIX_TARGET_DATE
+                                    if stored_date:
+                                        # Si ya lo teníamos escaneado, MANTENEMOS LA FECHA ORIGINAL
+                                        final_date = stored_date
+                                        is_new = False
                                     else:
-                                        # Si NO es target:
-                                        # - Si ya lo tenía en memoria -> Mantener fecha vieja
-                                        # - Si no lo tenía -> Poner fecha 2000 (para que no salte como nuevo hoy)
-                                        stored_date = memory_map.get(f"{s_num}-{ep_num}")
-                                        if stored_date:
-                                            raw_date = stored_date
-                                        else:
-                                            # Intento sacar fecha real API, sino 2000
-                                            api_date = ep.get('releases', [{}])[0].get('releaseDate', None)
-                                            raw_date = api_date if api_date else FIX_OLD_DATE
-
-                                    # 3. Ajustar por Zona Horaria
-                                    final_date = get_local_release_date(raw_date, code)
+                                        # Si NO lo teníamos, ES NUEVO -> Asignamos FECHA DE HOY (ajustada a local)
+                                        final_date = calculate_local_date(scan_date_str, code)
+                                        is_new = True
 
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
                                     if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
@@ -240,24 +223,16 @@ def get_data():
 
                                     clean_eps.append({"n": ep_num, "t": title, "ds": desc, "dt": final_date, "a": audios_list, "s": subs_list})
                                     
-                                    # 4. Detectar si es NUEVO (Ventana 90 días)
-                                    # Solo cuenta si la fecha es > 2024 (evita los del año 2000)
-                                    if final_date and "2025" in final_date: 
-                                        try:
-                                            dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
-                                            offset = UTC_OFFSETS.get(code, 0)
-                                            local_now = datetime.utcnow() + timedelta(hours=offset)
-                                            
-                                            if 0 <= (local_now - dt_obj_local).days <= 90: 
-                                                region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
-                                                new_eps_count += 1
-                                        except: pass
+                                    if is_new:
+                                        region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                        new_eps_count += 1
                                 
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
                     
                     new_database["regions"][code] = region_data
                     
+                    # Log VISIBLE para todos
                     if new_eps_count > 0:
                         log(f"   ✨ {code}: OK ({total_eps_count} Total | {new_eps_count} Nuevos)")
                     else:
