@@ -6,26 +6,22 @@
     <title>Miraculous Disney+ Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- TEMA PREMIUM MODERN --- */
+        /* --- TEMA PREMIUM DARK --- */
         :root {
             --bg-body: #0f1014;
             --bg-gradient: radial-gradient(circle at top center, #1b2030 0%, #0f1014 80%);
             
-            /* Tarjetas Glassmorphism */
             --bg-card: rgba(30, 34, 45, 0.7);
             --bg-card-hover: rgba(40, 44, 58, 0.9);
             --border-glass: 1px solid rgba(255, 255, 255, 0.08);
             
-            /* Colores de Marca */
             --accent-brand: #3a86ff;
-            --accent-gradient: linear-gradient(135deg, #3a86ff 0%, #0056b3 100%);
-            --accent-red: #e11d48; /* Rojo Miraculous elegante */
-            --accent-new: #10b981; /* Verde esmeralda */
+            --accent-new: #00e676; /* Verde neón más brillante */
+            --accent-new-glow: rgba(0, 230, 118, 0.25);
             
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --radius: 12px;
-            --shadow-soft: 0 8px 24px rgba(0,0,0,0.2);
         }
 
         body {
@@ -41,24 +37,31 @@
         header {
             text-align: center;
             padding: 20px;
-            background: rgba(15, 16, 20, 0.8);
+            background: rgba(15, 16, 20, 0.85);
             position: sticky; top: 0; z-index: 100;
             backdrop-filter: blur(20px);
             border-bottom: var(--border-glass);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
         }
 
         .logo-img {
-            max-width: 220px; /* Tamaño ajustado del logo */
+            max-width: 200px;
             height: auto;
             display: block;
-            margin: 0 auto;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.15));
-            transition: transform 0.3s;
+            margin: 0 auto 8px auto;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
         }
-        .logo-img:hover { transform: scale(1.02); }
 
-        .last-update { font-size: 0.7rem; color: var(--text-muted); margin-top: 10px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;}
+        .tracker-title {
+            font-size: 0.9rem;
+            color: var(--accent-brand);
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .last-update { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
 
         /* CONTROLES */
         .controls-wrapper {
@@ -88,9 +91,8 @@
         
         .select-btn img { width: 30px; margin-right: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); object-fit: cover; }
 
-        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
+        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3e"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
 
-        /* Dropdown Options */
         .options-list {
             position: absolute; top: 120%; left: 0; right: 0;
             background: #1f2937;
@@ -115,7 +117,7 @@
         .season-divider {
             margin: 50px 0 20px; font-size: 1.4rem; font-weight: 800;
             background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            border-left: 5px solid var(--accent-red);
+            border-left: 5px solid var(--accent-brand);
             padding-left: 15px; text-transform: uppercase; letter-spacing: 1px;
         }
 
@@ -124,15 +126,19 @@
             border-radius: var(--radius);
             padding: 22px; margin-bottom: 16px;
             border: var(--border-glass);
-            box-shadow: var(--shadow-soft);
             backdrop-filter: blur(5px);
             transition: transform 0.2s, background 0.2s;
+            position: relative;
+            overflow: hidden;
         }
         .ep-card:hover { transform: scale(1.01); background: var(--bg-card-hover); border-color: rgba(255,255,255,0.2); }
         
+        /* ESTILO NUEVO REFORZADO */
         .ep-card.is-new {
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), var(--bg-card) 60%);
-            border-left: 3px solid var(--accent-new);
+            background: linear-gradient(90deg, rgba(0, 230, 118, 0.12) 0%, var(--bg-card) 60%);
+            border-left: 4px solid var(--accent-new);
+            box-shadow: 0 4px 20px var(--accent-new-glow);
+            border-top: 1px solid rgba(0, 230, 118, 0.2);
         }
 
         .ep-header {
@@ -148,23 +154,35 @@
             align-items: flex-end; min-width: 100px;
         }
         .date-display { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+        
         .new-badge {
-            background: var(--accent-new); color: #000; font-size: 0.7rem; font-weight: 900;
+            background: var(--accent-new); color: #000; font-size: 0.75rem; font-weight: 900;
             padding: 4px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 6px;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 10px var(--accent-new-glow);
         }
 
-        /* SINOPSIS */
+        /* SINOPSIS MEJORADA (Móvil) */
         details.ep-synopsis summary {
             list-style: none; cursor: pointer; color: var(--accent-brand);
-            font-size: 0.9rem; font-weight: 600; user-select: none; padding: 8px 0; outline: none;
-            transition: color 0.2s; display: inline-block;
+            font-size: 0.9rem; font-weight: 600; user-select: none; padding: 10px 0; outline: none;
+            transition: color 0.2s; display: flex; align-items: center; justify-content: space-between;
         }
         details.ep-synopsis summary:hover { color: #fff; }
         details.ep-synopsis summary::-webkit-details-marker { display: none; }
-        details.ep-synopsis summary::after { content: " ▼"; font-size: 0.8em; margin-left: 5px; }
-        details.ep-synopsis[open] summary::after { content: " ▲"; }
-        .ep-desc { font-size: 0.95rem; color: #d1d5db; line-height: 1.6; margin-top: 5px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.1); }
+        
+        /* Icono de rotación */
+        details.ep-synopsis summary::after { 
+            content: "+"; font-size: 1.2em; font-weight: 400; transition: transform 0.3s ease; margin-left: 10px; 
+        }
+        details.ep-synopsis[open] summary::after { content: "+"; transform: rotate(45deg); }
+        
+        .ep-desc { 
+            font-size: 0.95rem; color: #d1d5db; line-height: 1.6; 
+            margin-top: 0; padding-bottom: 10px;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* TAGS & AUDIO */
         .tags-container {
@@ -195,12 +213,12 @@
             .ep-header { flex-direction: column; gap: 8px; }
             .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 5px; }
             .new-badge { margin-bottom: 0; margin-right: 12px; }
-            .logo-img { max-width: 160px; }
+            .logo-img { max-width: 180px; }
         }
         /* PC */
         @media (min-width: 769px) {
             details.ep-synopsis summary { display: none; }
-            details.ep-synopsis .ep-desc { display: block; border: none; padding: 0; }
+            details.ep-synopsis .ep-desc { display: block; padding-top: 10px; }
             details.ep-synopsis { pointer-events: none; }
         }
     </style>
@@ -209,6 +227,7 @@
 
 <header>
     <img src="https://www.miraculousladybug.com/wp-content/uploads/2023/02/MIR_CLASSIC_logo_rgb_web-1536x657.png" alt="Miraculous Logo" class="logo-img">
+    <span class="tracker-title">DISNEY+ TRACKER</span>
     <div class="last-update" id="ui-loading">Conectando...</div>
 </header>
 
@@ -232,17 +251,44 @@
 <script>
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // --- PRIORIDADES DE AUDIO ---
+    // --- MAPA COMPLETO DE AUDIO POR REGIÓN ---
     const AUDIO_PRIORITY = {
+        // Latam + Malvinas
         "AR": "Español (Latinoamericano)", "FK": "Español (Latinoamericano)",
         "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
         "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", 
-        "VE": "Español (Latinoamericano)",
+        "VE": "Español (Latinoamericano)", "EC": "Español (Latinoamericano)",
+        "GT": "Español (Latinoamericano)", "BO": "Español (Latinoamericano)",
+        "CR": "Español (Latinoamericano)", "DO": "Español (Latinoamericano)",
+        "SV": "Español (Latinoamericano)", "HN": "Español (Latinoamericano)",
+        "NI": "Español (Latinoamericano)", "PA": "Español (Latinoamericano)",
+        "PY": "Español (Latinoamericano)", "UY": "Español (Latinoamericano)",
+        
+        // Europa + Gibraltar
         "ES": "Español", "GI": "Español",
-        "FR": "Français", "BE": "Français", "CH": "Français",
-        "DE": "Deutsch", "AT": "Deutsch", "IT": "Italiano", 
+        "FR": "Français", "BE": "Français", "CH": "Français", "LU": "Français", "MC": "Français",
+        "DE": "Deutsch", "AT": "Deutsch", "LI": "Deutsch",
+        "IT": "Italiano", "SM": "Italiano", "VA": "Italiano",
         "PT": "Português", "BR": "Português",
-        "US": "English", "GB": "English", "CA": "English", "AU": "English"
+        "RO": "Română",
+        "NL": "Nederlands", 
+        "SE": "Svenska",
+        "NO": "Norsk",
+        "DK": "Dansk",
+        "FI": "Suomi",
+        "PL": "Polski",
+        "CZ": "Čeština", "SK": "Slovenčina",
+        "HU": "Magyar",
+        "TR": "Türkçe",
+        "GR": "Greek",
+
+        // Inglés (UK, USA, Australia, etc)
+        "US": "English", "GB": "English", "IE": "English", 
+        "CA": "English", "AU": "English", "NZ": "English",
+        
+        // Asia
+        "JP": "Japanese", "KR": "Korean", 
+        "TW": "Taiwanese Mandarin", "HK": "Cantonese"
     };
 
     const UI_TEXT = {
@@ -250,12 +296,12 @@
         es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", synop: "Ver Sinopsis", sub: "Subt.", more: "más...", less: "ver menos", seasonPre: "T" }
     };
 
-    // --- BANDERAS ESPECÍFICAS (WIKIMEDIA) ---
+    const CUSTOM_NAMES = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "Estados Unidos" };
+    
+    // --- BANDERAS CORRECTAS ---
     const CUSTOM_FLAGS = {
-        // Bandera de Tierra del Fuego (Oficial Malvinas Arg)
-        "FK": "https://upload.wikimedia.org/wikipedia/commons/9/94/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg", 
-        // Cruz de Borgoña (Gibraltar en este contexto)
-        "GI": "https://upload.wikimedia.org/wikipedia/commons/8/84/Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png"
+        "FK": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/120px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png", 
+        "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png/120px-Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png"
     };
 
     let db = null;
@@ -265,7 +311,6 @@
 
     async function init() {
         const params = new URLSearchParams(window.location.search);
-        // Detección de idioma
         if (params.get('lang') === 'en') {
             uiLang = 'en';
         } else {
@@ -293,22 +338,13 @@
         document.querySelector('#season-select option[value="all"]').innerText = t.allS;
     }
 
-    // --- LOGICA NOMBRE DE PAÍS (CUSTOM + IDIOMA) ---
     function getName(code) {
-        // Malvinas: Lógica específica por idioma
-        if (code === "FK") {
-            return uiLang === 'es' ? "Islas Malvinas (Arg.)" : "Malvinas Islands (Arg.)";
-        }
-        // Otros customs fijos
-        const customs = { "GB": "Reino Unido", "US": "Estados Unidos" };
-        if (customs[code]) return customs[code];
-
-        // Default Intl
+        if (code === "FK") return uiLang === 'es' ? "Islas Malvinas (Arg.)" : "Malvinas Islands (Arg.)";
+        if (CUSTOM_NAMES[code]) return CUSTOM_NAMES[code];
         try { return new Intl.DisplayNames([uiLang], {type:'region'}).of(code); } 
         catch { return code; }
     }
 
-    // --- RENDERIZADO ---
     function buildDropdown() {
         const list = document.getElementById('options-list');
         const sortedCodes = Object.keys(db.regions).sort((a,b) => getName(a).localeCompare(getName(b)));
@@ -340,11 +376,7 @@
         const sSelect = document.getElementById('season-select');
         sSelect.innerHTML = `<option value="all">${UI_TEXT[uiLang].allS}</option>`;
         sSelect.disabled = false;
-        
-        db.regions[code].seasons.forEach(s => {
-            const prefix = UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season';
-            sSelect.innerHTML += `<option value="${s.id}">${prefix} ${s.id}</option>`;
-        });
+        db.regions[code].seasons.forEach(s => sSelect.innerHTML += `<option value="${s.id}">${UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season'} ${s.id}</option>`);
         
         if(updateHistory) updateURL(code, 'all');
         renderEpisodes();
@@ -375,7 +407,7 @@
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
                 const isNew = checkNew(dateVal);
 
-                // AUDIO LOGIC
+                // AUDIO
                 const targetAudio = AUDIO_PRIORITY[selectedCountry] || "English";
                 let audios = [...ep.a];
                 let primary = null, others = [];
@@ -386,7 +418,6 @@
                 let audioHTML = '';
                 if(primary) audioHTML += `<div class="tag primary">${primary}</div>`;
                 
-                // TOGGLE LOGIC
                 if(others.length) {
                     const uid = `aud-${season.id}-${ep.n}`;
                     audioHTML += `<div id="${uid}" class="hidden-group">${others.map(a => `<div class="tag">${a}</div>`).join('')}</div>
@@ -432,18 +463,18 @@
         });
     }
 
-    // --- FUNCION TOGGLE AUDIO (EXPANDIR/CONTRAER) ---
+    // --- FUNCION TOGGLE AUDIO CORRECTA ---
     window.toggleAudio = function(btn, id, count) {
         const el = document.getElementById(id);
-        const isHidden = !el.classList.contains('show'); // Estado actual
         const txt = UI_TEXT[uiLang];
-
-        if (isHidden) {
-            el.classList.add('show');
-            btn.innerText = `[-] ${txt.less}`; // Cambiar texto a "ver menos"
+        
+        // Alternar clase 'show' para mostrar/ocultar (flex vs none)
+        if (el.style.display === "flex") {
+            el.style.display = "none";
+            btn.innerText = `+${count} ${txt.more}`;
         } else {
-            el.classList.remove('show');
-            btn.innerText = `+${count} ${txt.more}`; // Volver a "más..."
+            el.style.display = "flex";
+            btn.innerText = `[-] ${txt.less}`;
         }
     }
 
