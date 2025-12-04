@@ -5,40 +5,10 @@ import sys
 import os
 from datetime import datetime, timedelta
 
-# --- CONFIGURACIÓN ---
+# CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
 
-# FECHA QUE QUEREMOS ASIGNAR RETROACTIVAMENTE
-EVENT_DATE_STR = "2025-12-03"
-
-# LÍMITE DE LA VENTANA DE CORRECCIÓN (Año, Mes, Día)
-# Si escaneamos DESPUÉS de este día, ya no aplicará la fecha del 3 de Dic, usará la fecha real.
-CORRECTION_WINDOW_LIMIT = datetime(2025, 12, 10) 
-
-# 1. TÍTULOS DEL EVENTO
-TARGET_EVENT_TITLES = [
-    "mister agreste", 
-    "sleeping syren", "sirena durmiente", "sirène",
-    "dark castle", "castillo", 
-    "wreckless driver", "wrexkels driver",
-    "yaksi gozen"
-]
-
-# 2. REGIONES DACH (Para T6)
-DACH_CODES = ["DE", "AT", "CH", "LI"]
-
-# MAPA DE LIMPIEZA
-LANG_CODES = {
-    "es-419": "Spanish (Latin American)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
-    "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
-    "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
-    "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
-    "zh-HK": "Cantonese", "ru": "Russian", "pl": "Polish", "tr": "Turkish",
-    "nl": "Dutch", "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
-    "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai", "id": "Indonesian",
-    "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
-}
-
+# LISTA DE REGIONES
 REGIONS = [
     # LATAM
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
@@ -47,9 +17,19 @@ REGIONS = [
     {"c":"GT", "l":"es-419"}, {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"},
     {"c":"DO", "l":"es-419"}, {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"},
     {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
-    {"c":"FK", "l":"es-419"}, 
-    # NORTE AMERICA
+    {"c":"FK", "l":"es-419"},
+    # NORTE AMERICA & CARIBE
     {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"PR", "l":"es-419"}, {"c":"PM", "l":"fr-FR"},
+    {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"},
+    {"c":"TT", "l":"en-US"}, {"c":"AG", "l":"en-US"}, {"c":"DM", "l":"en-US"},
+    {"c":"GD", "l":"en-US"}, {"c":"KN", "l":"en-US"}, {"c":"LC", "l":"en-US"},
+    {"c":"VC", "l":"en-US"}, {"c":"BZ", "l":"en-US"}, {"c":"HT", "l":"fr-FR"},
+    {"c":"AW", "l":"en-US"}, {"c":"CW", "l":"en-US"}, {"c":"SX", "l":"en-US"},
+    {"c":"GP", "l":"fr-FR"}, {"c":"MQ", "l":"fr-FR"}, {"c":"BL", "l":"fr-FR"},
+    {"c":"MF", "l":"fr-FR"}, {"c":"KY", "l":"en-US"}, {"c":"BM", "l":"en-US"},
+    {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
+    {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
+    {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"},
     # EUROPA
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
     {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
@@ -68,27 +48,43 @@ REGIONS = [
     {"c":"LT", "l":"lt-LT"}, {"c":"CY", "l":"el-GR"}, {"c":"AL", "l":"sq-AL"},
     {"c":"MK", "l":"mk-MK"}, {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"},
     {"c":"ME", "l":"sr-ME"}, {"c":"TR", "l":"tr-TR"},
-    # ASIA
+    # ASIA / OTROS
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, {"c":"TW", "l":"zh-Hant-TW"},
     {"c":"HK", "l":"zh-Hant-HK"}, {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"},
     {"c":"WF", "l":"fr-FR"}, {"c":"GU", "l":"en-US"}, {"c":"MP", "l":"en-US"},
     {"c":"AS", "l":"en-US"}, {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"},
-    {"c":"MU", "l":"en-GB"},
-    # CARIBE
-    {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"},
-    {"c":"TT", "l":"en-US"}, {"c":"AG", "l":"en-US"}, {"c":"DM", "l":"en-US"},
-    {"c":"GD", "l":"en-US"}, {"c":"KN", "l":"en-US"}, {"c":"LC", "l":"en-US"},
-    {"c":"VC", "l":"en-US"}, {"c":"BZ", "l":"en-US"}, {"c":"HT", "l":"fr-FR"},
-    {"c":"AW", "l":"en-US"}, {"c":"CW", "l":"en-US"}, {"c":"SX", "l":"en-US"},
-    {"c":"GP", "l":"fr-FR"}, {"c":"MQ", "l":"fr-FR"}, {"c":"BL", "l":"fr-FR"},
-    {"c":"MF", "l":"fr-FR"}, {"c":"KY", "l":"en-US"}, {"c":"BM", "l":"en-US"},
-    {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
-    {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
-    {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"}
+    {"c":"MU", "l":"en-GB"}
 ]
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
+
+# Mapa de limpieza
+LANG_CODES = {
+    "es-419": "Spanish (Latin American)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
+    "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
+    "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
+    "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
+    "zh-HK": "Cantonese", "ru": "Russian", "pl": "Polish", "tr": "Turkish",
+    "nl": "Dutch", "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
+    "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai", "id": "Indonesian",
+    "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
+}
+
+# --- CONFIGURACIÓN DE CORRECCIÓN DE FECHAS (FIX DEC 3) ---
+FIX_TARGET_DATE = "2025-12-03"
+FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] # Alemania, Suiza, Liechtenstein, Austria
+FIX_TITLES = [
+    "mister agreste", 
+    "sleeping syren", 
+    "the dark castle", 
+    "wreckless driver", 
+    "yaksi gozen"
+]
+
+# FECHA LÍMITE PARA EL PARCHE: Domingo 7 de Diciembre de 2025 (Fin de esta semana)
+# Pasada esta fecha, la corrección se desactiva automáticamente.
+FIX_EXPIRY_DATE = datetime(2025, 12, 7, 23, 59, 59)
 
 def log(msg):
     print(msg)
@@ -110,16 +106,33 @@ def load_previous_db():
 
 def get_data():
     OLD_DB = load_previous_db()
-    new_database = {"meta": {"updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC")}, "regions": {}}
+    
+    new_database = {
+        "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") },
+        "regions": {}
+    }
 
-    log(f"🌍 INICIANDO ESCANEO (VENTANA TEMPORAL)...")
+    log(f"🌍 INICIANDO ESCANEO INTELIGENTE (MEMORIA)...")
+
+    # Fecha actual del sistema
+    today_obj = datetime.utcnow()
+    today_str = today_obj.strftime("%Y-%m-%d")
+
+    # Lógica de seguridad: La corrección solo aplica si NO hemos pasado del Domingo 7
+    IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
+
+    if IS_FIX_WINDOW:
+        log("⚠️ MODO CORRECCIÓN ACTIVO: Forzando fecha 3 Dic para episodios específicos hasta el domingo.")
+    else:
+        log("ℹ️ MODO NORMAL: La ventana de corrección ha expirado.")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
         lang = reg['l']
+        
         if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
 
-        # Memoria
+        # CARGAR MEMORIA DE FECHAS
         memory_map = {}
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
@@ -138,6 +151,7 @@ def get_data():
                 
                 if seasons:
                     region_data = {"seasons": [], "news": []}
+                    
                     for s in seasons:
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
@@ -151,47 +165,34 @@ def get_data():
                                 
                                 for i, ep in enumerate(eps_raw):
                                     ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
-                                    unique_key = f"{s_num}-{ep_num}"
-                                    
-                                    # DATOS
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
-                                    desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
-                                    if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
-
-                                    # --- FECHA INTELIGENTE ---
+                                    
+                                    # --- LÓGICA DE PERSISTENCIA Y CORRECCIÓN ---
+                                    unique_key = f"{s_num}-{ep_num}"
                                     stored_date = memory_map.get(unique_key)
-                                    today_str = datetime.utcnow().strftime("%Y-%m-%d")
                                     
                                     if stored_date:
-                                        final_date = stored_date # Mantener historia
-                                        is_new_entry = False
+                                        # Si ya existe en la DB vieja, mantenemos esa fecha
+                                        final_date = stored_date
                                     else:
-                                        final_date = today_str # Es nuevo
-                                        is_new_entry = True
+                                        # ES NUEVO: Inicialmente le damos la fecha de HOY
+                                        final_date = today_str
+                                        
+                                        # --- APLICAR PARCHE DEL 3 DE DICIEMBRE ---
+                                        # Solo si estamos en la ventana de tiempo (Hasta el Domingo)
+                                        if IS_FIX_WINDOW:
+                                            # Regla 1: Regiones DACH (Alemania, Suiza, etc) -> Temp 6, Eps 1 al 7
+                                            if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
+                                                final_date = FIX_TARGET_DATE
+                                            
+                                            # Regla 2: Títulos específicos (Global)
+                                            t_clean = title.lower() if title else ""
+                                            if any(ft in t_clean for ft in FIX_TITLES):
+                                                final_date = FIX_TARGET_DATE
 
-                                    # --- LÓGICA DE CORRECCIÓN TEMPORAL ---
-                                    # Solo aplicamos "3 Dic" si el episodio es nuevo Y estamos en la semana del evento.
-                                    # Si estamos en enero, esta lógica se ignora y usa la fecha real.
-                                    
-                                    t_low = title.lower()
-                                    is_target_title = any(t in t_low for t in TARGET_EVENT_TITLES)
-                                    is_dach_s6 = (code in DACH_CODES and s_num == 6 and ep_num <= 7)
-                                    
-                                    if is_new_entry and (is_target_title or is_dach_s6):
-                                        # ¿Estamos dentro de la ventana de corrección? (Hoy < 10 Dic)
-                                        if datetime.utcnow() < CORRECTION_WINDOW_LIMIT:
-                                            final_date = EVENT_DATE_STR # Forzar 3 Dic
-                                    
-                                    # --- ES NOVEDAD? ---
-                                    # Calculamos si mostrarlo en la pestaña Novedades (90 días)
-                                    is_new_flag = False
-                                    try:
-                                        dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
-                                        if 0 <= (datetime.utcnow() - dt_obj).days <= 90:
-                                            is_new_flag = True
-                                    except: pass
-
-                                    # ----------------------------------------
+                                    # Extracción del resto de datos
+                                    desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
+                                    if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
 
                                     meta = ep.get('mediaMetadata', {})
                                     subs_list = []
@@ -211,21 +212,27 @@ def get_data():
                                         "n": ep_num,
                                         "t": title,
                                         "ds": desc,
-                                        "dt": final_date,
+                                        "dt": final_date, 
                                         "a": audios_list,
                                         "s": subs_list
                                     }
                                     clean_eps.append(ep_obj)
                                     
-                                    if is_new_flag: 
-                                        region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                    # --- NOVEDADES ---
+                                    try:
+                                        dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
+                                        days_diff = (today_obj - dt_obj).days
+                                        # Consideramos novedad si tiene menos de 90 días
+                                        if 0 <= days_diff <= 90:
+                                            region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                    except: pass
 
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
 
                     new_database["regions"][code] = region_data
                     if len(region_data["news"]) > 0:
-                        log(f"   ✅ {code}: OK ({len(region_data['news'])} nuevos)")
+                        log(f"   ✅ {code}: OK ({len(region_data['news'])} novedades)")
                     else:
                         log(f"   ✅ {code}: OK")
         except: pass
@@ -240,4 +247,4 @@ if __name__ == "__main__":
             json.dump(data, f, ensure_ascii=False)
         log("🎉 BASE DE DATOS ACTUALIZADA.")
     except Exception as e:
-        log(f"💀 ERROR: {e}")
+        log(f"💀 ERROR: {e}") 
