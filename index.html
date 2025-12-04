@@ -4,28 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Miraculous Disney+ Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- TEMA PREMIUM DARK --- */
         :root {
             --bg-body: #0f1014;
             --bg-gradient: radial-gradient(circle at top center, #1b2030 0%, #0f1014 80%);
-            
             --bg-card: rgba(30, 34, 45, 0.7);
-            --bg-card-hover: rgba(40, 44, 58, 0.9);
+            --bg-card-hover: rgba(40, 44, 58, 0.95);
             --border-glass: 1px solid rgba(255, 255, 255, 0.08);
-            
             --accent-brand: #3a86ff;
-            --accent-new: #00e676; /* Verde neón más brillante */
-            --accent-new-glow: rgba(0, 230, 118, 0.25);
-            
+            --accent-new: #10b981;
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --radius: 12px;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background: var(--bg-body);
             background-image: var(--bg-gradient);
             color: var(--text-main);
@@ -33,40 +28,42 @@
             background-attachment: fixed;
         }
 
-        /* HEADER */
+        /* HEADER OPTIMIZADO */
         header {
             text-align: center;
-            padding: 20px;
-            background: rgba(15, 16, 20, 0.85);
+            padding: 15px 20px;
+            background: rgba(15, 16, 20, 0.9);
             position: sticky; top: 0; z-index: 100;
             backdrop-filter: blur(20px);
             border-bottom: var(--border-glass);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
 
         .logo-img {
-            max-width: 200px;
+            max-width: 180px;
             height: auto;
             display: block;
-            margin: 0 auto 8px auto;
+            margin: 0 auto;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
         }
 
         .tracker-title {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--accent-brand);
-            font-weight: 800;
-            letter-spacing: 4px;
+            font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
+            margin-top: 5px;
             display: block;
         }
 
-        .last-update { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+        .last-update { font-size: 0.65rem; color: #666; margin-top: 5px; font-weight: 500; }
 
         /* CONTROLES */
         .controls-wrapper {
-            max-width: 850px; margin: 30px auto; padding: 0 20px;
-            display: flex; gap: 15px;
+            max-width: 850px; margin: 20px auto; padding: 0 15px;
+            display: flex; gap: 10px;
         }
         .custom-select-container { position: relative; flex: 2; }
         
@@ -74,151 +71,120 @@
             background: #1f2937;
             border: var(--border-glass);
             color: white;
-            padding: 14px 20px;
+            padding: 12px 16px;
             border-radius: var(--radius);
             cursor: pointer;
             display: flex; align-items: center; justify-content: space-between;
-            font-weight: 600; font-size: 0.95rem;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-weight: 600; font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-family: 'Montserrat', sans-serif;
         }
         
-        .select-btn:hover, .std-select:hover:not(:disabled) {
-            background: #374151;
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        
-        .select-btn img { width: 30px; margin-right: 12px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); object-fit: cover; }
-
-        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3e"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
+        .select-btn:hover, .std-select:hover:not(:disabled) { background: #374151; border-color: rgba(255,255,255,0.3); }
+        .select-btn img { width: 26px; margin-right: 10px; border-radius: 4px; object-fit: cover; }
+        .std-select { appearance: none; flex: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 14px; }
 
         .options-list {
-            position: absolute; top: 120%; left: 0; right: 0;
-            background: #1f2937;
-            border: var(--border-glass); border-radius: var(--radius);
-            max-height: 60vh; overflow-y: auto; display: none; z-index: 200;
+            position: absolute; top: 110%; left: 0; right: 0;
+            background: #1f2937; border: var(--border-glass); border-radius: var(--radius);
+            max-height: 50vh; overflow-y: auto; display: none; z-index: 200;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .custom-select-container.active .options-list { display: block; animation: slideDown 0.2s ease; }
-        
-        .option {
-            padding: 12px 20px; cursor: pointer; display: flex; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
-        }
+        .custom-select-container.active .options-list { display: block; }
+        .option { padding: 12px 16px; cursor: pointer; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .option:hover { background: var(--accent-brand); color: white; }
-        .option img { width: 30px; margin-right: 12px; border-radius: 4px; }
-        
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .option img { width: 26px; margin-right: 10px; border-radius: 3px; }
 
         /* EPISODIOS */
-        #main-container { max-width: 850px; margin: 0 auto; padding: 0 20px 80px; }
+        #main-container { max-width: 850px; margin: 0 auto; padding: 0 15px 60px; }
 
         .season-divider {
-            margin: 50px 0 20px; font-size: 1.4rem; font-weight: 800;
-            background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            border-left: 5px solid var(--accent-brand);
-            padding-left: 15px; text-transform: uppercase; letter-spacing: 1px;
+            margin: 40px 0 15px; font-size: 1.2rem; font-weight: 800;
+            color: white; border-left: 4px solid var(--accent-brand);
+            padding-left: 15px; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         .ep-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 22px; margin-bottom: 16px;
+            padding: 20px; margin-bottom: 15px;
             border: var(--border-glass);
-            backdrop-filter: blur(5px);
-            transition: transform 0.2s, background 0.2s;
-            position: relative;
-            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative; overflow: hidden;
         }
-        .ep-card:hover { transform: scale(1.01); background: var(--bg-card-hover); border-color: rgba(255,255,255,0.2); }
         
-        /* ESTILO NUEVO REFORZADO */
         .ep-card.is-new {
-            background: linear-gradient(90deg, rgba(0, 230, 118, 0.12) 0%, var(--bg-card) 60%);
-            border-left: 4px solid var(--accent-new);
-            box-shadow: 0 4px 20px var(--accent-new-glow);
-            border-top: 1px solid rgba(0, 230, 118, 0.2);
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), var(--bg-card) 60%);
+            border-left: 3px solid var(--accent-new);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
         }
 
-        .ep-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            gap: 15px; margin-bottom: 12px;
-        }
+        .ep-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 10px; }
         .ep-info { flex: 1; }
-        .ep-num { display: block; font-size: 0.8rem; color: var(--accent-brand); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ep-title { font-size: 1.15rem; font-weight: 700; line-height: 1.4; color: #fff; }
+        .ep-num { display: block; font-size: 0.75rem; color: var(--accent-brand); font-weight: 700; margin-bottom: 3px; text-transform: uppercase; }
+        .ep-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: #fff; }
         
-        .ep-meta {
-            text-align: right; display: flex; flex-direction: column;
-            align-items: flex-end; min-width: 100px;
-        }
-        .date-display { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+        .ep-meta { text-align: right; display: flex; flex-direction: column; align-items: flex-end; min-width: 100px; }
+        .date-display { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
         
         .new-badge {
-            background: var(--accent-new); color: #000; font-size: 0.75rem; font-weight: 900;
-            padding: 4px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 6px;
-            box-shadow: 0 0 10px var(--accent-new-glow);
+            background: var(--accent-new); color: #000; font-size: 0.65rem; font-weight: 800;
+            padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 5px;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
         }
 
-        /* SINOPSIS MEJORADA (Móvil) */
+        /* SINOPSIS */
         details.ep-synopsis summary {
             list-style: none; cursor: pointer; color: var(--accent-brand);
-            font-size: 0.9rem; font-weight: 600; user-select: none; padding: 10px 0; outline: none;
-            transition: color 0.2s; display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.85rem; font-weight: 600; user-select: none; padding: 8px 0; outline: none;
+            display: flex; align-items: center;
         }
-        details.ep-synopsis summary:hover { color: #fff; }
         details.ep-synopsis summary::-webkit-details-marker { display: none; }
-        
-        /* Icono de rotación */
-        details.ep-synopsis summary::after { 
-            content: "+"; font-size: 1.2em; font-weight: 400; transition: transform 0.3s ease; margin-left: 10px; 
-        }
-        details.ep-synopsis[open] summary::after { content: "+"; transform: rotate(45deg); }
-        
-        .ep-desc { 
-            font-size: 0.95rem; color: #d1d5db; line-height: 1.6; 
-            margin-top: 0; padding-bottom: 10px;
-            animation: fadeIn 0.4s ease;
-        }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        details.ep-synopsis summary::after { content: "+"; font-size: 1.2em; margin-left: 8px; font-weight: 400; transition: transform 0.2s; }
+        details.ep-synopsis[open] summary::after { transform: rotate(45deg); }
+        .ep-desc { font-size: 0.9rem; color: #d1d5db; line-height: 1.5; margin-top: 5px; padding-left: 10px; border-left: 2px solid rgba(255,255,255,0.1); }
 
-        /* TAGS & AUDIO */
+        /* TAGS & AUDIO (FIX MÓVIL) */
         .tags-container {
-            display: flex; flex-wrap: wrap; gap: 8px; padding-top: 15px;
+            display: flex; flex-wrap: wrap; gap: 6px; padding-top: 15px;
             border-top: 1px solid rgba(255,255,255,0.08); align-items: center;
         }
         .tag {
-            background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 8px;
-            font-size: 0.8rem; color: #e5e7eb; display: inline-flex; align-items: center; font-weight: 500;
+            background: rgba(255,255,255,0.08); padding: 5px 10px; border-radius: 6px;
+            font-size: 0.75rem; color: #e5e7eb; display: inline-flex; align-items: center; font-weight: 600;
         }
         .tag.primary {
-            background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4);
-            color: #60a5fa; font-weight: 700;
+            background: rgba(58, 134, 255, 0.2); border: 1px solid rgba(58, 134, 255, 0.4);
+            color: #60a5fa;
         }
         .more-trigger {
-            color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
-            font-weight: 600; padding: 6px 10px; border-radius: 8px;
-            transition: 0.2s; border: 1px solid transparent; text-decoration: none;
+            color: var(--text-muted); font-size: 0.75rem; cursor: pointer;
+            font-weight: 600; padding: 5px 8px; text-decoration: none;
         }
-        .more-trigger:hover { background: rgba(255,255,255,0.1); color: white; }
         
+        /* FIX: Flex-wrap obligatorio para evitar desborde en móvil */
         .hidden-group { display: none; }
-        .hidden-group.show { display: flex; flex-wrap: wrap; gap: 8px; }
+        .hidden-group.show { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; margin-top: 5px; }
 
-        /* MOBILE */
+        /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
-            .controls-wrapper { flex-direction: column; }
-            .ep-header { flex-direction: column; gap: 8px; }
-            .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 5px; }
-            .new-badge { margin-bottom: 0; margin-right: 12px; }
-            .logo-img { max-width: 180px; }
+            header { padding: 12px 15px; }
+            .logo-img { max-width: 140px; }
+            .tracker-title { font-size: 0.65rem; }
+            
+            .controls-wrapper { flex-direction: column; gap: 10px; }
+            .ep-header { flex-direction: column; gap: 5px; }
+            .ep-meta { width: 100%; flex-direction: row; align-items: center; justify-content: flex-start; margin-top: 6px; }
+            .new-badge { margin-bottom: 0; margin-right: 10px; }
+            
+            /* Ajuste audio móvil */
+            .hidden-group.show { margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; }
         }
+
         /* PC */
         @media (min-width: 769px) {
             details.ep-synopsis summary { display: none; }
-            details.ep-synopsis .ep-desc { display: block; padding-top: 10px; }
+            details.ep-synopsis .ep-desc { display: block; border: none; padding: 0; }
             details.ep-synopsis { pointer-events: none; }
         }
     </style>
@@ -227,7 +193,7 @@
 
 <header>
     <img src="https://www.miraculousladybug.com/wp-content/uploads/2023/02/MIR_CLASSIC_logo_rgb_web-1536x657.png" alt="Miraculous Logo" class="logo-img">
-    <span class="tracker-title">DISNEY+ TRACKER</span>
+    <span class="tracker-title">Disney+ Tracker</span>
     <div class="last-update" id="ui-loading">Conectando...</div>
 </header>
 
@@ -242,7 +208,7 @@
         <div class="options-list" id="options-list"></div>
     </div>
     <select id="season-select" class="std-select" onchange="changeSeason()" disabled>
-        <option value="all">Todas las Temporadas</option>
+        <option value="all">Todas las temporadas</option>
     </select>
 </div>
 
@@ -251,9 +217,7 @@
 <script>
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // --- MAPA COMPLETO DE AUDIO POR REGIÓN ---
     const AUDIO_PRIORITY = {
-        // Latam + Malvinas
         "AR": "Español (Latinoamericano)", "FK": "Español (Latinoamericano)",
         "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
         "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", 
@@ -264,41 +228,26 @@
         "NI": "Español (Latinoamericano)", "PA": "Español (Latinoamericano)",
         "PY": "Español (Latinoamericano)", "UY": "Español (Latinoamericano)",
         
-        // Europa + Gibraltar
         "ES": "Español", "GI": "Español",
         "FR": "Français", "BE": "Français", "CH": "Français", "LU": "Français", "MC": "Français",
         "DE": "Deutsch", "AT": "Deutsch", "LI": "Deutsch",
         "IT": "Italiano", "SM": "Italiano", "VA": "Italiano",
         "PT": "Português", "BR": "Português",
-        "RO": "Română",
-        "NL": "Nederlands", 
-        "SE": "Svenska",
-        "NO": "Norsk",
-        "DK": "Dansk",
-        "FI": "Suomi",
-        "PL": "Polski",
-        "CZ": "Čeština", "SK": "Slovenčina",
-        "HU": "Magyar",
-        "TR": "Türkçe",
-        "GR": "Greek",
+        "RO": "Română", "NL": "Nederlands", "SE": "Svenska", "NO": "Norsk",
+        "DK": "Dansk", "FI": "Suomi", "PL": "Polski", "CZ": "Čeština", "SK": "Slovenčina",
+        "HU": "Magyar", "TR": "Türkçe", "GR": "Greek",
 
-        // Inglés (UK, USA, Australia, etc)
-        "US": "English", "GB": "English", "IE": "English", 
-        "CA": "English", "AU": "English", "NZ": "English",
-        
-        // Asia
-        "JP": "Japanese", "KR": "Korean", 
-        "TW": "Taiwanese Mandarin", "HK": "Cantonese"
+        "US": "English", "GB": "English", "IE": "English", "CA": "English", "AU": "English", "NZ": "English",
+        "JP": "Japanese", "KR": "Korean", "TW": "Taiwanese Mandarin", "HK": "Cantonese"
     };
 
     const UI_TEXT = {
-        en: { select: "Select Region", allS: "All Seasons", news: "NEW!", synop: "Show Synopsis", sub: "Subs", more: "more...", less: "show less", seasonPre: "S" },
-        es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", synop: "Ver Sinopsis", sub: "Subt.", more: "más...", less: "ver menos", seasonPre: "T" }
+        en: { select: "Select Region", allS: "All seasons", news: "NEW!", synop: "Show synopsis", sub: "Subs", more: "more...", less: "show less", seasonPre: "S" },
+        es: { select: "Selecciona Región", allS: "Todas las temporadas", news: "¡NUEVO!", synop: "Ver sinopsis", sub: "Subt.", more: "más...", less: "ver menos", seasonPre: "T" }
     };
 
     const CUSTOM_NAMES = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "Estados Unidos" };
     
-    // --- BANDERAS CORRECTAS ---
     const CUSTOM_FLAGS = {
         "FK": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg/120px-Bandera_de_la_Provincia_de_Tierra_del_Fuego.svg.png", 
         "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png/120px-Cruz_de_San_Andr%C3%A9s_Aspa_de_Borgo%C3%B1a.png"
@@ -317,9 +266,7 @@
             const userLang = navigator.language || navigator.userLanguage;
             if (userLang.startsWith('es')) uiLang = 'es';
         }
-        
         applyTexts();
-
         try {
             const res = await fetch('database.json?v=' + Date.now());
             if(!res.ok) throw new Error("DB Error");
@@ -376,7 +323,9 @@
         const sSelect = document.getElementById('season-select');
         sSelect.innerHTML = `<option value="all">${UI_TEXT[uiLang].allS}</option>`;
         sSelect.disabled = false;
-        db.regions[code].seasons.forEach(s => sSelect.innerHTML += `<option value="${s.id}">${UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season'} ${s.id}</option>`);
+        db.regions[code].seasons.forEach(s => {
+            sSelect.innerHTML += `<option value="${s.id}">${UI_TEXT[uiLang].seasonPre === 'T' ? 'Temporada' : 'Season'} ${s.id}</option>`;
+        });
         
         if(updateHistory) updateURL(code, 'all');
         renderEpisodes();
@@ -393,8 +342,19 @@
         container.innerHTML = '';
         const sVal = document.getElementById('season-select').value;
         const txt = UI_TEXT[uiLang];
-        
-        db.regions[selectedCountry].seasons.forEach(season => {
+        const regionData = db.regions[selectedCountry];
+
+        // 1. ENCONTRAR LA FECHA MÁS RECIENTE DE LA REGIÓN (Para la lógica "Last Launch")
+        let latestDateInRegion = "";
+        regionData.seasons.forEach(s => {
+            s.eps.forEach(e => {
+                if (e.dt && e.dt !== HIDDEN_DATE_MARKER) {
+                    if (e.dt > latestDateInRegion) latestDateInRegion = e.dt;
+                }
+            });
+        });
+
+        regionData.seasons.forEach(season => {
             if (sVal !== 'all' && season.id != sVal) return;
 
             const h = document.createElement('div');
@@ -405,9 +365,11 @@
 
             season.eps.forEach(ep => {
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
-                const isNew = checkNew(dateVal);
+                
+                // NUEVA LOGICA: Es nuevo solo si su fecha coincide con la última detectada
+                const isNew = (dateVal && dateVal === latestDateInRegion);
 
-                // AUDIO
+                // AUDIO LOGIC
                 const targetAudio = AUDIO_PRIORITY[selectedCountry] || "English";
                 let audios = [...ep.a];
                 let primary = null, others = [];
@@ -417,7 +379,6 @@
 
                 let audioHTML = '';
                 if(primary) audioHTML += `<div class="tag primary">${primary}</div>`;
-                
                 if(others.length) {
                     const uid = `aud-${season.id}-${ep.n}`;
                     audioHTML += `<div id="${uid}" class="hidden-group">${others.map(a => `<div class="tag">${a}</div>`).join('')}</div>
@@ -463,17 +424,16 @@
         });
     }
 
-    // --- FUNCION TOGGLE AUDIO CORRECTA ---
+    // TOGGLE AUDIO (Corrección de estado)
     window.toggleAudio = function(btn, id, count) {
         const el = document.getElementById(id);
         const txt = UI_TEXT[uiLang];
-        
-        // Alternar clase 'show' para mostrar/ocultar (flex vs none)
-        if (el.style.display === "flex") {
-            el.style.display = "none";
+        // Revisamos si tiene la clase show
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
             btn.innerText = `+${count} ${txt.more}`;
         } else {
-            el.style.display = "flex";
+            el.classList.add('show');
             btn.innerText = `[-] ${txt.less}`;
         }
     }
@@ -482,17 +442,13 @@
         const p = new URLSearchParams(window.location.search);
         if (p.get('c') && db.regions[p.get('c')]) {
             setCountry(p.get('c'), false);
-            if(p.get('s')) {
-                document.getElementById('season-select').value = p.get('s');
-                renderEpisodes();
-            }
+            if(p.get('s')) document.getElementById('season-select').value = p.get('s');
         }
     }
     function updateURL(c, s) { 
         const langParam = (new URLSearchParams(window.location.search).get('lang') === 'en') ? '&lang=en' : '';
         window.history.replaceState(null, '', `?c=${c}&s=${s}${langParam}`); 
     }
-    function checkNew(d) { if(!d) return false; return (new Date() - new Date(d))/(1000*3600*24) <= 90; }
 
     init();
 </script>
