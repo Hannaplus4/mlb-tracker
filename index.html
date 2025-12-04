@@ -1,447 +1,586 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miraculous Global Tracker v4</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Miraculous Global Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- VARIABLES DE COLOR (TEMA OSCURO) --- */
+        /* --- TEMA MODERNO (GLASSMORPHISM) --- */
         :root {
-            --bg-main: #121212; /* Fondo principal más oscuro */
-            --bg-card: #1e1e2e; /* Fondo de las tarjetas */
-            --accent: #ff4757; /* Rojo Miraculous (Ladybug) */
-            --accent-sec: #2ed573; /* Verde para nuevos (Chat Noir eyes) */
-            --text-primary: #ffffff;
-            --text-secondary: #a4b0be;
+            --bg-body: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7); /* Semitransparente */
+            --bg-card-hover: rgba(51, 65, 85, 0.9);
+            --accent-red: #ff4757; /* Ladybug */
+            --accent-green: #2ed573; /* Chat Noir (Nuevos) */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --blur-strength: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 71, 87, 0.05) 0%, transparent 20%),
+                              radial-gradient(circle at 90% 80%, rgba(46, 213, 115, 0.05) 0%, transparent 20%);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            padding: 0;
+            min-height: 100vh;
         }
 
         /* HEADER */
         header {
             text-align: center;
-            margin-bottom: 35px;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 20px;
+            padding: 40px 20px 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(var(--blur-strength));
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
         }
+
+        h1 { margin: 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px; }
+        .brand-accent { color: var(--accent-red); }
+        .last-update { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; font-weight: 500;}
+
+        /* --- CONTROLES (Custom Dropdown para Banderas) --- */
+        .controls-wrapper {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* País ancho, Temporada estrecho */
+            gap: 15px;
+        }
+
+        /* Custom Select Styles */
+        .custom-select-container { position: relative; width: 100%; }
         
-        h1 { 
-            margin: 0; 
-            color: var(--accent); 
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        h1 .bug { font-size: 1.2em; vertical-align: middle; }
-        .last-update { font-size: 0.85rem; color: var(--text-secondary); margin-top: 10px; }
-
-        /* CONTROLES (SELECTORES) */
-        .controls-container {
+        .select-btn {
             background: var(--bg-card);
-            padding: 20px;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 14px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
+            cursor: pointer;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.3s;
         }
+        .select-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-red); }
+        
+        .selected-value { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .arrow { transition: transform 0.3s; }
+        .select-btn.active .arrow { transform: rotate(180deg); }
 
-        .control-group {
+        .options-list {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 50;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .custom-select-container.active .options-list { display: block; animation: fadeIn 0.2s ease; }
+
+        .option {
+            padding: 12px 20px;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
-            min-width: 250px;
-            flex: 1;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
         }
+        .option:hover { background: rgba(255, 71, 87, 0.1); }
+        .option img { width: 24px; height: 18px; object-fit: cover; border-radius: 3px; }
+        .option.custom-flag img { width: auto; height: 20px; object-fit: contain; }
 
-        label { font-size: 0.9rem; color: var(--accent); margin-bottom: 5px; font-weight: 600;}
-
-        select {
-            padding: 12px 15px;
-            background: var(--bg-main);
-            border: 2px solid #333;
-            color: var(--text-primary);
-            border-radius: 8px;
+        /* Standard Select para Temporada (Estilizado) */
+        .std-select {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 12px;
             font-size: 1rem;
             cursor: pointer;
-            transition: border-color 0.3s;
-            appearance: none; /* Reset nativo */
+            appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 15px;
+            background-position: right 20px center;
+            background-size: 16px;
         }
-        select:focus { outline: none; border-color: var(--accent); }
 
-        /* BANDERAS EN SELECTOR */
-        .flag-icon { width: 24px; height: 18px; object-fit: cover; border-radius: 3px; vertical-align: middle; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
-        /* Ajuste para banderas personalizadas que pueden tener otras proporciones */
-        .flag-icon.custom-flag { width: auto; height: 20px; }
-
-
-        /* BANNER DE NOVEDADES */
+        /* --- NOVEDADES BANNER --- */
         #news-banner {
-            background: linear-gradient(135deg, var(--accent), #ff6b81);
+            max-width: 800px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.9), rgba(255, 107, 129, 0.9));
             padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            display: none; /* Oculto por defecto */
-            animation: slideDown 0.5s ease;
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+            border-radius: 16px;
+            display: none;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.2);
         }
-        #news-banner h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: white; display: flex; align-items: center;}
-        .news-fire { margin-right: 8px; font-size: 1.3rem; }
-        .news-pill { 
-            background: rgba(0,0,0,0.3); 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            display: inline-block; 
-            margin: 5px; 
-            font-size: 0.9rem; 
-            color: white;
+        .news-header { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 10px; }
+        .news-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .news-pill {
+            background: rgba(0,0,0,0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 500;
         }
 
-        /* --- TARJETAS DE EPISODIOS --- */
-        .season-separator {
-            color: var(--accent);
-            font-size: 1.2rem;
-            margin: 30px 0 15px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #333;
-            font-weight: 700;
+        /* --- LISTA DE EPISODIOS --- */
+        #main-container { max-width: 800px; margin: 0 auto; padding: 0 20px 40px; }
+
+        .season-divider {
+            margin: 40px 0 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            border-bottom: 2px solid rgba(255, 71, 87, 0.3);
+            padding-bottom: 10px;
         }
 
         .ep-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
             margin-bottom: 15px;
-            padding: 15px 20px;
-            border-radius: 10px;
-            border-left: 5px solid transparent; /* Borde izquierdo para estado */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-
-        .ep-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); background-color: #25253a;}
-
-        /* Estado: NUEVO */
+        
+        /* Efecto NUEVO */
         .ep-card.is-new {
-            border-left-color: var(--accent-sec);
-            background: linear-gradient(to right, rgba(46, 213, 115, 0.1), var(--bg-card) 40%);
+            border-color: var(--accent-green);
+            background: linear-gradient(90deg, rgba(46, 213, 115, 0.05), rgba(30, 41, 59, 0.7));
+        }
+        .ep-card.is-new::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--accent-green);
         }
 
-        /* LAYOUT DEL ENCABEZADO DEL EPISODIO (Flexbox) */
         .ep-header {
             display: flex;
-            justify-content: space-between; /* PC: Título izquierda, fecha derecha */
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap; /* Permite que baje en móvil */
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
         }
 
-        .ep-title-group {
-            font-size: 1.1rem;
-            font-weight: 600;
-            flex-grow: 1; /* Ocupa el espacio disponible */
-            margin-right: 15px;
-        }
-        .ep-num { color: var(--accent); margin-right: 8px; }
-
-        .ep-date-group {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+        .ep-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
+        .ep-num { color: var(--accent-red); margin-right: 8px; font-weight: 800; }
+        
+        .ep-meta {
+            text-align: right;
             display: flex;
-            align-items: center;
-            white-space: nowrap; /* Evita que la fecha se parta en dos líneas */
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 100px;
         }
 
-        /* Badge "NUEVO" parpadeante */
+        .date-display { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        
         .new-badge {
-            background-color: var(--accent-sec);
+            background: var(--accent-green);
             color: #000;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
             text-transform: uppercase;
-            margin-right: 8px;
-            animation: pulse 1.5s infinite ease-in-out;
-            box-shadow: 0 0 5px var(--accent-sec);
+            margin-bottom: 4px;
+            animation: pulse 2s infinite;
         }
 
         .ep-desc {
+            margin-top: 12px;
             font-size: 0.95rem;
-            color: #ccc;
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3; /* Limita a 3 líneas la descripción */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            color: #cbd5e1;
+            line-height: 1.5;
         }
 
-        /* --- TAGS (Audios/Subtítulos) --- */
-        .tags-container {
+        /* --- AUDIOS Y SUBS (Expandible) --- */
+        .tags-row {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #333;
+            font-size: 0.85rem;
         }
-        .tag-group {
-            background: #151520;
+
+        .tag-pill {
+            background: rgba(255,255,255,0.05);
             padding: 4px 10px;
             border-radius: 6px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            gap: 6px;
         }
-        .tag-icon { margin-right: 6px; }
-        .tag-lang { color: white; font-weight: 500; margin-left: 4px;}
+        .tag-icon { opacity: 0.7; }
 
-        /* --- ANIMACIONES --- */
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.8; } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        .more-audios {
+            color: var(--accent-red);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+        .hidden-audios { display: none; }
+        .hidden-audios.show { display: inline; }
 
-        /* =========================================
-           📱 MEDIA QUERY PARA MÓVILES (Responsive)
-           ========================================= */
+        /* ANIMACIONES */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* ================= MÓVIL ================= */
         @media (max-width: 768px) {
-            /* En pantallas pequeñas, cambiamos la dirección del flex header */
+            .controls-wrapper { grid-template-columns: 1fr; gap: 10px; }
+            
             .ep-header {
-                flex-direction: column; /* Apilar verticalmente */
-                align-items: flex-start; /* Alinear todo a la izquierda */
+                flex-direction: column; /* Fecha debajo del título */
+                align-items: flex-start;
             }
 
-            .ep-title-group {
-                margin-right: 0;
-                margin-bottom: 5px; /* Espacio entre título y fecha */
-                width: 100%;
+            .ep-meta {
+                text-align: left;
+                align-items: flex-start; /* Alinear a la izquierda */
+                margin-top: 5px;
+                flex-direction: row; /* Nuevo al lado de fecha */
+                gap: 10px;
+                align-items: center;
             }
-
-            .ep-date-group {
-                width: 100%;
-                /* La fecha queda debajo del título */
-            }
-
-            .controls-container { flex-direction: column; }
-            .control-group { min-width: 100%; }
+            
+            .new-badge { margin-bottom: 0; } /* Resetear margen */
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1><span class="bug">🐞</span> Miraculous Global Tracker</h1>
-    <div class="last-update" id="last-update">Conectando con la base de datos...</div>
+    <h1><span class="brand-accent">🐞</span> Miraculous Tracker</h1>
+    <div class="last-update" id="ui-loading">Loading data...</div>
 </header>
 
-<div class="controls-container">
-    <div class="control-group">
-        <label for="country-select">Selecciona Región/Territorio:</label>
-        <select id="country-select" onchange="handleCountryChange()">
-            <option value="" disabled selected>Cargando regiones...</option>
-        </select>
+<div class="controls-wrapper">
+    <div class="custom-select-container" id="country-dropdown">
+        <div class="select-btn" onclick="toggleDropdown()">
+            <span class="selected-value" id="current-country-display">
+                <span>🌍</span> Select Region
+            </span>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="options-list" id="country-options">
+            </div>
     </div>
-    
-    <div class="control-group">
-        <label for="season-select">Filtrar Temporada:</label>
-        <select id="season-select" onchange="renderEpisodes()" disabled>
-            <option value="all">✨ Mostrar Todo</option>
-        </select>
-    </div>
+
+    <select id="season-select" class="std-select" onchange="changeSeason()" disabled>
+        <option value="all" id="opt-all-seasons">All Seasons</option>
+    </select>
 </div>
 
 <div id="news-banner">
-    <h3><span class="news-fire">🔥</span> Novedades detectadas (< 90 días):</h3>
-    <div id="news-list"></div>
+    <div class="news-header">🔥 <span id="ui-news-title">New Releases</span></div>
+    <div class="news-grid" id="news-list"></div>
 </div>
 
-<div id="episodes-container"></div>
+<div id="main-container"></div>
 
 <script>
-    // =================CONFIGURACIÓN=================
-    // Fecha marcador para ocultar fechas viejas (debe coincidir con el Python)
-    const HIDDEN_DATE_MARKER = "2000-01-01"; 
-    const DAYS_FOR_NEW = 90; // Días para considerar algo "NUEVO"
+    // === CONFIGURACIÓN ===
+    const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // 1. MAPA DE NOMBRES PERSONALIZADOS (Tus correcciones)
-    const customCountryNames = {
-        "GB": "Reino Unido", // Corrección del (R.U)
-        "FK": "Islas Malvinas (Arg.)", // Nombre específico
-        // Puedes añadir más aquí: "US": "Estados Unidos", etc.
+    // Diccionario para detectar idioma preferido del audio según código de país
+    // "AR" (Argentina) -> Prefiere "Spanish (Latin American)"
+    const REGION_AUDIO_PREF = {
+        "AR": "Spanish (Latin American)", "MX": "Spanish (Latin American)", "CL": "Spanish (Latin American)", "CO": "Spanish (Latin American)", "PE": "Spanish (Latin American)", "VE": "Spanish (Latin American)",
+        "ES": "Spanish (Castilian)", 
+        "US": "English", "GB": "English", "AU": "English", "CA": "English",
+        "FR": "French", "BE": "French", "CH": "German", "DE": "German", "AT": "German",
+        "BR": "Portuguese (Brazil)", "PT": "Portuguese (Portugal)",
+        "IT": "Italian",
+        "JP": "Japanese", "KR": "Korean",
+        "TR": "Turkish", "PL": "Polish", "RU": "Russian"
     };
 
-    // 2. MAPA DE BANDERAS PERSONALIZADAS (SVG específicos)
-    const customFlagURLs = {
-        // Bandera de Tierra del Fuego para Malvinas
+    // Traducciones de la Interfaz (Inglés por defecto, Español si se detecta)
+    const UI_STRINGS = {
+        en: { select: "Select Region", allSeasons: "All Seasons", loading: "Loading...", news: "Recent Arrivals (< 90 days)", newBadge: "NEW!", season: "Season", noDesc: "No description available.", more: "more..." },
+        es: { select: "Selecciona Región", allSeasons: "Todas las Temporadas", loading: "Cargando...", news: "Novedades recientes", newBadge: "¡NUEVO!", season: "Temporada", noDesc: "Sin descripción.", more: "más..." }
+    };
+
+    // Ajustes manuales
+    const customNames = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "USA" };
+    const customFlags = {
         "FK": "https://upload.wikimedia.org/wikipedia/commons/9/97/Flag_of_Tierra_del_Fuego_province_in_Argentina.svg",
-        // Cruz de Borgoña para Gibraltar
         "GI": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Flag_of_Cross_of_Burgundy.svg"
     };
-    // ===============================================
 
-    let dbData = null;
-    let currentRegion = null;
-    const regionNames = new Intl.DisplayNames(['es'], { type: 'region' });
+    // --- ESTADO GLOBAL ---
+    let db = null;
+    let uiLang = 'en'; // Por defecto inglés
+    const urlParams = new URLSearchParams(window.location.search);
 
-    // --- FUNCIONES AUXILIARES ---
-
-    // Obtener nombre del país (con override personalizado)
-    function getDisplayName(code) {
-        if (customCountryNames[code]) return customCountryNames[code];
-        try { return regionNames.of(code); } catch(e) { return code; }
-    }
-
-    // Generar HTML de la bandera (CDN estándar o personalizada)
-    function getFlagHTML(code) {
-        if (customFlagURLs[code]) {
-             // Bandera personalizada con clase extra para ajuste de tamaño
-            return `<img src="${customFlagURLs[code]}" alt="${code}" class="flag-icon custom-flag">`;
-        }
-        // Bandera estándar de flagcdn
-        return `<img src="https://flagcdn.com/24x18/${code.toLowerCase()}.png" alt="${code}" class="flag-icon">`;
-    }
-
-    // Formatear fecha (YYYY-MM-DD -> DD/MM/YYYY)
-    function formatDate(dateStr) {
-        if (!dateStr || dateStr === HIDDEN_DATE_MARKER) return "";
-        const [y, m, d] = dateStr.split('-');
-        return `${d}/${m}/${y}`;
-    }
-
-    // Verificar si es nuevo
-    function isNewEpisode(dateStr) {
-        if (!dateStr || dateStr === HIDDEN_DATE_MARKER) return false;
-        const epDate = new Date(dateStr);
-        const today = new Date();
-        const diffTime = Math.abs(today - epDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-        return diffDays <= DAYS_FOR_NEW;
-    }
-
-    // --- LÓGICA PRINCIPAL ---
-
+    // --- INICIALIZACIÓN ---
     async function init() {
+        // 1. Detectar idioma del navegador
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.startsWith('es')) uiLang = 'es';
+        applyUILanguage();
+
         try {
-            const response = await fetch('database.json?v=' + new Date().getTime()); // Evitar caché
-            if (!response.ok) throw new Error("No se pudo cargar database.json");
-            dbData = await response.json();
+            const res = await fetch('database.json?v=' + Date.now());
+            db = await res.json();
+            document.getElementById('ui-loading').textContent = db.meta.updated;
             
-            document.getElementById('last-update').textContent = `📅 Última actualización de datos: ${dbData.meta.updated}`;
-            populateCountrySelect();
-        } catch (error) {
-            document.getElementById('last-update').innerHTML = `<span style="color:red">Error: ${error.message}. Verifica que database.json esté en la carpeta.</span>`;
+            buildCountryOptions();
+            
+            // 2. Comprobar URL para restaurar estado (?c=AR&s=5)
+            const urlCountry = urlParams.get('c');
+            const urlSeason = urlParams.get('s');
+
+            if (urlCountry && db.regions[urlCountry]) {
+                selectCountry(urlCountry, false);
+                if (urlSeason) {
+                    document.getElementById('season-select').value = urlSeason;
+                    renderEpisodes();
+                }
+            } else {
+                // No hay URL, intentar autodetectar región (opcional) o dejar en blanco
+                // Aquí solo dejamos el selector abierto o en blanco.
+            }
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('ui-loading').textContent = "Error loading database.";
         }
     }
 
-    function populateCountrySelect() {
-        const countrySelect = document.getElementById('country-select');
-        countrySelect.innerHTML = '<option value="" disabled selected>Selecciona una región...</option>';
-        
-        const regionCodes = Object.keys(dbData.regions).sort((a, b) => {
-            return getDisplayName(a).localeCompare(getDisplayName(b));
-        });
+    function applyUILanguage() {
+        const t = UI_STRINGS[uiLang];
+        document.getElementById('current-country-display').innerHTML = `<span>🌍</span> ${t.select}`;
+        document.getElementById('opt-all-seasons').textContent = t.allSeasons;
+        document.getElementById('ui-news-title').textContent = t.news;
+    }
 
-        regionCodes.forEach(code => {
-            const option = document.createElement('option');
-            option.value = code;
-            // Nota: Los <option> nativos no soportan imágenes (banderas) fácilmente.
-            // El nombre se muestra corregido.
-            option.textContent = getDisplayName(code); 
-            countrySelect.appendChild(option);
+    // --- LÓGICA DEL DROPDOWN CUSTOM ---
+    function buildCountryOptions() {
+        const list = document.getElementById('country-options');
+        const codes = Object.keys(db.regions).sort((a,b) => getCountryName(a).localeCompare(getCountryName(b)));
+
+        codes.forEach(code => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            if(customFlags[code]) div.classList.add('custom-flag');
+            
+            const flagUrl = customFlags[code] || `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
+            
+            div.innerHTML = `<img src="${flagUrl}" alt="${code}"> ${getCountryName(code)}`;
+            div.onclick = () => selectCountry(code, true);
+            list.appendChild(div);
         });
     }
 
-    function handleCountryChange() {
-        currentRegion = document.getElementById('country-select').value;
-        const seasonSelect = document.getElementById('season-select');
-        seasonSelect.disabled = false;
+    function toggleDropdown() {
+        document.getElementById('country-dropdown').classList.toggle('active');
+    }
+
+    // Cerrar dropdown si clic fuera
+    window.onclick = function(e) {
+        if (!e.target.closest('.custom-select-container')) {
+            document.getElementById('country-dropdown').classList.remove('active');
+        }
+    }
+
+    function selectCountry(code, updateHistory) {
+        const display = document.getElementById('current-country-display');
+        const flagUrl = customFlags[code] || `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
+        const isCustom = customFlags[code] ? 'custom-flag' : '';
         
-        // Poblar selector de temporadas
-        const seasons = dbData.regions[currentRegion].seasons.map(s => s.id);
-        seasonSelect.innerHTML = '<option value="all">✨ Mostrar Todo</option>';
-        seasons.forEach(sId => {
-            seasonSelect.innerHTML += `<option value="${sId}">Temporada ${sId}</option>`;
+        display.innerHTML = `<img src="${flagUrl}" class="${isCustom}" style="width:24px; border-radius:3px;"> ${getCountryName(code)}`;
+        document.getElementById('country-dropdown').classList.remove('active');
+        
+        // Habilitar temporadas
+        const sSelect = document.getElementById('season-select');
+        sSelect.disabled = false;
+        
+        // Llenar temporadas
+        const seasons = db.regions[code].seasons;
+        sSelect.innerHTML = `<option value="all">${UI_STRINGS[uiLang].allSeasons}</option>`;
+        seasons.forEach(s => {
+            sSelect.innerHTML += `<option value="${s.id}">${UI_STRINGS[uiLang].season} ${s.id}</option>`;
         });
 
-        renderNewsBanner();
+        if (updateHistory) {
+            updateURL(code, 'all');
+            sSelect.value = 'all';
+        }
+
+        renderNews(code);
         renderEpisodes();
     }
 
-    function renderNewsBanner() {
+    function changeSeason() {
+        const code = getCodeFromDisplay(); // Hacky but works or save global var
+        const sVal = document.getElementById('season-select').value;
+        // Need current country code. Let's store globally.
+        // Actually, easier to use URL param logic or global var
+        // Let's rely on global URL param which is synced.
+        const currentC = new URLSearchParams(window.location.search).get('c');
+        if(currentC) {
+            updateURL(currentC, sVal);
+            renderEpisodes();
+        }
+    }
+
+    function updateURL(c, s) {
+        const newUrl = `?c=${c}&s=${s}`;
+        window.history.pushState({path: newUrl}, '', newUrl);
+    }
+
+    // --- RENDERIZADO PRINCIPAL ---
+    function renderNews(code) {
         const banner = document.getElementById('news-banner');
         const list = document.getElementById('news-list');
-        const news = dbData.regions[currentRegion].news || [];
+        const newsData = db.regions[code].news || [];
 
-        if (news.length === 0) {
+        if(newsData.length === 0) {
             banner.style.display = 'none';
             return;
         }
 
         list.innerHTML = '';
-        // Mostrar solo las últimas 5 novedades para no saturar
-        news.slice(0, 5).forEach(item => {
-            list.innerHTML += `<span class="news-pill">${item.e} - ${item.t} (${formatDate(item.d)})</span>`;
+        newsData.slice(0, 6).forEach(n => {
+            if(n.d === HIDDEN_DATE_MARKER) return; // Seguridad extra
+            list.innerHTML += `<div class="news-pill">${n.e} - ${n.t}</div>`;
         });
         banner.style.display = 'block';
     }
 
     function renderEpisodes() {
-        const container = document.getElementById('episodes-container');
-        container.innerHTML = '';
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('c');
+        const filterS = params.get('s');
         
-        const selectedSeasonStr = document.getElementById('season-select').value;
-        const regionData = dbData.regions[currentRegion];
+        if(!code || !db.regions[code]) return;
 
-        regionData.seasons.forEach(season => {
-            if (selectedSeasonStr !== 'all' && season.id.toString() !== selectedSeasonStr) return;
+        const container = document.getElementById('main-container');
+        container.innerHTML = '';
+        const region = db.regions[code];
+        const t = UI_STRINGS[uiLang];
 
-            container.innerHTML += `<div class="season-separator">Temporada ${season.id}</div>`;
+        region.seasons.forEach(season => {
+            if (filterS !== 'all' && filterS != season.id) return;
+
+            const divider = document.createElement('div');
+            divider.className = 'season-divider';
+            divider.textContent = `${t.season} ${season.id}`;
+            container.appendChild(divider);
 
             season.eps.forEach(ep => {
-                const isNew = isNewEpisode(ep.dt);
-                const displayDate = formatDate(ep.dt);
+                const dateStr = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
+                const isNew = dateStr ? checkIsNew(dateStr) : false;
                 
-                // HTML de la fecha: Si está oculta, no se muestra nada.
-                let dateHTML = '';
-                if (displayDate) {
-                    const newBadgeHtml = isNew ? '<span class="new-badge">¡NUEVO!</span>' : '';
-                    dateHTML = `<div class="ep-date-group">${newBadgeHtml}📅 ${displayDate}</div>`;
+                // --- LÓGICA DE AUDIO INTELIGENTE ---
+                const prefLang = REGION_AUDIO_PREF[code] || "English"; // Fallback general
+                let sortedAudios = [...ep.a];
+                
+                // Mover el idioma preferido al principio si existe
+                const prefIndex = sortedAudios.findIndex(a => a.includes(prefLang) || a === prefLang);
+                if (prefIndex > -1) {
+                    const item = sortedAudios.splice(prefIndex, 1)[0];
+                    sortedAudios.unshift(item);
                 }
 
-                let audiosHTML = ep.a.length ? `<div class="tag-group"><span class="tag-icon">🔊</span> ${ep.a.map(a => `<span class="tag-lang">${a}</span>`).join(', ')}</div>` : '';
-                let subsHTML = ep.s.length ? `<div class="tag-group"><span class="tag-icon">📝</span> ${ep.s.map(s => `<span class="tag-lang">${s.l}</span>`).join(', ')}</div>` : '';
+                // Generar HTML de audios
+                let audioHtml = '';
+                if (sortedAudios.length > 0) {
+                    const first = sortedAudios[0];
+                    const rest = sortedAudios.slice(1);
+                    
+                    audioHtml = `<div class="tag-pill"><span class="tag-icon">🔊</span> ${first}`;
+                    
+                    if (rest.length > 0) {
+                        const hiddenId = `aud-${season.id}-${ep.n}`;
+                        audioHtml += `
+                            <span class="hidden-audios" id="${hiddenId}">, ${rest.join(', ')}</span>
+                            <span class="more-audios" onclick="document.getElementById('${hiddenId}').classList.toggle('show'); this.style.display='none'">
+                                +${rest.length} ${t.more}
+                            </span>
+                        `;
+                    }
+                    audioHtml += `</div>`;
+                }
 
-                const cardHtml = `
-                    <div class="ep-card ${isNew ? 'is-new' : ''}">
-                        <div class="ep-header">
-                            <div class="ep-title-group">
-                                <span class="ep-num">T${season.id} E${ep.n}</span> ${ep.t}
-                            </div>
-                            ${dateHTML} </div>
-                        <div class="ep-desc">${ep.ds || 'Sin descripción disponible.'}</div>
-                        <div class="tags-container">
-                            ${audiosHTML}
-                            ${subsHTML}
+                // Render Card
+                const card = document.createElement('div');
+                card.className = `ep-card ${isNew ? 'is-new' : ''}`;
+                
+                let badge = isNew ? `<div class="new-badge">${t.newBadge}</div>` : '';
+                let dateDisplay = dateStr ? `<div class="date-display">📅 ${formatDate(dateStr)}</div>` : '';
+
+                card.innerHTML = `
+                    <div class="ep-header">
+                        <div class="ep-title">
+                            <span class="ep-num">#${ep.n}</span> ${ep.t}
+                        </div>
+                        <div class="ep-meta">
+                            ${badge}
+                            ${dateDisplay}
                         </div>
                     </div>
+                    <div class="ep-desc">${ep.ds || t.noDesc}</div>
+                    <div class="tags-row">
+                        ${audioHtml}
+                        ${ep.s.length ? `<div class="tag-pill"><span class="tag-icon">📝</span> ${ep.s.map(s=>s.l).join(', ')}</div>` : ''}
+                    </div>
                 `;
-                container.innerHTML += cardHtml;
+                container.appendChild(card);
             });
         });
     }
 
-    // Iniciar APP
+    // --- UTILES ---
+    function getCountryName(code) {
+        if(customNames[code]) return customNames[code];
+        try { return new Intl.DisplayNames([uiLang], { type: 'region' }).of(code); } 
+        catch { return code; }
+    }
+
+    function formatDate(str) {
+        const [y, m, d] = str.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    function checkIsNew(dateStr) {
+        const d = new Date(dateStr);
+        const diff = (new Date() - d) / (1000 * 60 * 60 * 24);
+        return diff <= 90;
+    }
+
+    // Arrancar
     init();
 
 </script>
