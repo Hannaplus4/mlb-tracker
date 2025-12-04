@@ -10,7 +10,6 @@ SERIES_ID = "1CjTiHEJbLRC"
 DB_FILE = "database.json"
 
 # --- CONFIGURACIÓN DE HORARIOS ---
-# Diferencia horaria aproximada respecto a UTC
 UTC_OFFSETS = {
     "US": -5, "CA": -5, "MX": -6, "AR": -3, "BR": -3, "CL": -3, "CO": -5, "PE": -5,
     "UY": -3, "VE": -4, "EC": -5, "GT": -6, "BO": -4, "CR": -6, "DO": -4, "SV": -6,
@@ -52,7 +51,10 @@ REGIONS = [
     {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"}, {"c":"AI", "l":"en-US"}, 
     {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"}, {"c":"SR", "l":"en-US"}, 
     {"c":"GF", "l":"fr-FR"}, {"c":"UM", "l":"en-US"}, 
+    
+    # Corrección visual para ES, AD, GI (Se fuerza "Spanish" luego)
     {"c":"ES", "l":"es-ES"}, {"c":"AD", "l":"es-ES"}, {"c":"GI", "l":"es-ES"},
+    
     {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"}, {"c":"IT", "l":"it-IT"}, 
     {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"}, {"c":"NL", "l":"nl-NL"}, 
     {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"}, {"c":"AT", "l":"de-AT"}, 
@@ -71,8 +73,11 @@ REGIONS = [
     {"c":"BA", "l":"hr-BA"}, {"c":"RS", "l":"sr-RS"}, {"c":"ME", "l":"sr-ME"}, 
     {"c":"TR", "l":"tr-TR"}, {"c":"XK", "l":"sq-AL"}, 
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
-    {"c":"TW", "l":"zh-TW"}, 
-    {"c":"HK", "l":"zh-HK"}, 
+
+    # IMPORTANTE: usar zh-Hant para evitar fallback a inglés donde aplica
+    {"c":"TW", "l":"zh-Hant"},
+    {"c":"HK", "l":"zh-Hant"},
+
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
     {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"}, {"c":"WF", "l":"fr-FR"}, 
@@ -102,7 +107,6 @@ LANG_CODES = {
 }
 
 FIX_TARGET_DATE = "2025-12-03" 
-FIX_OLD_DATE = "2021-01-01"    
 FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
 FIX_TITLES = [
     "mister agreste", "sleeping syren", "the dark castle", "wreckless driver", "yaksi gozen",
@@ -115,20 +119,33 @@ def log(msg):
     sys.stdout.flush()
 
 def clean_sub_name(code, raw_name, region_code=None):
+    # Corrección visual forzada para España y alrededores
     if region_code in ['ES', 'AD', 'GI'] and (code == 'es-419' or raw_name == 'es-419'):
         return "Spanish"
-        
+    
     if not raw_name or "--" in raw_name or raw_name == code:
         base = raw_name.split('--')[0] if raw_name else code
         return LANG_CODES.get(base, base)
     return raw_name
+
+def prioritize_audios(audios_list, region_lang_code):
+    """
+    Mueve el idioma principal de la región al inicio de la lista.
+    """
+    target_name = LANG_CODES.get(region_lang_code, region_lang_code)
+    
+    if target_name in audios_list:
+        audios_list.remove(target_name)
+        audios_list.insert(0, target_name)
+    return audios_list
 
 def load_previous_db():
     if os.path.exists(DB_FILE):
         try:
             with open(DB_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except: pass
+        except:
+            pass
     return {"regions": {}}
 
 def get_local_release_date(pacific_date_str, region_code):
@@ -175,7 +192,11 @@ def get_data():
                     memory_map[f"{s['id']}-{ep['n']}"] = ep.get('dt', '')
         
         try:
-            url_bundle = f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/encodedSeriesId/{SERIES_ID}"
+            url_bundle = (
+                f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/"
+                f"version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/"
+                f"language/{lang}/encodedSeriesId/{SERIES_ID}"
+            )
             r = requests.get(url_bundle, headers=HEADERS, timeout=4)
             
             if r.status_code == 200:
@@ -187,71 +208,159 @@ def get_data():
                     for s in seasons:
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
+
+                        # --- NUEVO: paginación segura de episodios ---
+                        page = 1
+                        page_size = 50
+                        eps_raw = []
+
+                        while True:
+                            url_eps = (
+                                f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/"
+                                f"version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/"
+                                f"language/{lang}/seasonId/{s_id}/pageSize/{page_size}/page/{page}"
+                            )
+                            try:
+                                r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
+                                if r_eps.status_code != 200:
+                                    break
+
+                                batch = (
+                                    r_eps.json()
+                                    .get('data', {})
+                                    .get('DmcEpisodes', {})
+                                    .get('videos', [])
+                                )
+                                if not batch:
+                                    break
+
+                                eps_raw.extend(batch)
+
+                                # Si viene menos que page_size, ya es la última página
+                                if len(batch) < page_size:
+                                    break
+
+                                page += 1
+                                time.sleep(0.05)
+                            except:
+                                break
+                        # --- FIN NUEVO BLOQUE DE PAGINACIÓN ---
+
+                        total_eps_count += len(eps_raw)
+                        clean_eps = []
                         
-                        url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
-                        
-                        try:
-                            r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
-                            if r_eps.status_code == 200:
-                                eps_raw = r_eps.json().get('data', {}).get('DmcEpisodes', {}).get('videos', [])
-                                total_eps_count += len(eps_raw)
-                                clean_eps = []
-                                
-                                for i, ep in enumerate(eps_raw):
-                                    ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
-                                    title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
+                        for i, ep in enumerate(eps_raw):
+                            ep_num = (
+                                ep.get('episodeSequenceNumber')
+                                or ep.get('sequenceNumber')
+                                or (i + 1)
+                            )
+                            title = (
+                                ep.get('text', {})
+                                .get('title', {})
+                                .get('full', {})
+                                .get('program', {})
+                                .get('default', {})
+                                .get('content', 'Sin Título')
+                            )
+                            
+                            episode_key = f"{s_num}-{ep_num}"
+                            stored_date = memory_map.get(episode_key)
+
+                            # --- LÓGICA DE FECHAS ---
+                            is_target = False
+                            if IS_FIX_WINDOW:
+                                if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
+                                    is_target = True
+                                t_clean = title.lower() if title else ""
+                                if any(ft in t_clean for ft in FIX_TITLES):
+                                    is_target = True
+
+                            if stored_date:
+                                raw_date = stored_date
+                            elif is_target:
+                                raw_date = FIX_TARGET_DATE
+                            elif IS_FIX_WINDOW:
+                                raw_date = None
+                            else:
+                                raw_date = today_str
+
+                            # Ajuste Horario (Solo si hay fecha)
+                            final_date = (
+                                get_local_release_date(raw_date, code) if raw_date else None
+                            )
+
+                            desc = (
+                                ep.get('text', {})
+                                .get('description', {})
+                                .get('medium', {})
+                                .get('program', {})
+                                .get('default', {})
+                                .get('content', '')
+                            )
+                            if not desc:
+                                desc = (
+                                    ep.get('text', {})
+                                    .get('description', {})
+                                    .get('brief', {})
+                                    .get('program', {})
+                                    .get('default', {})
+                                    .get('content', '')
+                                )
+
+                            meta = ep.get('mediaMetadata', {})
+                            subs_list = []
+                            for sub in meta.get('captionTracks', []):
+                                subs_list.append({
+                                    "l": clean_sub_name(
+                                        sub.get('language'),
+                                        sub.get('renditionName'),
+                                        code
+                                    ),
+                                    "t": sub.get('trackType', 'NORMAL')
+                                })
+                            
+                            # AUDIOS + REORDENAMIENTO
+                            audios_list = []
+                            for aud in meta.get('audioTracks', []):
+                                audios_list.append(
+                                    clean_sub_name(
+                                        aud.get('language'),
+                                        aud.get('renditionName'),
+                                        code
+                                    )
+                                )
+                            
+                            # Reordenar poniendo el idioma local primero
+                            audios_list = prioritize_audios(audios_list, lang)
+
+                            clean_eps.append({
+                                "n": ep_num,
+                                "t": title,
+                                "ds": desc,
+                                "dt": final_date,
+                                "a": audios_list,
+                                "s": subs_list
+                            })
+                            
+                            # Detección de Novedades (últimos 90 días, año 2025)
+                            if final_date and "2025" in final_date:
+                                try:
+                                    dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
+                                    offset = UTC_OFFSETS.get(code, 0)
+                                    local_now = datetime.utcnow() + timedelta(hours=offset)
                                     
-                                    episode_key = f"{s_num}-{ep_num}"
-                                    stored_date = memory_map.get(episode_key)
-
-                                    # --- LOGICA DE FECHAS (SIN API) ---
-                                    
-                                    # Caso 1: Ya lo conocemos -> Mantenemos fecha
-                                    if stored_date:
-                                        raw_date = stored_date
-                                        is_new_detection = False
-                                    
-                                    # Caso 2: Es nuevo (no estaba en BD)
-                                    else:
-                                        is_new_detection = True
-                                        if IS_FIX_WINDOW:
-                                            # Detectar si es target especial
-                                            is_target = False
-                                            if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7: is_target = True
-                                            t_clean = title.lower() if title else ""
-                                            if any(ft in t_clean for ft in FIX_TITLES): is_target = True
-                                            
-                                            if is_target:
-                                                raw_date = FIX_TARGET_DATE # 3 Dic
-                                            else:
-                                                raw_date = FIX_OLD_DATE    # 2021 (Viejo)
-                                        else:
-                                            # Despues del 8 de Dic: Fecha Escaneo
-                                            raw_date = today_str
-
-                                    # Ajuste final de Zona Horaria
-                                    final_date = get_local_release_date(raw_date, code)
-
-                                    desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
-                                    if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
-
-                                    meta = ep.get('mediaMetadata', {})
-                                    subs_list = []
-                                    for sub in meta.get('captionTracks', []):
-                                        subs_list.append({"l": clean_sub_name(sub.get('language'), sub.get('renditionName'), code), "t": sub.get('trackType', 'NORMAL')})
-                                    audios_list = []
-                                    for aud in meta.get('audioTracks', []):
-                                        audios_list.append(clean_sub_name(aud.get('language'), aud.get('renditionName'), code))
-
-                                    clean_eps.append({"n": ep_num, "t": title, "ds": desc, "dt": final_date, "a": audios_list, "s": subs_list})
-                                    
-                                    # Reportar si es NUEVO y la fecha no es antigua
-                                    if is_new_detection and final_date and "2025" in final_date:
-                                        region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                    if 0 <= (local_now - dt_obj_local).days <= 90:
+                                        region_data["news"].append({
+                                            "e": f"T{s_num} E{ep_num}",
+                                            "t": title,
+                                            "d": final_date
+                                        })
                                         new_eps_count += 1
-                                
-                                region_data["seasons"].append({"id": s_num, "eps": clean_eps})
-                        except: pass
+                                except:
+                                    pass
+                        
+                        region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                     
                     new_database["regions"][code] = region_data
                     
@@ -262,7 +371,7 @@ def get_data():
             else:
                 log(f"   ⚠️ {code}: Error API {r.status_code}")
                 
-        except Exception as e: 
+        except Exception as e:
             pass
         
         time.sleep(0.1)
@@ -272,6 +381,8 @@ def get_data():
 if __name__ == "__main__":
     try:
         data = get_data()
-        with open("database.json", "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False)
+        with open("database.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
         log("🎉 BASE DE DATOS ACTUALIZADA.")
-    except Exception as e: log(f"💀 ERROR: {e}")
+    except Exception as e:
+        log(f"💀 ERROR: {e}")
