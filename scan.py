@@ -38,7 +38,7 @@ REGIONS = [
     {"c":"GT", "l":"es-419"}, {"c":"BO", "l":"es-419"}, {"c":"CR", "l":"es-419"},
     {"c":"DO", "l":"es-419"}, {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"},
     {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
-    {"c":"FK", "l":"es-419"}, {"c":"GS", "l":"es-419"}, 
+    {"c":"FK", "l":"es-419"}, {"c":"GS", "l":"es-419"},
     {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"PR", "l":"es-419"}, 
     {"c":"PM", "l":"fr-FR"}, {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, 
     {"c":"BB", "l":"en-US"}, {"c":"TT", "l":"en-US"}, {"c":"AG", "l":"en-US"}, 
@@ -74,7 +74,7 @@ REGIONS = [
     {"c":"TR", "l":"tr-TR"}, {"c":"XK", "l":"sq-AL"}, 
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
 
-    # IMPORTANTE: usar zh-Hant para evitar fallback a inglés donde aplica
+    # Chino tradicional como idioma principal en TW/HK
     {"c":"TW", "l":"zh-Hant"},
     {"c":"HK", "l":"zh-Hant"},
 
@@ -90,20 +90,26 @@ REGIONS = [
     {"c":"NF", "l":"en-AU"}, {"c":"HM", "l":"en-AU"}
 ]
 
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'
+}
 
 LANG_CODES = {
     "es-419": "Spanish (LatAm)", "es-ES": "Spanish", "es": "Spanish",
-    "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
-    "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
-    "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
+    "en": "English", "en-US": "English", "en-GB": "English",
+    "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
+    "fr-FR": "French", "fr-CA": "French (Canadian)", "fr": "French",
+    "de": "German", "it": "Italian",
+    "ja": "Japanese", "ko": "Korean",
+    "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
     "zh-HK": "Cantonese", "zh-TW": "Mandarin (Taiwan)", "cmn-TW": "Mandarin (Taiwan)",
-    "ru": "Russian", "pl": "Polish", "tr": "Turkish", "nl": "Dutch", "da": "Danish", 
-    "sv": "Swedish", "no": "Norwegian", "fi": "Finnish", "el": "Greek", "he": "Hebrew", 
-    "ar": "Arabic", "th": "Thai", "id": "Indonesian", "vi": "Vietnamese", "ms": "Malay", 
-    "cs": "Czech", "hu": "Hungarian", "ro": "Romanian", "sq": "Albanian", "mk": "Macedonian", 
-    "sr": "Serbian", "hr": "Croatian", "sl": "Slovenian", "bg": "Bulgarian", 
-    "et": "Estonian", "lv": "Latvian", "lt": "Lithuanian"
+    "ru": "Russian", "pl": "Polish", "tr": "Turkish", "nl": "Dutch",
+    "da": "Danish", "sv": "Swedish", "no": "Norwegian", "fi": "Finnish",
+    "el": "Greek", "he": "Hebrew", "ar": "Arabic", "th": "Thai",
+    "id": "Indonesian", "vi": "Vietnamese", "ms": "Malay",
+    "cs": "Czech", "hu": "Hungarian", "ro": "Romanian", "sq": "Albanian",
+    "mk": "Macedonian", "sr": "Serbian", "hr": "Croatian", "sl": "Slovenian",
+    "bg": "Bulgarian", "et": "Estonian", "lv": "Latvian", "lt": "Lithuanian"
 }
 
 FIX_TARGET_DATE = "2025-12-03" 
@@ -130,13 +136,38 @@ def clean_sub_name(code, raw_name, region_code=None):
 
 def prioritize_audios(audios_list, region_lang_code):
     """
-    Mueve el idioma principal de la región al inicio de la lista.
+    Mueve al inicio el audio principal de la región, aunque el API use
+    variantes tipo 'fr', 'fr-FR', 'French (France)', etc.
     """
-    target_name = LANG_CODES.get(region_lang_code, region_lang_code)
-    
-    if target_name in audios_list:
-        audios_list.remove(target_name)
-        audios_list.insert(0, target_name)
+    if not audios_list:
+        return audios_list
+
+    base = region_lang_code.split('-')[0] if region_lang_code else region_lang_code
+
+    target_human = (
+        LANG_CODES.get(region_lang_code) or
+        LANG_CODES.get(base) or
+        region_lang_code
+    )
+
+    candidates = set()
+    for v in (target_human, base, region_lang_code):
+        if not v:
+            continue
+        v_clean = v.split('(')[0].strip().lower()
+        candidates.add(v_clean)
+
+    def score(name):
+        if not name:
+            return 2
+        n = name.lower()
+        n_clean = n.split('(')[0].strip()
+        for c in candidates:
+            if n_clean == c or n_clean.startswith(c):
+                return 0  # idioma local
+        return 1          # otros (inglés, etc.)
+
+    audios_list.sort(key=score)
     return audios_list
 
 def load_previous_db():
@@ -192,9 +223,11 @@ def get_data():
                     memory_map[f"{s['id']}-{ep['n']}"] = ep.get('dt', '')
         
         try:
+            api_region_code = code  # aquí podrías mapear si alguna vez necesitas alias
+
             url_bundle = (
-                f"https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/"
-                f"version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/"
+                "https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/"
+                f"version/5.1/region/{api_region_code}/audience/k-false,l-true/maturity/1899/"
                 f"language/{lang}/encodedSeriesId/{SERIES_ID}"
             )
             r = requests.get(url_bundle, headers=HEADERS, timeout=4)
@@ -209,15 +242,15 @@ def get_data():
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
 
-                        # --- NUEVO: paginación segura de episodios ---
+                        # --- Paginación de episodios (idioma principal de la región) ---
                         page = 1
                         page_size = 50
                         eps_raw = []
 
                         while True:
                             url_eps = (
-                                f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/"
-                                f"version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/"
+                                "https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/"
+                                f"version/5.1/region/{api_region_code}/audience/k-false,l-true/maturity/1899/"
                                 f"language/{lang}/seasonId/{s_id}/pageSize/{page_size}/page/{page}"
                             )
                             try:
@@ -236,7 +269,6 @@ def get_data():
 
                                 eps_raw.extend(batch)
 
-                                # Si viene menos que page_size, ya es la última página
                                 if len(batch) < page_size:
                                     break
 
@@ -244,7 +276,49 @@ def get_data():
                                 time.sleep(0.05)
                             except:
                                 break
-                        # --- FIN NUEVO BLOQUE DE PAGINACIÓN ---
+
+                        # --- Fallback a inglés para TW/HK para rellenar huecos ---
+                        if code in ("TW", "HK"):
+                            page_en = 1
+                            eps_en = []
+                            while True:
+                                url_eps_en = (
+                                    "https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/"
+                                    f"version/5.1/region/{api_region_code}/audience/k-false,l-true/maturity/1899/"
+                                    f"language/en/seasonId/{s_id}/pageSize/{page_size}/page/{page_en}"
+                                )
+                                try:
+                                    r_eps_en = requests.get(url_eps_en, headers=HEADERS, timeout=4)
+                                    if r_eps_en.status_code != 200:
+                                        break
+                                    batch_en = (
+                                        r_eps_en.json()
+                                        .get('data', {})
+                                        .get('DmcEpisodes', {})
+                                        .get('videos', [])
+                                    )
+                                    if not batch_en:
+                                        break
+                                    eps_en.extend(batch_en)
+                                    if len(batch_en) < page_size:
+                                        break
+                                    page_en += 1
+                                    time.sleep(0.05)
+                                except:
+                                    break
+
+                            by_num = {}
+                            for ep in eps_raw:
+                                num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber')
+                                if num is not None:
+                                    by_num[num] = ep  # prioriza zh-Hant
+
+                            for ep in eps_en:
+                                num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber')
+                                if num is not None and num not in by_num:
+                                    by_num[num] = ep  # rellena huecos con inglés
+
+                            eps_raw = [by_num[n] for n in sorted(by_num.keys())]
 
                         total_eps_count += len(eps_raw)
                         clean_eps = []
@@ -285,7 +359,6 @@ def get_data():
                             else:
                                 raw_date = today_str
 
-                            # Ajuste Horario (Solo si hay fecha)
                             final_date = (
                                 get_local_release_date(raw_date, code) if raw_date else None
                             )
@@ -320,7 +393,6 @@ def get_data():
                                     "t": sub.get('trackType', 'NORMAL')
                                 })
                             
-                            # AUDIOS + REORDENAMIENTO
                             audios_list = []
                             for aud in meta.get('audioTracks', []):
                                 audios_list.append(
@@ -331,7 +403,6 @@ def get_data():
                                     )
                                 )
                             
-                            # Reordenar poniendo el idioma local primero
                             audios_list = prioritize_audios(audios_list, lang)
 
                             clean_eps.append({
@@ -343,7 +414,6 @@ def get_data():
                                 "s": subs_list
                             })
                             
-                            # Detección de Novedades (últimos 90 días, año 2025)
                             if final_date and "2025" in final_date:
                                 try:
                                     dt_obj_local = datetime.strptime(final_date, "%Y-%m-%d")
