@@ -8,12 +8,9 @@ from datetime import datetime, timedelta
 # CONFIGURACIÓN
 SERIES_ID = "1CjTiHEJbLRC"
 
-# --- LISTA DE REGIONES DEFINITIVA ---
-# Basada en el archivo de configuración 'countriesConfig' de Disney+
-# Incluye: Territorios de Ultramar y Microestados.
-
+# --- LISTA DE REGIONES CORREGIDA ---
 REGIONS = [
-    # --- LATINOAMÉRICA (Idioma Base: es-419) ---
+    # --- LATINOAMÉRICA Y TERRITORIOS AUSTRALES (Idioma: es-419) ---
     {"c":"AR", "l":"es-419"}, {"c":"MX", "l":"es-419"}, {"c":"BR", "l":"pt-BR"},
     {"c":"CL", "l":"es-419"}, {"c":"CO", "l":"es-419"}, {"c":"PE", "l":"es-419"},
     {"c":"UY", "l":"es-419"}, {"c":"VE", "l":"es-419"}, {"c":"EC", "l":"es-419"},
@@ -21,13 +18,11 @@ REGIONS = [
     {"c":"DO", "l":"es-419"}, {"c":"SV", "l":"es-419"}, {"c":"HN", "l":"es-419"},
     {"c":"NI", "l":"es-419"}, {"c":"PA", "l":"es-419"}, {"c":"PY", "l":"es-419"},
     {"c":"FK", "l":"es-419"}, # Islas Malvinas
-
-    # --- TERRITORIOS AUSTRALES (Forzados a LATAM) ---
-    {"c":"GS", "l":"es-419"}, # Islas Georgias del Sur y Sandwich del Sur
+    {"c":"GS", "l":"es-419"}, # Islas Georgias del Sur (Forzado a Latino)
 
     # --- NORTEAMÉRICA Y CARIBE ---
     {"c":"US", "l":"en-US"}, {"c":"CA", "l":"en-CA"}, {"c":"PR", "l":"es-419"}, 
-    {"c":"PM", "l":"fr-FR"}, # San Pedro y Miquelón
+    {"c":"PM", "l":"fr-FR"}, 
     {"c":"JM", "l":"en-US"}, {"c":"BS", "l":"en-US"}, {"c":"BB", "l":"en-US"}, 
     {"c":"TT", "l":"en-US"}, {"c":"AG", "l":"en-US"}, {"c":"DM", "l":"en-US"}, 
     {"c":"GD", "l":"en-US"}, {"c":"KN", "l":"en-US"}, {"c":"LC", "l":"en-US"}, 
@@ -35,31 +30,34 @@ REGIONS = [
     
     # Caribe Neerlandés y Territorios
     {"c":"AW", "l":"nl-NL"}, {"c":"CW", "l":"nl-NL"}, {"c":"SX", "l":"nl-NL"},
-    {"c":"BQ", "l":"nl-NL"}, # Bonaire, San Eustaquio y Saba
+    {"c":"BQ", "l":"nl-NL"}, 
     {"c":"GP", "l":"fr-FR"}, {"c":"MQ", "l":"fr-FR"}, {"c":"BL", "l":"fr-FR"},
     {"c":"MF", "l":"fr-FR"}, {"c":"KY", "l":"en-US"}, {"c":"BM", "l":"en-US"},
     {"c":"VI", "l":"en-US"}, {"c":"VG", "l":"en-US"}, {"c":"TC", "l":"en-US"},
     {"c":"AI", "l":"en-US"}, {"c":"MS", "l":"en-US"}, {"c":"GY", "l":"en-US"},
     {"c":"SR", "l":"en-US"}, {"c":"GF", "l":"fr-FR"},
-    {"c":"UM", "l":"en-US"}, # Islas menores alejadas de EE. UU.
+    {"c":"UM", "l":"en-US"}, 
 
-    # --- EUROPA (Oeste, Este, Balcanes y Nórdicos) ---
-    {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
-    {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
-    {"c":"NL", "l":"nl-NL"}, {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"},
-    {"c":"AT", "l":"de-AT"}, {"c":"IE", "l":"en-GB"}, {"c":"SE", "l":"sv-SE"},
-    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FI"}, 
-    {"c":"IS", "l":"en-GB"}, {"c":"LU", "l":"fr-FR"}, {"c":"MC", "l":"fr-FR"},
-    {"c":"LI", "l":"de-DE"}, {"c":"MT", "l":"en-GB"}, {"c":"AD", "l":"es-ES"},
-    {"c":"SM", "l":"it-IT"}, {"c":"VA", "l":"it-IT"}, {"c":"GI", "l":"es-ES"},
+    # --- EUROPA ---
+    # España y territorios asociados (Forzados a Castellano puro)
+    {"c":"ES", "l":"es-ES"}, 
+    {"c":"AD", "l":"es-ES"}, # Andorra
+    {"c":"GI", "l":"es-ES"}, # Gibraltar
+
+    # Resto de Europa
+    {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"}, {"c":"IT", "l":"it-IT"}, 
+    {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"}, {"c":"NL", "l":"nl-NL"}, 
+    {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"}, {"c":"AT", "l":"de-AT"}, 
+    {"c":"IE", "l":"en-GB"}, {"c":"SE", "l":"sv-SE"}, {"c":"NO", "l":"no-NO"}, 
+    {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FI"}, {"c":"IS", "l":"en-GB"}, 
+    {"c":"LU", "l":"fr-FR"}, {"c":"MC", "l":"fr-FR"}, {"c":"LI", "l":"de-DE"}, 
+    {"c":"MT", "l":"en-GB"}, {"c":"SM", "l":"it-IT"}, {"c":"VA", "l":"it-IT"}, 
     {"c":"IM", "l":"en-GB"}, {"c":"GG", "l":"en-GB"}, {"c":"JE", "l":"en-GB"},
     
-    # Regiones Nórdicas Especiales
-    {"c":"AX", "l":"sv-SE"}, # Åland
-    {"c":"FO", "l":"da-DK"}, # Islas Feroe
-    {"c":"GL", "l":"da-DK"}, # Groenlandia
-    {"c":"SJ", "l":"no-NO"}, # Svalbard y Jan Mayen
-    {"c":"BV", "l":"no-NO"}, # Isla Bouvet
+    # Regiones Nórdicas y Especiales
+    {"c":"AX", "l":"sv-SE"}, # Åland (Agregado con idioma Sueco)
+    {"c":"FO", "l":"da-DK"}, {"c":"GL", "l":"da-DK"}, {"c":"SJ", "l":"no-NO"}, 
+    {"c":"BV", "l":"no-NO"}, 
 
     # Europa del Este y Balcanes
     {"c":"PL", "l":"pl-PL"}, {"c":"CZ", "l":"cs-CZ"}, {"c":"SK", "l":"sk-SK"}, 
@@ -80,17 +78,9 @@ REGIONS = [
     {"c":"NC", "l":"fr-FR"}, {"c":"PF", "l":"fr-FR"}, {"c":"WF", "l":"fr-FR"}, 
     {"c":"GU", "l":"en-US"}, {"c":"MP", "l":"en-US"}, {"c":"AS", "l":"en-US"}, 
     {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"}, {"c":"MU", "l":"en-GB"},
-    
-    # Asociados a Nueva Zelanda
     {"c":"CK", "l":"en-NZ"}, {"c":"NU", "l":"en-NZ"}, {"c":"TK", "l":"en-NZ"},
-
-    # Territorios Británicos de Ultramar
     {"c":"PN", "l":"en-GB"}, {"c":"SH", "l":"en-GB"}, {"c":"IO", "l":"en-GB"}, 
-    
-    # Territorios Franceses Australes
     {"c":"TF", "l":"fr-FR"}, 
-
-    # Territorios Externos de Australia
     {"c":"CC", "l":"en-AU"}, {"c":"CX", "l":"en-AU"}, 
     {"c":"NF", "l":"en-AU"}, {"c":"HM", "l":"en-AU"}
 ]
@@ -98,7 +88,9 @@ REGIONS = [
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
 
 LANG_CODES = {
-    "es-419": "Spanish (LatAm)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
+    "es-419": "Spanish (LatAm)", 
+    "es-ES": "Spanish", # Cambiado para que ES/AD/GI muestren solo "Spanish"
+    "es": "Spanish",
     "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
     "fr-FR": "French", "fr-CA": "French (Canadian)", "de": "German", "it": "Italian",
     "ja": "Japanese", "ko": "Korean", "zh-Hant": "Chinese (Traditional)", "zh-Hans": "Chinese (Simplified)",
@@ -144,10 +136,13 @@ def get_data():
     OLD_DB = load_previous_db()
     new_database = { "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") }, "regions": {} }
     
-    log(f"🌍 INICIANDO ESCANEO GLOBAL (Total: {len(REGIONS)} regiones)...")
-    today_obj = datetime.utcnow()
-    today_str = today_obj.strftime("%Y-%m-%d")
-    IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
+    # FECHA BASE: HORA DEL PACÍFICO (UTC-8)
+    # Se usa para calcular el día actual de referencia.
+    pacific_time_now = datetime.utcnow() - timedelta(hours=8)
+    today_str = pacific_time_now.strftime("%Y-%m-%d")
+    IS_FIX_WINDOW = (pacific_time_now <= FIX_EXPIRY_DATE)
+    
+    log(f"🌍 INICIANDO ESCANEO (Ref. Time: Pacific {today_str})...")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -172,7 +167,8 @@ def get_data():
                     for s in seasons:
                         s_id = s['seasonId']
                         s_num = s.get('seasonSequenceNumber', 0)
-                        url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/60/page/1"
+                        # AUMENTADO pageSize a 150 para evitar saltar episodios en regiones como HK
+                        url_eps = f"https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{code}/audience/k-false,l-true/maturity/1899/language/{lang}/seasonId/{s_id}/pageSize/150/page/1"
                         try:
                             r_eps = requests.get(url_eps, headers=HEADERS, timeout=4)
                             if r_eps.status_code == 200:
@@ -207,7 +203,8 @@ def get_data():
                                     if final_date:
                                         try:
                                             dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
-                                            if 0 <= (today_obj - dt_obj).days <= 90: 
+                                            # Se calcula la novedad basándose en la hora del Pacífico
+                                            if 0 <= (pacific_time_now - dt_obj).days <= 90: 
                                                 region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
                                                 new_eps_count += 1
                                         except: pass
