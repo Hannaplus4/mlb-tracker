@@ -74,12 +74,21 @@ LANG_CODES = {
 FIX_TARGET_DATE = "2025-12-03"
 
 FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
+
+# Lista expandida con los títulos en inglés y español
 FIX_TITLES = [
+    # Inglés
     "mister agreste", 
     "sleeping syren", 
     "the dark castle", 
     "wreckless driver", 
-    "yaksi gozen"
+    "yaksi gozen",
+    # Español / Variantes (Puerto Rico, Gibraltar, etc.)
+    "senor agreste",
+    "señor agreste",
+    "sirena durmiente",
+    "el castillo oscuro",
+    "conductor temerario"
 ]
 
 # FECHA LÍMITE: Domingo 7 de Diciembre de 2025
@@ -162,12 +171,14 @@ def get_data():
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     
                                     if IS_FIX_WINDOW:
-                                        # LÓGICA DE FILTRADO ESTRICTO
+                                        # LÓGICA DE FILTRADO
                                         is_target = False
                                         
+                                        # Regla DACH
                                         if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
                                             is_target = True
                                         
+                                        # Regla Títulos (Ahora incluye español)
                                         t_clean = title.lower() if title else ""
                                         if any(ft in t_clean for ft in FIX_TITLES):
                                             is_target = True
@@ -175,11 +186,11 @@ def get_data():
                                         if is_target:
                                             final_date = FIX_TARGET_DATE
                                         else:
-                                            # SI NO ES OBJETIVO: Fecha vacía para que no se vea nada
+                                            # SI NO ES OBJETIVO: Fecha vacía (estética limpia)
                                             final_date = ""
                                     
                                     else:
-                                        # LÓGICA NORMAL (Para la semana que viene)
+                                        # LÓGICA NORMAL (Futuro)
                                         unique_key = f"{s_num}-{ep_num}"
                                         stored_date = memory_map.get(unique_key)
                                         if stored_date:
@@ -216,7 +227,7 @@ def get_data():
                                     clean_eps.append(ep_obj)
                                     
                                     # --- NOVEDADES ---
-                                    # Solo calculamos si hay fecha. Si está vacía, se ignora.
+                                    # Solo si hay fecha
                                     if final_date:
                                         try:
                                             dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
