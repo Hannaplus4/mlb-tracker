@@ -71,9 +71,9 @@ LANG_CODES = {
     "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
 }
 
-# --- CONFIGURACIÓN DE CORRECCIÓN DE FECHAS (FIX DEC 3) ---
+# --- CONFIGURACIÓN DE CORRECCIÓN (FORZAR) ---
 FIX_TARGET_DATE = "2025-12-03"
-FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] # Alemania, Suiza, Liechtenstein, Austria
+FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
 FIX_TITLES = [
     "mister agreste", 
     "sleeping syren", 
@@ -82,8 +82,7 @@ FIX_TITLES = [
     "yaksi gozen"
 ]
 
-# FECHA LÍMITE PARA EL PARCHE: Domingo 7 de Diciembre de 2025 (Fin de esta semana)
-# Pasada esta fecha, la corrección se desactiva automáticamente.
+# FECHA LÍMITE: Domingo 7 de Diciembre de 2025
 FIX_EXPIRY_DATE = datetime(2025, 12, 7, 23, 59, 59)
 
 def log(msg):
@@ -112,19 +111,16 @@ def get_data():
         "regions": {}
     }
 
-    log(f"🌍 INICIANDO ESCANEO INTELIGENTE (MEMORIA)...")
+    log(f"🌍 INICIANDO ESCANEO (MODO REPARACIÓN)...")
 
-    # Fecha actual del sistema
     today_obj = datetime.utcnow()
     today_str = today_obj.strftime("%Y-%m-%d")
 
-    # Lógica de seguridad: La corrección solo aplica si NO hemos pasado del Domingo 7
+    # MODO REPARACIÓN ACTIVO
     IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
 
     if IS_FIX_WINDOW:
-        log("⚠️ MODO CORRECCIÓN ACTIVO: Forzando fecha 3 Dic para episodios específicos hasta el domingo.")
-    else:
-        log("ℹ️ MODO NORMAL: La ventana de corrección ha expirado.")
+        log("⚠️ MODO FORZAR CORRECCIÓN: Sobrescribiendo fechas incorrectas guardadas previamente.")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -132,7 +128,7 @@ def get_data():
         
         if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
 
-        # CARGAR MEMORIA DE FECHAS
+        # CARGAR MEMORIA
         memory_map = {}
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
@@ -167,30 +163,29 @@ def get_data():
                                     ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     
-                                    # --- LÓGICA DE PERSISTENCIA Y CORRECCIÓN ---
+                                    # --- LÓGICA DE MEMORIA ESTÁNDAR ---
                                     unique_key = f"{s_num}-{ep_num}"
                                     stored_date = memory_map.get(unique_key)
                                     
                                     if stored_date:
-                                        # Si ya existe en la DB vieja, mantenemos esa fecha
                                         final_date = stored_date
                                     else:
-                                        # ES NUEVO: Inicialmente le damos la fecha de HOY
-                                        final_date = today_str
+                                        final_date = today_str # Si es totalmente nuevo, hoy.
                                         
-                                        # --- APLICAR PARCHE DEL 3 DE DICIEMBRE ---
-                                        # Solo si estamos en la ventana de tiempo (Hasta el Domingo)
-                                        if IS_FIX_WINDOW:
-                                            # Regla 1: Regiones DACH (Alemania, Suiza, etc) -> Temp 6, Eps 1 al 7
-                                            if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
-                                                final_date = FIX_TARGET_DATE
-                                            
-                                            # Regla 2: Títulos específicos (Global)
-                                            t_clean = title.lower() if title else ""
-                                            if any(ft in t_clean for ft in FIX_TITLES):
-                                                final_date = FIX_TARGET_DATE
+                                    # --- PARCHE DE SOBRESCRITURA (FIX) ---
+                                    # Aquí está el cambio: Se ejecuta SIEMPRE si estamos en la ventana,
+                                    # incluso si stored_date ya existe (para corregir errores previos).
+                                    if IS_FIX_WINDOW:
+                                        # Regla 1: Regiones DACH -> Temp 6, Eps 1 al 7
+                                        if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
+                                            final_date = FIX_TARGET_DATE
+                                        
+                                        # Regla 2: Títulos específicos
+                                        t_clean = title.lower() if title else ""
+                                        if any(ft in t_clean for ft in FIX_TITLES):
+                                            final_date = FIX_TARGET_DATE
 
-                                    # Extracción del resto de datos
+                                    # Extracción del resto
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
                                     if not desc: desc = ep.get('text', {}).get('description', {}).get('brief', {}).get('program', {}).get('default', {}).get('content', '')
 
@@ -222,7 +217,6 @@ def get_data():
                                     try:
                                         dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
                                         days_diff = (today_obj - dt_obj).days
-                                        # Consideramos novedad si tiene menos de 90 días
                                         if 0 <= days_diff <= 90:
                                             region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
                                     except: pass
@@ -245,6 +239,6 @@ if __name__ == "__main__":
         data = get_data()
         with open("database.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
-        log("🎉 BASE DE DATOS ACTUALIZADA.")
+        log("🎉 BASE DE DATOS REPARADA Y ACTUALIZADA.")
     except Exception as e:
-        log(f"💀 ERROR: {e}") 
+        log(f"💀 ERROR: {e}")
