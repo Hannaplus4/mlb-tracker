@@ -4,67 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Miraculous Disney+ Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- TEMA MODERNO (Disney+ Dark Theme inspired) --- */
+        /* --- TEMA DISNEY+ DARK --- */
         :root {
-            --bg-body: #0e0e10;
-            --bg-header: rgba(15, 15, 20, 0.95);
-            --bg-card: #1a1c23;
-            --bg-card-hover: #23252e;
-            --accent-primary: #00d2ff; /* Azul Disney+ */
-            --accent-secondary: #ed1c24; /* Rojo Miraculous */
-            --accent-new: #00fa9a; /* Verde Nuevos */
+            --bg-body: #1a1d29;
+            --bg-header: #0f1014;
+            --bg-card: #2c3040; /* Color base tarjeta */
+            --bg-card-hover: #373b4d;
+            --accent-brand: #0072d2; /* Azul Disney */
+            --accent-new: #4cd137; /* Verde Nuevo */
             --text-main: #f9f9f9;
-            --text-muted: #a0a0a0;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --radius: 12px;
+            --text-muted: #cacaca;
+            --tag-bg: rgba(255, 255, 255, 0.1);
+            --radius: 8px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-body);
-            background-image: radial-gradient(circle at top center, #1a2236 0%, #0e0e10 60%);
+            background-image: linear-gradient(to bottom, #0f1014 0%, #1a1d29 100%);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             min-height: 100vh;
         }
 
-        /* HEADER */
+        /* HEADER & LOGO */
         header {
             text-align: center;
-            padding: 25px 20px;
-            background: var(--bg-header);
-            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
         }
 
-        h1 { margin: 0; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px; text-transform: uppercase; background: linear-gradient(90deg, #fff, #a0a0a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .last-update { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; font-weight: 500;}
+        .logo-container {
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .logo-main {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #fff 0%, #ccc 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: block;
+            line-height: 1;
+        }
+        
+        .logo-sub {
+            font-size: 0.8rem;
+            color: var(--accent-brand);
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .last-update { font-size: 0.7rem; color: #666; margin-top: 10px; font-weight: 500;}
 
         /* --- CONTROLES --- */
         .controls-wrapper {
-            max-width: 900px;
-            margin: 25px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: flex;
             gap: 15px;
+            flex-direction: row;
         }
 
         /* Dropdown Personalizado */
-        .custom-select-container { position: relative; width: 100%; }
+        .custom-select-container { position: relative; flex: 2; }
         
         .select-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: #3a3d4a;
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 14px 18px;
+            padding: 12px 15px;
             border-radius: var(--radius);
             cursor: pointer;
             display: flex;
@@ -73,120 +95,75 @@
             transition: 0.2s;
             font-weight: 500;
         }
-        .select-btn:hover { border-color: var(--accent-primary); background: var(--bg-card-hover); }
-        .select-btn img { margin-right: 10px; width: 24px; border-radius: 3px; }
+        .select-btn:hover { background: #4a4d5a; border-color: white; }
+        .select-btn img { margin-right: 12px; width: 28px; height: auto; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         
-        /* Lista de Opciones */
         .options-list {
             position: absolute;
-            top: 115%;
-            left: 0;
-            right: 0;
-            background: #15171e;
-            border: 1px solid var(--border-color);
+            top: 110%; left: 0; right: 0;
+            background: #1e212b;
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: var(--radius);
-            max-height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             display: none;
             z-index: 200;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
         .custom-select-container.active .options-list { display: block; }
 
         .option {
-            padding: 12px 18px;
+            padding: 12px 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            transition: 0.1s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
         }
-        .option:hover { background: rgba(0, 210, 255, 0.1); color: white; }
-        .option img { width: 24px; height: 16px; object-fit: cover; border-radius: 2px; margin-right: 12px; }
-        
-        /* Ajuste para banderas cuadradas/raras */
-        .option img.custom-flag, .select-btn img.custom-flag { width: 22px; height: auto; object-fit: contain; }
+        .option:hover { background: var(--accent-brand); }
+        .option img { width: 28px; margin-right: 12px; border-radius: 3px; }
 
         /* Selector Temporada */
         .std-select {
-            width: 100%;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            flex: 1;
+            background: #3a3d4a;
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
+            padding: 12px;
             border-radius: var(--radius);
             font-size: 1rem;
             cursor: pointer;
-            appearance: none;
-            font-family: inherit;
         }
-        .std-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* --- NOVEDADES (Estilo Tarjetas) --- */
-        #news-banner {
-            max-width: 900px;
-            margin: 0 auto 30px;
-            padding: 0 20px;
-            display: none;
-        }
-        .news-header {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent-new);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .news-card {
-            background: rgba(0, 250, 154, 0.05); /* Verde muy suave */
-            border: 1px solid rgba(0, 250, 154, 0.2);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: transform 0.2s;
-        }
-        .news-card:hover { transform: translateY(-2px); background: rgba(0, 250, 154, 0.1); }
-        .news-card strong { display: block; color: var(--accent-new); font-size: 0.8rem; margin-bottom: 4px; }
-
-        /* --- EPISODIOS --- */
-        #main-container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        /* --- CONTENEDOR EPISODIOS --- */
+        #main-container { max-width: 800px; margin: 0 auto; padding: 0 15px 60px; }
 
         .season-divider {
-            margin: 50px 0 20px;
-            font-size: 1.4rem;
+            margin: 40px 0 20px;
+            font-size: 1.2rem;
             font-weight: 800;
-            color: var(--accent-primary);
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
+            color: var(--text-main);
+            border-left: 5px solid var(--accent-brand);
+            padding-left: 15px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .ep-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
             border-radius: var(--radius);
             padding: 20px;
             margin-bottom: 15px;
             position: relative;
             overflow: hidden;
-            transition: 0.2s;
+            transition: transform 0.2s;
+            border: 1px solid transparent;
         }
-        .ep-card:hover { background: var(--bg-card-hover); border-color: rgba(255,255,255,0.2); }
+        .ep-card:hover { transform: scale(1.01); background: var(--bg-card-hover); z-index: 10; border-color: rgba(255,255,255,0.1); }
 
-        /* ESTILO NUEVO */
+        /* Estilo NUEVO */
         .ep-card.is-new {
-            border-color: var(--accent-new);
-            box-shadow: 0 0 15px rgba(0, 250, 154, 0.1);
-        }
-        .ep-card.is-new::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent-new);
+            background: linear-gradient(90deg, rgba(76, 209, 55, 0.1), var(--bg-card) 60%);
+            border-left: 4px solid var(--accent-new);
         }
 
         .ep-header {
@@ -194,97 +171,131 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 15px;
+            margin-bottom: 10px;
         }
 
-        .ep-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: #fff; }
-        .ep-num { color: var(--accent-primary); font-weight: 800; margin-right: 8px; font-size: 0.9em; }
+        .ep-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: #fff; }
+        .ep-num { color: #888; font-weight: 500; font-size: 0.9em; display: block; margin-bottom: 4px; }
         
         .ep-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
+            text-align: right;
+            min-width: 120px;
         }
 
-        .date-display { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; font-family: monospace; }
+        .date-display { font-size: 0.8rem; color: #bbb; font-weight: 500; }
         
         .new-badge {
             background: var(--accent-new);
             color: #000;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 3px 8px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 4px 8px;
             border-radius: 4px;
             text-transform: uppercase;
-            animation: pulse 2s infinite;
+            display: inline-block;
+            margin-bottom: 5px;
         }
 
+        /* --- SINOPSIS (Desplegable) --- */
+        .synopsis-container { margin-bottom: 15px; }
+        
         .ep-desc {
-            margin-top: 10px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #ccc;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            line-height: 1.6;
         }
 
-        /* --- AUDIOS Y SUBS --- */
-        .tags-row {
-            margin-top: 15px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.05);
+        /* En móvil usamos <details> */
+        details.mobile-synopsis summary {
+            list-style: none;
+            cursor: pointer;
+            color: var(--accent-brand);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 0;
+            user-select: none;
+        }
+        details.mobile-synopsis summary::-webkit-details-marker { display: none; }
+        details.mobile-synopsis summary::after { content: " ▼"; font-size: 0.8em; }
+        details.mobile-synopsis[open] summary::after { content: " ▲"; }
+        
+        /* --- AUDIOS (Mejorado) --- */
+        .tags-container {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
-            font-size: 0.8rem;
+            gap: 8px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            align-items: center;
         }
 
-        .tag-pill {
-            background: rgba(255,255,255,0.08);
-            padding: 4px 10px;
-            border-radius: 6px;
+        .tag {
+            background: var(--tag-bg);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
             color: #ddd;
+            white-space: nowrap;
         }
-        .tag-icon { opacity: 0.6; margin-right: 6px; }
 
-        .more-audios-btn {
-            color: var(--accent-primary);
-            cursor: pointer;
-            margin-left: 5px;
+        /* Audio Principal Destacado */
+        .tag.primary-audio {
+            background: rgba(0, 114, 210, 0.3); /* Azul transparente */
+            border: 1px solid var(--accent-brand);
+            color: white;
             font-weight: 600;
-            text-decoration: none;
-            border-bottom: 1px dotted var(--accent-primary);
         }
-        .hidden-content { display: none; }
-        .hidden-content.show { display: inline; animation: fadeIn 0.3s; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tag-icon { opacity: 0.7; margin-right: 6px; }
 
-        /* --- MÓVIL --- */
+        .more-btn {
+            color: #bbb;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            padding: 5px;
+        }
+        .more-btn:hover { color: white; }
+
+        .hidden-tags { display: none; }
+        .hidden-tags.show { display: contents; } /* Display contents para que se integren al flex */
+
+
+        /* --- RESPONSIVE (MÓVIL) --- */
+        @media (min-width: 769px) {
+            /* PC: Sinopsis siempre visible, <details> abierto y sin click */
+            details.mobile-synopsis { pointer-events: none; }
+            details.mobile-synopsis summary { display: none; } /* Ocultar botón */
+            details.mobile-synopsis[open] .ep-desc { display: block; }
+        }
+
         @media (max-width: 768px) {
-            .controls-wrapper { grid-template-columns: 1fr; }
+            /* MÓVIL */
+            .controls-wrapper { flex-direction: column; }
             
             .ep-header { flex-direction: column; } /* Título arriba */
             
             .ep-meta { 
                 margin-top: 5px; 
                 width: 100%;
-                justify-content: flex-start; /* Fecha a la izquierda debajo del título */
+                text-align: left; /* Fecha a la izquierda */
+                display: flex;
+                align-items: center;
+                gap: 10px;
             }
-            .date-display { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Miraculous Disney+ Tracker</h1>
-    <div class="last-update" id="ui-loading">Connecting...</div>
+    <div class="logo-container">
+        <span class="logo-main">MIRACULOUS</span>
+        <span class="logo-sub">DISNEY+ TRACKER</span>
+    </div>
+    <div class="last-update" id="ui-loading">Conectando...</div>
 </header>
 
 <div class="controls-wrapper">
@@ -295,18 +306,12 @@
             </span>
             <span style="font-size:0.8rem">▼</span>
         </div>
-        <div class="options-list" id="options-list">
-            </div>
+        <div class="options-list" id="options-list"></div>
     </div>
 
     <select id="season-select" class="std-select" onchange="changeSeason()" disabled>
-        <option value="all">All Seasons</option>
+        <option value="all">Todas las Temporadas</option>
     </select>
-</div>
-
-<div id="news-banner">
-    <div class="news-header">✨ <span id="news-title">New Episodes</span></div>
-    <div class="news-grid" id="news-grid"></div>
 </div>
 
 <div id="main-container"></div>
@@ -315,109 +320,63 @@
     // === CONFIGURACIÓN ===
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // --- MAPA DE PRIORIDAD DE AUDIO (SEGÚN TU LISTA EXACTA) ---
-    // Clave: Código de País (ISO) -> Valor: String EXACTO del audio a priorizar
+    // PRIORIDAD DE AUDIO
     const AUDIO_PRIORITY = {
-        // Latam
         "AR": "Español (Latinoamericano)", "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
         "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", "VE": "Español (Latinoamericano)",
-        // Europa
-        "ES": "Español", // O "Español (Castilian)" si el script lo guarda así
-        "FR": "Français", "BE": "Français", "CH": "Français", // Suiza a veces es aleman/frances
+        "ES": "Español", // A veces llega como Español solo
+        "FR": "Français", "BE": "Français", "CH": "Français", 
         "DE": "Deutsch", "AT": "Deutsch",
-        "IT": "Italiano",
-        "PT": "Português", "BR": "Português",
-        "RO": "Română",
-        "SE": "Svenska",
-        "NL": "Nederlands",
-        "NO": "Norsk",
-        "PL": "Polski",
-        "CZ": "Čeština",
-        "TR": "Türkçe",
-        "HU": "Magyar",
-        "GR": "Greek",
-        "DK": "Dansk",
-        "FI": "Suomi",
-        // Asia / Global
-        "JP": "Japanese",
-        "TW": "Taiwanese Mandarin",
-        "HK": "Cantonese",
+        "IT": "Italiano", "PT": "Português", "BR": "Português",
         "US": "English", "GB": "English", "CA": "English", "AU": "English"
     };
 
-    // Strings de la UI
     const UI_TEXT = {
-        en: { select: "Select Region", allS: "All Seasons", news: "New Episodes", loading: "Loading...", more: "more..." },
-        es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "Nuevos Episodios", loading: "Cargando...", more: "más..." }
+        en: { select: "Select Region", allS: "All Seasons", news: "NEW!", loading: "Loading...", synop: "📖 View Synopsis", audio: "Audio", sub: "Subs" },
+        es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", loading: "Cargando...", synop: "📖 Ver Sinopsis", audio: "Audio", sub: "Subt." }
     };
 
-    // Ajustes Visuales
+    // NOMBRES Y BANDERAS (ARREGLADAS)
     const CUSTOM_NAMES = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "Estados Unidos" };
     
-    // BANDERAS (PNG estables)
     const CUSTOM_FLAGS = {
-        // Tierra del Fuego para Malvinas
-        "FK": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Flag_of_Tierra_del_Fuego_province_in_Argentina.svg/320px-Flag_of_Tierra_del_Fuego_province_in_Argentina.svg.png",
-        // Cruz de Borgoña para Gibraltar
-        "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Flag_of_Cross_of_Burgundy.svg/320px-Flag_of_Cross_of_Burgundy.svg.png"
+        // Tierra del Fuego (AR-V) desde FlagCDN, carga rapidísimo y es la correcta para Malvinas Argentinas
+        "FK": "https://flagcdn.com/w40/ar-v.png", 
+        // Cruz de Borgoña desde Wikimedia (Enlace directo miniatura)
+        "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Flag_of_Cross_of_Burgundy.svg/60px-Flag_of_Cross_of_Burgundy.svg.png"
     };
 
-    // --- VARIABLES GLOBALES ---
+    // GLOBALES
     let db = null;
     let selectedCountry = null;
     let uiLang = 'en';
 
-    // --- INICIO ---
+    // === INICIO ===
     async function init() {
-        // Detectar idioma navegador
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang.startsWith('es')) uiLang = 'es';
         applyTexts();
 
         try {
             const res = await fetch('database.json?v=' + Date.now());
-            if(!res.ok) throw new Error("DB not found");
+            if(!res.ok) throw new Error("DB Error");
             db = await res.json();
-            document.getElementById('ui-loading').innerText = db.meta.updated;
+            document.getElementById('ui-loading').innerText = `UPDATED: ${db.meta.updated}`;
             
             buildDropdown();
             checkURL();
         } catch (e) {
-            document.getElementById('ui-loading').innerHTML = "<span style='color:#ff4757'>Error loading data</span>";
-            console.error(e);
+            document.getElementById('ui-loading').innerText = "ERROR LOADING DATA";
         }
     }
 
     function applyTexts() {
         const t = UI_TEXT[uiLang];
         document.getElementById('select-label').innerHTML = `<span style="font-size:1.2rem; margin-right:10px">🌍</span> ${t.select}`;
-        document.getElementById('news-title').innerText = t.news;
-        const sOpt = document.querySelector('#season-select option[value="all"]');
-        if(sOpt) sOpt.innerText = t.allS;
+        document.querySelector('#season-select option[value="all"]').innerText = t.allS;
     }
 
-    // --- CONTROL DE URL Y ESTADO ---
-    function checkURL() {
-        const params = new URLSearchParams(window.location.search);
-        const c = params.get('c');
-        const s = params.get('s');
-
-        if (c && db.regions[c]) {
-            setCountry(c, false); // No updates history yet to avoid loop
-            if (s) {
-                const sel = document.getElementById('season-select');
-                sel.value = s;
-                renderEpisodes(); // Render manual
-            }
-        }
-    }
-
-    function updateURL(c, s) {
-        const url = `?c=${c}&s=${s}`;
-        window.history.replaceState(null, '', url);
-    }
-
-    // --- DROPDOWN CUSTOM ---
+    // === CONTROLES ===
     function buildDropdown() {
         const list = document.getElementById('options-list');
         const sortedCodes = Object.keys(db.regions).sort((a,b) => getName(a).localeCompare(getName(b)));
@@ -427,14 +386,9 @@
             div.className = 'option';
             
             const img = document.createElement('img');
-            if (CUSTOM_FLAGS[code]) {
-                img.src = CUSTOM_FLAGS[code];
-                img.classList.add('custom-flag');
-            } else {
-                img.src = `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
-            }
+            // Usar Custom o FlagCDN estándar
+            img.src = CUSTOM_FLAGS[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
             
-            div.innerHTML = "";
             div.appendChild(img);
             div.appendChild(document.createTextNode(getName(code)));
             
@@ -450,20 +404,15 @@
         if(e) e.stopPropagation();
         document.getElementById('country-dropdown').classList.toggle('active');
     }
-    
     window.onclick = () => document.getElementById('country-dropdown').classList.remove('active');
 
-    // --- LÓGICA DE SELECCIÓN ---
     function setCountry(code, updateHistory) {
         selectedCountry = code;
-        
-        // Actualizar botón visual
         const label = document.getElementById('select-label');
-        const flagSrc = CUSTOM_FLAGS[code] || `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
-        const flagClass = CUSTOM_FLAGS[code] ? 'custom-flag' : '';
-        label.innerHTML = `<img src="${flagSrc}" class="${flagClass}" style="width:24px; margin-right:10px; border-radius:3px"> ${getName(code)}`;
+        const flagSrc = CUSTOM_FLAGS[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+        
+        label.innerHTML = `<img src="${flagSrc}" style="width:28px; margin-right:10px; border-radius:3px"> ${getName(code)}`;
 
-        // Llenar temporadas
         const sSelect = document.getElementById('season-select');
         sSelect.innerHTML = `<option value="all">${UI_TEXT[uiLang].allS}</option>`;
         sSelect.disabled = false;
@@ -471,11 +420,8 @@
         db.regions[code].seasons.forEach(s => {
             sSelect.innerHTML += `<option value="${s.id}">Temporada ${s.id}</option>`;
         });
-        sSelect.value = 'all'; // Reset a todas
-
-        if(updateHistory) updateURL(code, 'all');
         
-        renderNews(code);
+        if(updateHistory) updateURL(code, 'all');
         renderEpisodes();
     }
 
@@ -486,32 +432,7 @@
         renderEpisodes();
     }
 
-    // --- RENDERIZADO ---
-    function renderNews(code) {
-        const box = document.getElementById('news-banner');
-        const grid = document.getElementById('news-grid');
-        const items = db.regions[code].news || [];
-
-        // Filtramos items validos (que no sean marker date)
-        const validNews = items.filter(i => i.d !== HIDDEN_DATE_MARKER);
-
-        if (validNews.length === 0) {
-            box.style.display = 'none';
-            return;
-        }
-
-        grid.innerHTML = '';
-        validNews.slice(0, 6).forEach(n => {
-            grid.innerHTML += `
-                <div class="news-card">
-                    <strong>${formatDate(n.d)}</strong>
-                    ${n.e} - ${n.t}
-                </div>
-            `;
-        });
-        box.style.display = 'block';
-    }
-
+    // === RENDERIZADO EPISODIOS ===
     function renderEpisodes() {
         const container = document.getElementById('main-container');
         container.innerHTML = '';
@@ -520,7 +441,6 @@
         db.regions[selectedCountry].seasons.forEach(season => {
             if (sVal !== 'all' && season.id != sVal) return;
 
-            // Header Temporada
             const h = document.createElement('div');
             h.className = 'season-divider';
             h.innerText = `Temporada ${season.id}`;
@@ -530,71 +450,77 @@
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
                 const isNew = checkNew(dateVal);
 
-                // --- LOGICA DE AUDIO AVANZADA ---
+                // AUDIO LOGIC
                 const targetAudio = AUDIO_PRIORITY[selectedCountry] || "English";
                 let audios = [...ep.a];
                 let primary = null;
                 let others = [];
 
-                // Buscar coincidencias (Exacta o Parcial)
-                // Ej: Buscar "Español (Latinoamericano)" en la lista ["English", "Español (Latinoamericano)"]
-                const idx = audios.findIndex(a => a === targetAudio || a.includes(targetAudio));
-                
+                const idx = audios.findIndex(a => a.includes(targetAudio));
                 if (idx !== -1) {
                     primary = audios[idx];
-                    audios.splice(idx, 1); // Quitarlo de la lista
+                    audios.splice(idx, 1);
                     others = audios;
-                } else {
-                    // Si no encuentra el prioritario, usa el primero que haya
-                    if(audios.length > 0) {
-                        primary = audios[0];
-                        others = audios.slice(1);
-                    }
+                } else if(audios.length > 0) {
+                    primary = audios[0];
+                    others = audios.slice(1);
                 }
 
                 // Generar HTML Audio
                 let audioHTML = '';
                 if(primary) {
-                    audioHTML = `<div class="tag-pill"><span class="tag-icon">🔊</span> ${primary}`;
-                    if(others.length > 0) {
-                        const uid = `aud-${season.id}-${ep.n}`;
-                        audioHTML += `
-                            <span id="${uid}" class="hidden-content">, ${others.join(', ')}</span>
-                            <span class="more-audios-btn" onclick="document.getElementById('${uid}').classList.toggle('show'); this.style.display='none'">
-                                +${others.length} ${UI_TEXT[uiLang].more}
-                            </span>
-                        `;
-                    }
-                    audioHTML += `</div>`;
+                    audioHTML += `<div class="tag primary-audio"><span class="tag-icon">🔊</span> ${primary}</div>`;
+                }
+                if(others.length > 0) {
+                    const uid = `aud-${season.id}-${ep.n}`;
+                    audioHTML += `
+                        <div id="${uid}" class="hidden-tags">
+                            ${others.map(a => `<div class="tag">${a}</div>`).join('')}
+                        </div>
+                        <div class="more-btn" onclick="document.getElementById('${uid}').classList.toggle('show'); this.remove()">+${others.length} más...</div>
+                    `;
                 }
 
                 // Subs
                 let subHTML = '';
                 if(ep.s.length > 0) {
-                    // Mostrar solo 3 subs max, resto oculto si son muchos
-                    const subNames = ep.s.map(x => x.l);
-                    const subDisplay = subNames.slice(0, 3).join(', ');
-                    const extra = subNames.length > 3 ? ` (+${subNames.length - 3})` : '';
-                    subHTML = `<div class="tag-pill"><span class="tag-icon">📝</span> ${subDisplay}${extra}</div>`;
+                   const count = ep.s.length;
+                   subHTML = `<div class="tag"><span class="tag-icon">📝</span> ${count} ${UI_TEXT[uiLang].sub}</div>`;
                 }
 
-                // Card HTML
+                // Fecha Localizada (Sistema)
+                let dateDisplay = "";
+                if (dateVal) {
+                    // Crea fecha UTC para evitar desfasaje horario
+                    const d = new Date(dateVal + "T00:00:00");
+                    dateDisplay = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+
+                const badge = isNew ? `<span class="new-badge">${UI_TEXT[uiLang].news}</span>` : '';
+
                 const card = document.createElement('div');
                 card.className = `ep-card ${isNew ? 'is-new' : ''}`;
                 
-                const badge = isNew ? `<span class="new-badge">${UI_TEXT[uiLang].news}</span>` : '';
-                const dateDisplay = dateVal ? `<span class="date-display">📅 ${formatDate(dateVal)}</span>` : '';
-
                 card.innerHTML = `
                     <div class="ep-header">
-                        <div class="ep-title"><span class="ep-num">#${ep.n}</span> ${ep.t}</div>
+                        <div>
+                            <span class="ep-num">S${season.id} E${ep.n}</span>
+                            <div class="ep-title">${ep.t}</div>
+                        </div>
                         <div class="ep-meta">
                             ${badge}
-                            ${dateDisplay}
+                            <div class="date-display">${dateDisplay}</div>
                         </div>
                     </div>
-                    <div class="ep-desc">${ep.ds || ""}</div>
-                    <div class="tags-row">
+                    
+                    <div class="synopsis-container">
+                        <details class="mobile-synopsis" open>
+                            <summary>${UI_TEXT[uiLang].synop}</summary>
+                            <div class="ep-desc">${ep.ds || "Sin descripción."}</div>
+                        </details>
+                    </div>
+
+                    <div class="tags-container">
                         ${audioHTML}
                         ${subHTML}
                     </div>
@@ -604,10 +530,20 @@
         });
     }
 
-    // --- UTILES ---
-    function getName(code) { return CUSTOM_NAMES[code] || new Intl.DisplayNames([uiLang], {type:'region'}).of(code); }
-    function formatDate(d) { if(!d) return ""; const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
-    function checkNew(d) { if(!d) return false; const diff = (new Date() - new Date(d))/(1000*3600*24); return diff <= 90; }
+    // UTILS
+    function checkURL() {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('c') && db.regions[p.get('c')]) {
+            setCountry(p.get('c'), false);
+            if(p.get('s')) {
+                document.getElementById('season-select').value = p.get('s');
+                renderEpisodes();
+            }
+        }
+    }
+    function updateURL(c, s) { window.history.replaceState(null, '', `?c=${c}&s=${s}`); }
+    function getName(c) { return CUSTOM_NAMES[c] || new Intl.DisplayNames([uiLang], {type:'region'}).of(c); }
+    function checkNew(d) { if(!d) return false; return (new Date() - new Date(d))/(1000*3600*24) <= 90; }
 
     init();
 
