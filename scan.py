@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 SERIES_ID = "1CjTiHEJbLRC"
 
 # --- LISTA DE REGIONES DEFINITIVA ---
-# Excluye: Hotstar SEA, MENA, África Continental e Israel.
-# Incluye: Territorios de Ultramar, Microestados y Regiones Especiales.
+# Basada en el archivo de configuración 'countriesConfig' de Disney+
+# Incluye: Territorios de Ultramar y Microestados.
 
 REGIONS = [
     # --- LATINOAMÉRICA (Idioma Base: es-419) ---
@@ -23,7 +23,6 @@ REGIONS = [
     {"c":"FK", "l":"es-419"}, # Islas Malvinas
 
     # --- TERRITORIOS AUSTRALES (Forzados a LATAM) ---
-    # Nota: GS es territorio británico, pero solicitaste audio/títulos en Latino.
     {"c":"GS", "l":"es-419"}, # Islas Georgias del Sur y Sandwich del Sur
 
     # --- NORTEAMÉRICA Y CARIBE ---
@@ -45,23 +44,22 @@ REGIONS = [
     {"c":"UM", "l":"en-US"}, # Islas menores alejadas de EE. UU.
 
     # --- EUROPA (Oeste, Este, Balcanes y Nórdicos) ---
-    # Nota: ES, AD y GI pueden reportar audios "Latino" por error en origen.
     {"c":"ES", "l":"es-ES"}, {"c":"FR", "l":"fr-FR"}, {"c":"DE", "l":"de-DE"},
     {"c":"IT", "l":"it-IT"}, {"c":"GB", "l":"en-GB"}, {"c":"PT", "l":"pt-PT"},
     {"c":"NL", "l":"nl-NL"}, {"c":"BE", "l":"fr-BE"}, {"c":"CH", "l":"de-CH"},
     {"c":"AT", "l":"de-AT"}, {"c":"IE", "l":"en-GB"}, {"c":"SE", "l":"sv-SE"},
-    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FL"},
+    {"c":"NO", "l":"no-NO"}, {"c":"DK", "l":"da-DK"}, {"c":"FI", "l":"fi-FI"}, 
     {"c":"IS", "l":"en-GB"}, {"c":"LU", "l":"fr-FR"}, {"c":"MC", "l":"fr-FR"},
     {"c":"LI", "l":"de-DE"}, {"c":"MT", "l":"en-GB"}, {"c":"AD", "l":"es-ES"},
     {"c":"SM", "l":"it-IT"}, {"c":"VA", "l":"it-IT"}, {"c":"GI", "l":"es-ES"},
     {"c":"IM", "l":"en-GB"}, {"c":"GG", "l":"en-GB"}, {"c":"JE", "l":"en-GB"},
     
     # Regiones Nórdicas Especiales
-    {"c":"AX", "l":"sv-SE"}, # Åland (Confirmado)
+    {"c":"AX", "l":"sv-SE"}, # Åland
     {"c":"FO", "l":"da-DK"}, # Islas Feroe
     {"c":"GL", "l":"da-DK"}, # Groenlandia
     {"c":"SJ", "l":"no-NO"}, # Svalbard y Jan Mayen
-    {"c":"BV", "l":"no-NO"}, # Isla Bouvet (Dependencia Noruega)
+    {"c":"BV", "l":"no-NO"}, # Isla Bouvet
 
     # Europa del Este y Balcanes
     {"c":"PL", "l":"pl-PL"}, {"c":"CZ", "l":"cs-CZ"}, {"c":"SK", "l":"sk-SK"}, 
@@ -74,7 +72,6 @@ REGIONS = [
 
     # --- ASIA / PACÍFICO / OCEANÍA ---
     {"c":"JP", "l":"ja-JP"}, {"c":"KR", "l":"ko-KR"}, 
-    # Nota: TW a menudo carece de metadata traducida
     {"c":"TW", "l":"zh-TW"}, {"c":"HK", "l":"zh-HK"}, 
     {"c":"SG", "l":"en-SG"}, {"c":"AU", "l":"en-AU"},
     {"c":"NZ", "l":"en-NZ"}, 
@@ -84,10 +81,8 @@ REGIONS = [
     {"c":"GU", "l":"en-US"}, {"c":"MP", "l":"en-US"}, {"c":"AS", "l":"en-US"}, 
     {"c":"RE", "l":"fr-FR"}, {"c":"YT", "l":"fr-FR"}, {"c":"MU", "l":"en-GB"},
     
-    # Asociados a Nueva Zelanda (Posibles)
-    {"c":"CK", "l":"en-NZ"}, # Islas Cook
-    {"c":"NU", "l":"en-NZ"}, # Niue
-    {"c":"TK", "l":"en-NZ"}, # Tokelau
+    # Asociados a Nueva Zelanda
+    {"c":"CK", "l":"en-NZ"}, {"c":"NU", "l":"en-NZ"}, {"c":"TK", "l":"en-NZ"},
 
     # Territorios Británicos de Ultramar
     {"c":"PN", "l":"en-GB"}, {"c":"SH", "l":"en-GB"}, {"c":"IO", "l":"en-GB"}, 
@@ -97,7 +92,7 @@ REGIONS = [
 
     # Territorios Externos de Australia
     {"c":"CC", "l":"en-AU"}, {"c":"CX", "l":"en-AU"}, 
-    {"c":"NF", "l":"en-AU"}, {"c":"HM", "l":"en-AU"}  
+    {"c":"NF", "l":"en-AU"}, {"c":"HM", "l":"en-AU"}
 ]
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
@@ -149,7 +144,7 @@ def get_data():
     OLD_DB = load_previous_db()
     new_database = { "meta": { "updated": datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC") }, "regions": {} }
     
-    log(f"🌍 INICIANDO ESCANEO GLOBAL...")
+    log(f"🌍 INICIANDO ESCANEO GLOBAL (Total: {len(REGIONS)} regiones)...")
     today_obj = datetime.utcnow()
     today_str = today_obj.strftime("%Y-%m-%d")
     IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
