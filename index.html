@@ -10,13 +10,12 @@
         :root {
             --bg-body: #1a1d29;
             --bg-header: #0f1014;
-            --bg-card: #2c3040; /* Color base tarjeta */
+            --bg-card: #2c3040;
             --bg-card-hover: #373b4d;
-            --accent-brand: #0072d2; /* Azul Disney */
-            --accent-new: #4cd137; /* Verde Nuevo */
+            --accent-brand: #0072d2;
+            --accent-new: #4cd137;
             --text-main: #f9f9f9;
             --text-muted: #cacaca;
-            --tag-bg: rgba(255, 255, 255, 0.1);
             --radius: 8px;
         }
 
@@ -30,61 +29,55 @@
             min-height: 100vh;
         }
 
-        /* HEADER & LOGO */
+        /* HEADER */
         header {
             text-align: center;
-            padding: 30px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 25px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
         }
 
-        .logo-container {
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
         .logo-main {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            background: linear-gradient(90deg, #fff 0%, #ccc 50%, #fff 100%);
+            background: linear-gradient(90deg, #fff 0%, #a0a0a0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: block;
-            line-height: 1;
         }
         
         .logo-sub {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--accent-brand);
             font-weight: 700;
-            letter-spacing: 4px;
-            margin-top: 5px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 4px;
             display: block;
         }
 
-        .last-update { font-size: 0.7rem; color: #666; margin-top: 10px; font-weight: 500;}
+        .last-update { font-size: 0.7rem; color: #666; margin-top: 8px; font-weight: 500;}
 
         /* --- CONTROLES --- */
         .controls-wrapper {
             max-width: 800px;
-            margin: 20px auto;
+            margin: 15px auto;
             padding: 0 15px;
             display: flex;
-            gap: 15px;
-            flex-direction: row;
+            gap: 12px;
         }
 
-        /* Dropdown Personalizado */
+        /* Dropdown Custom */
         .custom-select-container { position: relative; flex: 2; }
         
         .select-btn {
             background: #3a3d4a;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             color: white;
             padding: 12px 15px;
             border-radius: var(--radius);
@@ -92,19 +85,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: 0.2s;
             font-weight: 500;
+            transition: 0.2s;
         }
-        .select-btn:hover { background: #4a4d5a; border-color: white; }
-        .select-btn img { margin-right: 12px; width: 28px; height: auto; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .select-btn:active { background: #4a4d5a; }
         
         .options-list {
             position: absolute;
-            top: 110%; left: 0; right: 0;
+            top: 105%; left: 0; right: 0;
             background: #1e212b;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: var(--radius);
-            max-height: 400px;
+            max-height: 60vh; /* Mejor altura en móviles */
             overflow-y: auto;
             display: none;
             z-index: 200;
@@ -118,16 +110,14 @@
             display: flex;
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: background 0.2s;
         }
         .option:hover { background: var(--accent-brand); }
-        .option img { width: 28px; margin-right: 12px; border-radius: 3px; }
+        .option img, .select-btn img { width: 28px; margin-right: 12px; border-radius: 3px; object-fit: contain; }
 
-        /* Selector Temporada */
         .std-select {
             flex: 1;
             background: #3a3d4a;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             color: white;
             padding: 12px;
             border-radius: var(--radius);
@@ -135,166 +125,167 @@
             cursor: pointer;
         }
 
-        /* --- CONTENEDOR EPISODIOS --- */
-        #main-container { max-width: 800px; margin: 0 auto; padding: 0 15px 60px; }
+        /* --- EPISODIOS --- */
+        #main-container { max-width: 800px; margin: 0 auto; padding: 0 15px 80px; }
 
         .season-divider {
-            margin: 40px 0 20px;
-            font-size: 1.2rem;
+            margin: 35px 0 15px;
+            font-size: 1.1rem;
             font-weight: 800;
             color: var(--text-main);
-            border-left: 5px solid var(--accent-brand);
-            padding-left: 15px;
+            border-left: 4px solid var(--accent-brand);
+            padding-left: 12px;
             text-transform: uppercase;
         }
 
         .ep-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s;
+            padding: 18px;
+            margin-bottom: 12px;
             border: 1px solid transparent;
+            transition: 0.2s;
         }
-        .ep-card:hover { transform: scale(1.01); background: var(--bg-card-hover); z-index: 10; border-color: rgba(255,255,255,0.1); }
-
-        /* Estilo NUEVO */
+        
+        /* Nuevo */
         .ep-card.is-new {
-            background: linear-gradient(90deg, rgba(76, 209, 55, 0.1), var(--bg-card) 60%);
-            border-left: 4px solid var(--accent-new);
+            background: linear-gradient(90deg, rgba(76, 209, 55, 0.08), var(--bg-card) 70%);
+            border-left: 3px solid var(--accent-new);
         }
 
+        /* HEADER DEL EPISODIO */
         .ep-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .ep-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: #fff; }
-        .ep-num { color: #888; font-weight: 500; font-size: 0.9em; display: block; margin-bottom: 4px; }
-        
+        .ep-info { flex: 1; }
+        .ep-num { display: block; font-size: 0.8rem; color: #888; font-weight: 600; margin-bottom: 2px; }
+        .ep-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: #fff; }
+
         .ep-meta {
             text-align: right;
-            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 100px;
         }
 
-        .date-display { font-size: 0.8rem; color: #bbb; font-weight: 500; }
+        .date-display { font-size: 0.8rem; color: #bbb; font-weight: 500; white-space: nowrap; }
         
         .new-badge {
             background: var(--accent-new);
             color: #000;
             font-size: 0.65rem;
             font-weight: 900;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             text-transform: uppercase;
+            margin-bottom: 4px;
             display: inline-block;
-            margin-bottom: 5px;
         }
 
-        /* --- SINOPSIS (Desplegable) --- */
-        .synopsis-container { margin-bottom: 15px; }
+        /* SINOPSIS */
+        details.ep-synopsis { margin-bottom: 10px; }
         
-        .ep-desc {
-            font-size: 0.95rem;
-            color: #ccc;
-            line-height: 1.6;
-        }
-
-        /* En móvil usamos <details> */
-        details.mobile-synopsis summary {
+        details.ep-synopsis summary {
             list-style: none;
             cursor: pointer;
             color: var(--accent-brand);
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            padding: 10px 0;
             user-select: none;
+            padding: 5px 0;
+            outline: none;
         }
-        details.mobile-synopsis summary::-webkit-details-marker { display: none; }
-        details.mobile-synopsis summary::after { content: " ▼"; font-size: 0.8em; }
-        details.mobile-synopsis[open] summary::after { content: " ▲"; }
-        
-        /* --- AUDIOS (Mejorado) --- */
+        details.ep-synopsis summary::-webkit-details-marker { display: none; }
+        details.ep-synopsis summary::after { content: " ▼"; font-size: 0.8em; }
+        details.ep-synopsis[open] summary::after { content: " ▲"; }
+
+        .ep-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        /* AUDIOS */
         .tags-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            padding-top: 15px;
+            gap: 6px;
+            padding-top: 12px;
             border-top: 1px solid rgba(255,255,255,0.08);
-            align-items: center;
         }
 
         .tag {
-            background: var(--tag-bg);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            background: rgba(255,255,255,0.08);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #ddd;
             display: inline-flex;
             align-items: center;
-            color: #ddd;
-            white-space: nowrap;
         }
 
-        /* Audio Principal Destacado */
-        .tag.primary-audio {
-            background: rgba(0, 114, 210, 0.3); /* Azul transparente */
-            border: 1px solid var(--accent-brand);
+        .tag.primary {
+            background: rgba(0, 114, 210, 0.25);
+            border: 1px solid rgba(0, 114, 210, 0.5);
             color: white;
             font-weight: 600;
         }
 
-        .tag-icon { opacity: 0.7; margin-right: 6px; }
-
-        .more-btn {
-            color: #bbb;
+        .more-trigger {
+            color: #aaa;
+            font-size: 0.75rem;
             cursor: pointer;
-            font-size: 0.8rem;
             text-decoration: underline;
-            padding: 5px;
-        }
-        .more-btn:hover { color: white; }
-
-        .hidden-tags { display: none; }
-        .hidden-tags.show { display: contents; } /* Display contents para que se integren al flex */
-
-
-        /* --- RESPONSIVE (MÓVIL) --- */
-        @media (min-width: 769px) {
-            /* PC: Sinopsis siempre visible, <details> abierto y sin click */
-            details.mobile-synopsis { pointer-events: none; }
-            details.mobile-synopsis summary { display: none; } /* Ocultar botón */
-            details.mobile-synopsis[open] .ep-desc { display: block; }
+            padding: 4px;
         }
 
+        .hidden-group { display: none; }
+        .hidden-group.show { display: contents; }
+
+        /* --- RESPONSIVE MOBILE --- */
         @media (max-width: 768px) {
-            /* MÓVIL */
             .controls-wrapper { flex-direction: column; }
             
-            .ep-header { flex-direction: column; } /* Título arriba */
-            
-            .ep-meta { 
-                margin-top: 5px; 
-                width: 100%;
-                text-align: left; /* Fecha a la izquierda */
-                display: flex;
-                align-items: center;
-                gap: 10px;
+            .ep-header {
+                flex-direction: column; /* Apilar verticalmente */
+                gap: 5px;
             }
+
+            .ep-meta {
+                width: 100%;
+                flex-direction: row; /* En móvil, poner badge y fecha en línea */
+                align-items: center;
+                justify-content: flex-start; /* Alinear a la izquierda */
+                text-align: left;
+                margin-top: 4px;
+            }
+
+            .new-badge { margin-bottom: 0; margin-right: 8px; }
+        }
+
+        /* --- PC DESKTOP (Sinopsis siempre abierta) --- */
+        @media (min-width: 769px) {
+            /* Ocultar el botón de resumen */
+            details.ep-synopsis summary { display: none; }
+            /* Mostrar siempre el contenido */
+            details.ep-synopsis .ep-desc { display: block; }
+            /* Desactivar interacción */
+            details.ep-synopsis { pointer-events: none; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container">
-        <span class="logo-main">MIRACULOUS</span>
-        <span class="logo-sub">DISNEY+ TRACKER</span>
-    </div>
+    <span class="logo-main">MIRACULOUS</span>
+    <span class="logo-sub">DISNEY+ TRACKER</span>
     <div class="last-update" id="ui-loading">Conectando...</div>
 </header>
 
@@ -317,41 +308,37 @@
 <div id="main-container"></div>
 
 <script>
-    // === CONFIGURACIÓN ===
+    // === CONFIG ===
     const HIDDEN_DATE_MARKER = "2000-01-01";
     
-    // PRIORIDAD DE AUDIO
+    // Matriz de Audio
     const AUDIO_PRIORITY = {
         "AR": "Español (Latinoamericano)", "MX": "Español (Latinoamericano)", "CL": "Español (Latinoamericano)",
         "CO": "Español (Latinoamericano)", "PE": "Español (Latinoamericano)", "VE": "Español (Latinoamericano)",
-        "ES": "Español", // A veces llega como Español solo
-        "FR": "Français", "BE": "Français", "CH": "Français", 
-        "DE": "Deutsch", "AT": "Deutsch",
-        "IT": "Italiano", "PT": "Português", "BR": "Português",
+        "ES": "Español", "FR": "Français", "BE": "Français", "CH": "Français", 
+        "DE": "Deutsch", "AT": "Deutsch", "IT": "Italiano", "PT": "Português", "BR": "Português",
         "US": "English", "GB": "English", "CA": "English", "AU": "English"
     };
 
     const UI_TEXT = {
-        en: { select: "Select Region", allS: "All Seasons", news: "NEW!", loading: "Loading...", synop: "📖 View Synopsis", audio: "Audio", sub: "Subs" },
-        es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", loading: "Cargando...", synop: "📖 Ver Sinopsis", audio: "Audio", sub: "Subt." }
+        en: { select: "Select Region", allS: "All Seasons", news: "NEW!", synop: "📖 Show Synopsis", sub: "Subs" },
+        es: { select: "Selecciona Región", allS: "Todas las Temporadas", news: "¡NUEVO!", synop: "📖 Ver Sinopsis", sub: "Subt." }
     };
 
-    // NOMBRES Y BANDERAS (ARREGLADAS)
     const CUSTOM_NAMES = { "GB": "Reino Unido", "FK": "Islas Malvinas (Arg.)", "US": "Estados Unidos" };
     
+    // BANDERAS ROBUSTAS (Wikimedia Commons Thumbnails directos)
     const CUSTOM_FLAGS = {
-        // Tierra del Fuego (AR-V) desde FlagCDN, carga rapidísimo y es la correcta para Malvinas Argentinas
-        "FK": "https://flagcdn.com/w40/ar-v.png", 
-        // Cruz de Borgoña desde Wikimedia (Enlace directo miniatura)
-        "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Flag_of_Cross_of_Burgundy.svg/60px-Flag_of_Cross_of_Burgundy.svg.png"
+        "FK": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Flag_of_Tierra_del_Fuego_province_in_Argentina.svg/120px-Flag_of_Tierra_del_Fuego_province_in_Argentina.svg.png",
+        "GI": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Flag_of_Cross_of_Burgundy.svg/120px-Flag_of_Cross_of_Burgundy.svg.png"
     };
 
-    // GLOBALES
     let db = null;
     let selectedCountry = null;
     let uiLang = 'en';
+    const isMobile = window.innerWidth <= 768;
 
-    // === INICIO ===
+    // === INIT ===
     async function init() {
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang.startsWith('es')) uiLang = 'es';
@@ -362,11 +349,10 @@
             if(!res.ok) throw new Error("DB Error");
             db = await res.json();
             document.getElementById('ui-loading').innerText = `UPDATED: ${db.meta.updated}`;
-            
             buildDropdown();
             checkURL();
         } catch (e) {
-            document.getElementById('ui-loading').innerText = "ERROR LOADING DATA";
+            document.getElementById('ui-loading').innerText = "ERROR DATA";
         }
     }
 
@@ -384,18 +370,11 @@
         sortedCodes.forEach(code => {
             const div = document.createElement('div');
             div.className = 'option';
-            
             const img = document.createElement('img');
-            // Usar Custom o FlagCDN estándar
             img.src = CUSTOM_FLAGS[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
-            
             div.appendChild(img);
             div.appendChild(document.createTextNode(getName(code)));
-            
-            div.onclick = () => {
-                setCountry(code, true);
-                toggleDropdown();
-            };
+            div.onclick = () => { setCountry(code, true); toggleDropdown(); };
             list.appendChild(div);
         });
     }
@@ -410,16 +389,12 @@
         selectedCountry = code;
         const label = document.getElementById('select-label');
         const flagSrc = CUSTOM_FLAGS[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
-        
         label.innerHTML = `<img src="${flagSrc}" style="width:28px; margin-right:10px; border-radius:3px"> ${getName(code)}`;
 
         const sSelect = document.getElementById('season-select');
         sSelect.innerHTML = `<option value="all">${UI_TEXT[uiLang].allS}</option>`;
         sSelect.disabled = false;
-        
-        db.regions[code].seasons.forEach(s => {
-            sSelect.innerHTML += `<option value="${s.id}">Temporada ${s.id}</option>`;
-        });
+        db.regions[code].seasons.forEach(s => sSelect.innerHTML += `<option value="${s.id}">Temporada ${s.id}</option>`);
         
         if(updateHistory) updateURL(code, 'all');
         renderEpisodes();
@@ -427,12 +402,11 @@
 
     function changeSeason() {
         if (!selectedCountry) return;
-        const sVal = document.getElementById('season-select').value;
-        updateURL(selectedCountry, sVal);
+        updateURL(selectedCountry, document.getElementById('season-select').value);
         renderEpisodes();
     }
 
-    // === RENDERIZADO EPISODIOS ===
+    // === RENDER ===
     function renderEpisodes() {
         const container = document.getElementById('main-container');
         container.innerHTML = '';
@@ -450,79 +424,63 @@
                 const dateVal = (ep.dt === HIDDEN_DATE_MARKER) ? '' : ep.dt;
                 const isNew = checkNew(dateVal);
 
-                // AUDIO LOGIC
+                // AUDIO
                 const targetAudio = AUDIO_PRIORITY[selectedCountry] || "English";
                 let audios = [...ep.a];
-                let primary = null;
-                let others = [];
-
+                let primary = null, others = [];
+                
                 const idx = audios.findIndex(a => a.includes(targetAudio));
-                if (idx !== -1) {
-                    primary = audios[idx];
-                    audios.splice(idx, 1);
-                    others = audios;
-                } else if(audios.length > 0) {
-                    primary = audios[0];
-                    others = audios.slice(1);
-                }
+                if (idx !== -1) { primary = audios[idx]; audios.splice(idx, 1); others = audios; }
+                else if(audios.length) { primary = audios[0]; others = audios.slice(1); }
 
-                // Generar HTML Audio
                 let audioHTML = '';
-                if(primary) {
-                    audioHTML += `<div class="tag primary-audio"><span class="tag-icon">🔊</span> ${primary}</div>`;
-                }
-                if(others.length > 0) {
+                if(primary) audioHTML += `<div class="tag primary">🔊 ${primary}</div>`;
+                if(others.length) {
                     const uid = `aud-${season.id}-${ep.n}`;
-                    audioHTML += `
-                        <div id="${uid}" class="hidden-tags">
-                            ${others.map(a => `<div class="tag">${a}</div>`).join('')}
-                        </div>
-                        <div class="more-btn" onclick="document.getElementById('${uid}').classList.toggle('show'); this.remove()">+${others.length} más...</div>
-                    `;
+                    audioHTML += `<div id="${uid}" class="hidden-group">${others.map(a => `<div class="tag">${a}</div>`).join('')}</div>
+                                  <div class="more-trigger" onclick="document.getElementById('${uid}').classList.toggle('show'); this.remove()">+${others.length} más...</div>`;
                 }
 
-                // Subs
-                let subHTML = '';
-                if(ep.s.length > 0) {
-                   const count = ep.s.length;
-                   subHTML = `<div class="tag"><span class="tag-icon">📝</span> ${count} ${UI_TEXT[uiLang].sub}</div>`;
-                }
-
-                // Fecha Localizada (Sistema)
+                // FECHA: Numérica en Inglés, Localizada en Español
                 let dateDisplay = "";
                 if (dateVal) {
-                    // Crea fecha UTC para evitar desfasaje horario
                     const d = new Date(dateVal + "T00:00:00");
-                    dateDisplay = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                    if (uiLang === 'en') {
+                        // Numérica para inglés (ej: 12/03/2025)
+                        dateDisplay = d.toLocaleDateString('en-GB'); 
+                    } else {
+                        // Texto para español (ej: 3 de diciembre)
+                        dateDisplay = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                    }
                 }
 
-                const badge = isNew ? `<span class="new-badge">${UI_TEXT[uiLang].news}</span>` : '';
+                // SINOPSIS: Abierta en PC (por CSS), Cerrada en Móvil (por defecto)
+                // Usamos attribute 'open' solo si es PC para asegurar, aunque CSS lo maneja.
+                // Para móvil: <details> sin 'open'.
+                const synopsisHTML = `
+                    <details class="ep-synopsis" ${!isMobile ? 'open' : ''}>
+                        <summary>${UI_TEXT[uiLang].synop}</summary>
+                        <div class="ep-desc">${ep.ds || ""}</div>
+                    </details>
+                `;
 
                 const card = document.createElement('div');
                 card.className = `ep-card ${isNew ? 'is-new' : ''}`;
-                
                 card.innerHTML = `
                     <div class="ep-header">
-                        <div>
+                        <div class="ep-info">
                             <span class="ep-num">S${season.id} E${ep.n}</span>
                             <div class="ep-title">${ep.t}</div>
                         </div>
                         <div class="ep-meta">
-                            ${badge}
+                            ${isNew ? `<span class="new-badge">${UI_TEXT[uiLang].news}</span>` : ''}
                             <div class="date-display">${dateDisplay}</div>
                         </div>
                     </div>
-                    
-                    <div class="synopsis-container">
-                        <details class="mobile-synopsis" open>
-                            <summary>${UI_TEXT[uiLang].synop}</summary>
-                            <div class="ep-desc">${ep.ds || "Sin descripción."}</div>
-                        </details>
-                    </div>
-
+                    ${synopsisHTML}
                     <div class="tags-container">
                         ${audioHTML}
-                        ${subHTML}
+                        ${ep.s.length ? `<div class="tag">📝 ${ep.s.length} ${UI_TEXT[uiLang].sub}</div>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
@@ -546,7 +504,6 @@
     function checkNew(d) { if(!d) return false; return (new Date() - new Date(d))/(1000*3600*24) <= 90; }
 
     init();
-
 </script>
 </body>
 </html>
