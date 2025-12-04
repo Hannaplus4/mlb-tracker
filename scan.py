@@ -59,7 +59,6 @@ REGIONS = [
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
 
-# Mapa de limpieza
 LANG_CODES = {
     "es-419": "Spanish (Latin American)", "es-ES": "Spanish (Castilian)", "es": "Spanish",
     "en": "English", "pt-BR": "Portuguese (Brazil)", "pt-PT": "Portuguese (Portugal)",
@@ -71,8 +70,9 @@ LANG_CODES = {
     "vi": "Vietnamese", "ms": "Malay", "cs": "Czech", "hu": "Hungarian", "ro": "Romanian"
 }
 
-# --- CONFIGURACIÓN DE CORRECCIÓN (FORZAR) ---
+# --- CONFIGURACIÓN DE FILTRADO ---
 FIX_TARGET_DATE = "2025-12-03"
+
 FIX_DACH_REGIONS = ["DE", "CH", "LI", "AT"] 
 FIX_TITLES = [
     "mister agreste", 
@@ -111,16 +111,15 @@ def get_data():
         "regions": {}
     }
 
-    log(f"🌍 INICIANDO ESCANEO (MODO REPARACIÓN)...")
+    log(f"🌍 INICIANDO ESCANEO MAESTRO (CREACIÓN DESDE CERO)...")
 
     today_obj = datetime.utcnow()
     today_str = today_obj.strftime("%Y-%m-%d")
 
-    # MODO REPARACIÓN ACTIVO
     IS_FIX_WINDOW = (today_obj <= FIX_EXPIRY_DATE)
 
     if IS_FIX_WINDOW:
-        log("⚠️ MODO FORZAR CORRECCIÓN: Sobrescribiendo fechas incorrectas guardadas previamente.")
+        log("🏗️ MODO INICIALIZACIÓN: Creando base limpia. Viejos = Sin fecha. Nuevos = 3 Dic.")
 
     for idx, reg in enumerate(REGIONS):
         code = reg['c']
@@ -128,7 +127,6 @@ def get_data():
         
         if idx % 10 == 0: log(f"Procesando bloque {idx+1}...")
 
-        # CARGAR MEMORIA
         memory_map = {}
         if code in OLD_DB.get("regions", {}):
             for s in OLD_DB["regions"][code].get("seasons", []):
@@ -163,27 +161,31 @@ def get_data():
                                     ep_num = ep.get('episodeSequenceNumber') or ep.get('sequenceNumber') or (i + 1)
                                     title = ep.get('text', {}).get('title', {}).get('full', {}).get('program', {}).get('default', {}).get('content', 'Sin Título')
                                     
-                                    # --- LÓGICA DE MEMORIA ESTÁNDAR ---
-                                    unique_key = f"{s_num}-{ep_num}"
-                                    stored_date = memory_map.get(unique_key)
-                                    
-                                    if stored_date:
-                                        final_date = stored_date
-                                    else:
-                                        final_date = today_str # Si es totalmente nuevo, hoy.
-                                        
-                                    # --- PARCHE DE SOBRESCRITURA (FIX) ---
-                                    # Aquí está el cambio: Se ejecuta SIEMPRE si estamos en la ventana,
-                                    # incluso si stored_date ya existe (para corregir errores previos).
                                     if IS_FIX_WINDOW:
-                                        # Regla 1: Regiones DACH -> Temp 6, Eps 1 al 7
-                                        if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
-                                            final_date = FIX_TARGET_DATE
+                                        # LÓGICA DE FILTRADO ESTRICTO
+                                        is_target = False
                                         
-                                        # Regla 2: Títulos específicos
+                                        if code in FIX_DACH_REGIONS and s_num == 6 and ep_num <= 7:
+                                            is_target = True
+                                        
                                         t_clean = title.lower() if title else ""
                                         if any(ft in t_clean for ft in FIX_TITLES):
+                                            is_target = True
+                                            
+                                        if is_target:
                                             final_date = FIX_TARGET_DATE
+                                        else:
+                                            # SI NO ES OBJETIVO: Fecha vacía para que no se vea nada
+                                            final_date = ""
+                                    
+                                    else:
+                                        # LÓGICA NORMAL (Para la semana que viene)
+                                        unique_key = f"{s_num}-{ep_num}"
+                                        stored_date = memory_map.get(unique_key)
+                                        if stored_date:
+                                            final_date = stored_date
+                                        else:
+                                            final_date = today_str
 
                                     # Extracción del resto
                                     desc = ep.get('text', {}).get('description', {}).get('medium', {}).get('program', {}).get('default', {}).get('content', '')
@@ -214,21 +216,24 @@ def get_data():
                                     clean_eps.append(ep_obj)
                                     
                                     # --- NOVEDADES ---
-                                    try:
-                                        dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
-                                        days_diff = (today_obj - dt_obj).days
-                                        if 0 <= days_diff <= 90:
-                                            region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
-                                    except: pass
+                                    # Solo calculamos si hay fecha. Si está vacía, se ignora.
+                                    if final_date:
+                                        try:
+                                            dt_obj = datetime.strptime(final_date, "%Y-%m-%d")
+                                            days_diff = (today_obj - dt_obj).days
+                                            if 0 <= days_diff <= 90:
+                                                region_data["news"].append({"e":f"T{s_num} E{ep_num}", "t":title, "d":final_date})
+                                        except: pass
 
                                 region_data["seasons"].append({"id": s_num, "eps": clean_eps})
                         except: pass
 
                     new_database["regions"][code] = region_data
+                    
                     if len(region_data["news"]) > 0:
                         log(f"   ✅ {code}: OK ({len(region_data['news'])} novedades)")
                     else:
-                        log(f"   ✅ {code}: OK")
+                        log(f"   ✅ {code}: OK (0 novedades)")
         except: pass
         time.sleep(0.1)
 
@@ -239,6 +244,6 @@ if __name__ == "__main__":
         data = get_data()
         with open("database.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
-        log("🎉 BASE DE DATOS REPARADA Y ACTUALIZADA.")
+        log("🎉 BASE DE DATOS GENERADA (MODO LIMPIO).")
     except Exception as e:
         log(f"💀 ERROR: {e}")
